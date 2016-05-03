@@ -1,0 +1,20 @@
+citHeader("To cite package 'RnBeads' in publications please use:")
+
+citEntry(entry = "Article",
+	title = "Compehensive Analysis of DNA Methylation Data with RnBeads",
+	author = personList(as.person("Yassen Assenov"),
+		as.person("Fabian Mueller"),
+		as.person("Pavlo Lutsik"),
+		as.person("Joern Walter"),
+		as.person("Thomas Lengauer"),
+		as.person("Christoph Bock")),
+	journal = "Nature Methods",
+	year = 2014L,
+	volume = 11L,
+	number = 11L,
+	pages = "1138--1140",
+	month = "nov",
+	url = "http://rnbeads.mpi-inf.mpg.de",
+	doi = "10.1038/nmeth.3115",
+	textVersion = "Yassen Assenov*, Fabian Mueller*, Pavlo Lutsik*, Joern Walter, Thomas Lengauer and Christoph Bock (2014) Comprehensive Analysis of DNA Methylation Data with RnBeads. Nature Methods, 11(11), 1138-1140."
+)

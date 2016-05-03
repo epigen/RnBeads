@@ -1,0 +1,119 @@
+Package: RnBeads
+Title: RnBeads
+Description: RnBeads facilitates comprehensive analysis of various types of DNA
+    methylation data at the genome scale.
+Authors@R: c(
+    person("Yassen", "Assenov", email = "yassen@mpi-inf.mpg.de",
+    role = c("aut")),
+    person("Pavlo", "Lutsik", email = "p.lutsik@mx.uni-saarland.de",
+    role = c("aut")),
+    person("Fabian", "Mueller", email = "rnbeads@mpi-inf.mpg.de",
+    role = c("aut", "cre")))
+Date: 2016-03-20
+Version: 1.4.0
+Suggests:
+    Category,
+    GEOquery,
+    GOstats,
+    Gviz,
+    IlluminaHumanMethylation450kmanifest,
+    RPMM,
+    RefFreeEWAS,
+    RnBeads.hg19,
+    XML,
+    annotate,
+    biomaRt,
+    foreach,
+    doParallel,
+    ggbio,
+    isva,
+    mclust,
+    mgcv,
+    minfi,
+    nlme,
+    org.Hs.eg.db,
+    org.Mm.eg.db,
+    org.Rn.eg.db,
+    quadprog,
+    rtracklayer,
+    sva,
+    wateRmelon,
+    wordcloud,
+    argparse,
+    glmnet,
+    impute
+Depends:
+    R (>= 3.0.0),
+    BiocGenerics,
+    S4Vectors (>= 0.9.25),
+    GenomicRanges,
+    MASS,
+    RColorBrewer,
+    cluster,
+    ff,
+    fields,
+    ggplot2 (>= 0.9.2),
+    gplots,
+    gridExtra,
+    limma,
+    matrixStats,
+    methods,
+    illuminaio,
+    methylumi,
+    plyr
+Imports:
+    IRanges
+License: GPL-3
+biocViews: DNAMethylation, MethylationArray, MethylSeq, Epigenetics,
+    QualityControl, Preprocessing, BatchEffect, DifferentialMethylation,
+    Sequencing, CpGIsland, TwoChannel, DataImport
+Collate:
+    'CNV.R'
+    'Report-class.R'
+    'Report-methods.R'
+    'ReportPlot-class.R'
+    'ReportPlot-methods.R'
+    'RnBDiffMeth-class.R'
+    'bigFf.R'
+    'RnBSet-class.R'
+    'RnBeadSet-class.R'
+    'RnBeadRawSet-class.R'
+    'RnBeads-package.R'
+    'RnBiseqSet-class.R'
+    'annotations.R'
+    'batch.R'
+    'batch.quality.R'
+    'bmiq.R'
+    'cellTypeAdjustment.R'
+    'clusterArchitecture.R'
+    'clusterArchitectureSGE.R'
+    'clustering.R'
+    'computeCluster.R'
+    'controlPlots.R'
+    'controlPlotsBiSeq.R'
+    'dataExport.R'
+    'dataImport.R'
+    'differentialMethylation.R'
+    'enrichment.R'
+    'filtering.R'
+    'filteringSummary.R'
+    'gender.R'
+    'greedycut.R'
+    'loading.R'
+    'logger.R'
+    'main.R'
+    'normalization.R'
+    'options.R'
+    'parallelProcessing.R'
+    'plottingUtils.R'
+    'profiles.R'
+    'qualityControl.R'
+    'readGEO.R'
+    'regionDescription.R'
+    'regionProfiles.R'
+    'subSegments.R'
+    'sva.R'
+    'utilities.R'
+    'wbcInference.R'
+    'agePrediction.R'
+RoxygenNote: 5.0.1

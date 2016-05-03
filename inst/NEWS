@@ -1,0 +1,252 @@
+RnBeads 1.3.8
+=============
+
+ * Added age prediction from 450K and bisulfite data to inference module
+
+RnBeads 1.3.7
+=============
+
+ * Subsampling for reporting and plotting methylation values distributions in filtering
+   report to reduce memory footprint.
+
+RnBeads 1.3.6
+=============
+
+ * Support for Illumina EPIC array and related bugfixes
+ * Added a section on whitelist and blacklist in the Preprocessing module
+
+RnBeads 1.3.5
+=============
+
+ * Fixes with ggplot in 450K array QC plotting
+ * Added an option 'differential.report.sites' to decrease runtime by skipping the differential site methylation section in the report
+
+RnBeads 1.3.4
+=============
+
+ * Added support for Illumina EPIC array
+
+RnBeads 1.3.3
+=============
+
+ * Added 'smooth.profile' parameter to rnb.plot.locus.profile function
+
+RnBeads 1.3.2
+=============
+
+ * Performance and memory improvements during loading, qc and preprocessing of large bisulfite-derived RnBSets
+ * Added optional arguments to meth() and covg() allowing for partial retrieval of methylation and coverage information from RnBSets. Particularly makes sense for large, disk-based datasets.
+ * Added option "disk.dump.bigff.finalizer" for setting the finalizer for temporary BigFfMat objects
+
+RnBeads 1.3.1
+=============
+
+ * Added "remove.regions" function for RnBSet class
+ * summarize.regions now summarizes for each sample individually in order to reduce memory consumption for large WGBS datasets
+ * import.skip.object.check option for keeping the memory profile low while loading huge datasets
+ * NA sites (filtering.missing.value.quantile) are now removed even if they were previously masked (filtering.low.coverage.masking)
+ * Added "nsites" method for quickly extracting the number of sites for large RnBSet objects without having to retrieve the full methylation matrix
+ * Added "hasCovg" method for quickly determining whether coverage information is present in large RnBSet objects without having to retrieve the full coverage matrix
+
+RnBeads 1.1.9
+=============
+
+ * Filtering report fix when no normalization is conducted
+ * Bugfixes for combine(RnBSet, RnBSet) and BigFf matrices
+
+RnBeads 1.1.8
+=============
+
+ * Corrected coverage statistics in sample summary table: Sites with NA methylation values are no longer considered in the coverage statistics (makes a difference if some coverage threshold is applied)
+ * Improved method for gender prediction. Predicted genders are also included in the exported annotation table
+
+RnBeads 1.1.7
+=============
+
+ * Improvements to mergeSamples function for RnBiseqSets
+ * Some more memory clean-up
+
+RnBeads 1.1.6
+=============
+
+ * Differential methylation based on region level only is now supported
+ * Minor updates to the differential methylation report generation
+ * Performance improvements and minor bugfixes for using disk.dump.bigff
+ * Performance improvements (more memory clean-up)
+
+
+RnBeads 1.1.5
+=============
+
+ * New option: disk.dump.bigff for using a wrapper class of the ff package to avoid their INT_MAX issue
+
+RnBeads 1.1.4
+=============
+
+ * Fixes in parallel environment setup from bioconcuctor
+
+RnBeads 1.1.3
+=============
+
+ * Some fixes in data loading
+ * Fixes in parallel environment setup
+
+RnBeads 1.1.2
+=============
+
+ * New annotation package format
+ * Support for filtering out cross-reactive probes in Infinium 450k dataset
+ * Improved logging on a Mac
+
+RnBeads 1.0.0
+=============
+
+ * Bioconductor release
+
+RnBeads 0.99.23
+===============
+
+ * Incorporated some bioconductor check related improvements
+
+RnBeads 0.99.22
+===============
+
+ * Incorporated bioconductor requirements for parallel processing. "parallel.disable" is now "parallel.teardown"
+
+RnBeads 0.99.20
+===============
+
+ * RnBeads no longer suggests IlluminaHumanMethylation450k.db.
+
+RnBeads 0.99.19
+===============
+
+ * Fixed a bug in the computation of surrogate variables (SVA) that did not take into account other adjustment variables in the model (compared to the null model)
+ * Updated locus profiles to work with the latest version of Gviz
+ * Differential methylation reports now contain information on group sizes
+ * Included plots of number of sites vs coverage percentiles for each sample in the dataset (rnb.plot.num.sites.covg)
+ * Bisulfite-seq QC reports now contain an additional section with summary statistics and plots when the coverage histogram plots are enabled
+
+RnBeads 0.99.18
+===============
+
+ * Implementation of class constructors (the S4 constructors are not available anymore)
+ * Analyses can now be started from an RnBSet which is stored on the hard drive (using save.rnb.set) via the rnb.set.dir data type
+ * New IDAT loading routine, based on the illuminaio package
+ * Multiple fixes in wrappers for wateRmelon normalization methods
+ * Fixed the RefFreeEWAS wrapper
+ * Updated the Houseman, 2012 reference-based method implementation
+ * RnBSets now know the version with which they were created
+ * Various other bugfixes and improvements to reports and documentation
+
+RnBeads 0.99.17
+===============
+
+ * Consistency issues with Bioconductor 3.0 fixed
+ * Fixed a bug relating to no coverage masking being conducted for sequencing data
+ * Various other bugfixes
+
+RnBeads 0.99.16
+===============
+
+ * Enhanced XML-based analysis though the tag preanalysis.script
+ * Optimized loading of the sequencing data sets
+ * Enhanced region profiles plots. Added region site distribution plots
+ * Locus profiles can now be generated in the exploratory report for regions specified in custom bed files and for genes listed as gene symbols
+ * Improved cell type heterogeneity inference (no cell types excluded anymore)
+ * Added more support for paired differential methylation with limma
+ * Some functions were renamed: merge.samples->mergeSamples, add.pheno->addPheno, add.region.subsegments->addRegionSubsegments, and all functions operating on Report
+ * Added helper classes for submitting RnBeads to a scientific compute cluster. Current implementation includes Sun Grid Engine
+ * The default pipeline now uses ff functionality and saves intermediate objects into the report directory
+ * Minor bugfixes
+
+RnBeads 0.99.15
+===============
+
+ * Restructuring of the pipeline modules:
+ ** the loading module has been renamed to import
+ ** the prefiltering,normalization and postfiltering modules have been summarized in a new module: preprocessing
+ ** the batch and profiles modules have been summarized in a new module for exploratory analysis
+ ** the export module has been renamed to tracks and tables
+ ** corresponding option names have been changed
+ ** see the overview figure on the website or the vignette for a quick overview on the new module structure
+ * Multiple RnBSets can now be concatenated with the add() function
+ * Multiple samples in an RnBSet can be merged using the merge.samples() function
+ * Gender prediction can be performed on Infinium 450k datasets
+ * Minor updates on covariate adjustment
+ * Updates on tissue heterogeneity estimation
+ * Calling differentially methylated sites with RefFreeEWAS now supports paired design
+ * Multiple minor bugfixes and performance improvements
+ * Vignette and documentation updates
+
+RnBeads 0.99.13
+===============
+
+ * Added new module on annotation inference
+ * Added correction for cell type heterogeneity
+ * Added SVA functionality
+ * Minor bugfixes
+ * Updates to the vignette and other documentation
+
+RnBeads 0.99.12
+===============
+
+ * Support Bismark coverage file loading
+ * Enhanced documentation and logging of loading steps
+ * Minor bugfixes
+ * Updates to the vignette and other documentation
+
+ RnBeads 0.99.11
+===============
+
+ * Accommodate data packages for individual genomes
+ * Performance: disk space usage when using disk dumping, options for subsetting sites when computing distance matrices for clustering, PCA and MDS
+ * Region subsegmentation
+ * The default method for differential methylation p-values is limma
+
+RnBeads 0.99.10
+===============
+
+ * Performance improvements
+ * Option to keep big matrices on the hard drive rather than main memory
+ * Restructuring of the filtering modules. Parts of the filtering steps are executed before normalization others afterwards
+ * Improvements in normalization: more methods supported
+ * Cosmetic changes to some of the plots
+
+RnBeads 0.99.9
+==============
+
+ * Bugfixes in paired analysis
+ * Usability of bisulfite sequencing
+
+RnBeads 0.99.8
+==============
+
+ * New normalization methods integrated
+ * Improved arguments to rnb.run.analysis
+ * Improved parsing of the sample annotation table
+ * Paired analysis (testing stage)
+ * Webservice installed
+ * Multiple bugfixes
+
+RnBeads 0.99.7
+==============
+
+ * Support for background subtraction and BMIQ normalization of Infinium 450k data
+ * Support for differential methylation analysis on all pairs of sample groups
+
+RnBeads 0.99.6
+==============
+
+ * Locus Profiles
+ * Support for parallel computing
+
+RnBeads 0.99.0
+==============
+
+ * Many additional features including bisulfite sequencing mode, the mouse genome, data export, ...
+
+RnBeads 0.5.0
+=============
+
+ * Initial release of RnBeads containing six modules - loading and normalization, quality control, filtering, batch effects, methylation profiles and differential methylation.
