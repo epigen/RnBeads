@@ -525,7 +525,6 @@ setAs("RnBeadRawSet","MethyLumiSet",
 			
 		})
 
-
 ########################################################################################################################
 		
 ## ---------------------------------------------------------------------------------------------------------------------
@@ -926,9 +925,21 @@ intensities.by.color<-function(raw.set,
 		add.missing=TRUE
 		){
 	
-	if(!require("IlluminaHumanMethylation450kmanifest")){
-		rnb.error("IlluminaHumanMethylation450kmanifest should be installed")
-	}		
+			
+	if(raw.set@target=="probes450"){
+		if(!require("IlluminaHumanMethylation450kmanifest")){
+			rnb.error("IlluminaHumanMethylation450kmanifest should be installed")
+		}
+		manifest_obj<-IlluminaHumanMethylation450kmanifest
+	}else if(raw.set@target=="probesEPIC"){
+		if(!require("IlluminaHumanMethylationEPICmanifest")){
+			rnb.error("IlluminaHumanMethylationEPICmanifest, should be installed")
+		}
+		data(IlluminaHumanMethylationEPICmanifest)
+		manifest_obj<-IlluminaHumanMethylationEPICmanifest
+	}else{
+		rnb.error("unsupported RnBeadRawSet object")
+	}
 	
 	Mmatrix<-M(raw.set, row.names=TRUE)
 	Umatrix<-U(raw.set, row.names=TRUE)
@@ -964,8 +975,8 @@ intensities.by.color<-function(raw.set,
 	
 	if(address.rownames){
 	
-		tII<-rbind(as.data.frame(IlluminaHumanMethylation450kmanifest@data$TypeII[,c("Name", "AddressA")]),
-			as.data.frame(IlluminaHumanMethylation450kmanifest@data$TypeSnpII[,c("Name", "AddressA")]))
+		tII<-rbind(as.data.frame(manifest_obj@data$TypeII[,c("Name", "AddressA")]),
+			as.data.frame(manifest_obj@data$TypeSnpII[,c("Name", "AddressA")]))
 	
 		tII<-tII[match(dII.probes, tII$Name),]
 	}
@@ -982,8 +993,8 @@ intensities.by.color<-function(raw.set,
 	
 	if(address.rownames){
 	
-		tI<-rbind(as.data.frame(IlluminaHumanMethylation450kmanifest@data$TypeI[,c("Name","Color", "AddressA", "AddressB")]),
-				as.data.frame(IlluminaHumanMethylation450kmanifest@data$TypeSnpI[,c("Name","Color", "AddressA", "AddressB")]))
+		tI<-rbind(as.data.frame(manifest_obj@data$TypeI[,c("Name","Color", "AddressA", "AddressB")]),
+				as.data.frame(manifest_obj@data$TypeSnpI[,c("Name","Color", "AddressA", "AddressB")]))
 	
 	
 		tI.red<-tI[tI$Color=="Red",]
@@ -1035,7 +1046,15 @@ intensities.by.color<-function(raw.set,
 	
 	if(address.rownames) intensities.by.channel$Cy5<-intensities.by.channel$Cy5[rownames(intensities.by.channel$Cy3),,drop=FALSE]
 	if(add.controls){
-		ncd<-rnb.get.annotation("controls450")
+		if(raw.set@target == "probes27"){
+			controls.ann.tocken<-"controls27"
+		}else if(raw.set@target == "probes450"){
+			controls.ann.tocken<-"controls450"
+		}else{
+			controls.ann.tocken<-"controlsEPIC"
+		}
+			
+		ncd<-rnb.get.annotation(controls.ann.token)
 		#ncd<-ncd[ncd[["Target"]] == "NEGATIVE", ]
 		ncd$Target<-tolower(ncd$Target)
 		controls.by.channel<-qc(raw.set)
