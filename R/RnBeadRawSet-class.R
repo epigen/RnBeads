@@ -1047,11 +1047,11 @@ intensities.by.color<-function(raw.set,
 	if(address.rownames) intensities.by.channel$Cy5<-intensities.by.channel$Cy5[rownames(intensities.by.channel$Cy3),,drop=FALSE]
 	if(add.controls){
 		if(raw.set@target == "probes27"){
-			controls.ann.tocken<-"controls27"
+			controls.ann.token<-"controls27"
 		}else if(raw.set@target == "probes450"){
-			controls.ann.tocken<-"controls450"
+			controls.ann.token<-"controls450"
 		}else{
-			controls.ann.tocken<-"controlsEPIC"
+			controls.ann.token<-"controlsEPIC"
 		}
 			
 		ncd<-rnb.get.annotation(controls.ann.token)
