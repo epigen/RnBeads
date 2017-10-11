@@ -54,6 +54,7 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 #'   \item{\code{inferred.covariates}}{\code{list} with covariate information.
 #' 		Can contain elements \code{"sva"} and \code{"cell.types"}.}
 #' 	 \item{\code{version}}{Package version in which the dataset was created.}
+#' 	 \item{\code{imputed}}{Flag indicating if methylation matrix has been imputed.}
 #' }
 #'
 #' @section Methods and Functions:
@@ -71,6 +72,7 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 #'   \item{\code{\link[BiocGenerics]{combine}}}{Combines two datasets.}
 #'   \item{\code{\link{regionMapping,RnBSet-method}}}{Retrieve the sites mapping to a given region type}
 #'   \item{\code{\link[=rnb.sample.summary.table,RnBSet-method]{rnb.sample.summary.table}}}{Creates a sample summary table from an RnBSet object.}
+#'   \item{\code{\link{isImputed,RnBSet-method}}}{Getter for the imputation slot.}
 #' }
 #'
 #' @name RnBSet-class
@@ -89,7 +91,8 @@ setClass("RnBSet",
 				assembly="character",
 				target="characterOrNULL",
 				inferred.covariates="list",
-				version="characterOrNULL"),
+				version="characterOrNULL",
+		    imputed="logical"),
 		prototype(pheno=data.frame(),
 				sites=matrix(nrow=0, ncol=0),
 				meth.sites=matrix(nrow=0, ncol=0),
@@ -101,7 +104,8 @@ setClass("RnBSet",
 				assembly="hg19",
 				target=NULL,
 				inferred.covariates=list(),
-				version=as.character(packageVersion("RnBeads"))),
+				version=as.character(packageVersion("RnBeads")),
+		    imputed=FALSE),
 		contains = "VIRTUAL",
 		package = "RnBeads")
 
@@ -1295,6 +1299,7 @@ setMethod("combine", signature(x="RnBSet",y="RnBSet"),
 				}
 			}
 			new.set@inferred.covariates<-list()
+			new.set@imputed <- x@imputed && y@imputed
 
 			rm(common.sites, sites1, sites2, subs1, subs2, x, y)
 			rnb.cleanMem()
@@ -2306,6 +2311,25 @@ setMethod("getNumNaMeth", signature(object = "RnBSet"),
 		return(res)
 	}
 )
+if(!isGeneric("isImputed")) setGeneric("isImputed", function(object, ...) standardGeneric("isImputed"))
+#' isImputed
+#' 
+#' Getter for the imputation field. Return TRUE, if the object has been imputed and FALSE otherwise.
+#' @param object Object for which the information should be returned
+#' @return TRUE, if the object has been imputed and FALSE otherwise.
+#' @author Michael Scherer
+#' @aliases isImputed
+#' @aliases isImputed,RnBSet-method
+#' @export
+setMethod("isImputed",signature(object="RnBSet"),
+  function(object){
+    if(.hasSlot(object,"imputed")){
+      return(object@imputed)
+    }
+    return(FALSE)
+  }          
+)
+
 ########################################################################################################################
 #' rnb.sample.summary.table
 #'

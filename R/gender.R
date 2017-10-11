@@ -43,8 +43,8 @@ rnb.contains.sex <- function(rnb.set) {
 #' @return Calculated shifts in the form of a matrix in which every row corresponds to a sample in \code{rnb.set} and
 #'         the columns denote the shifts in the X and Y chromosomes.
 #'
-#' @author Yassen Assenov
 #' @noRd
+#' @author Yassen Assenov
 rnb.get.XY.shifts <- function(rnb.set, signal.type = "raw") {
 
   target <- rnb.set@target

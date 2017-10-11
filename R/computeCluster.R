@@ -602,6 +602,12 @@ combine.diffMeth.objs <- function(obj.list){
 	names(ontol.list.empty) <- ontologies
 	dm.go.enrich.comb <- list(probe=list(),region=list())
 	dm.lola.enrich.comb <- list(probe=list(),region=list(),lolaDb=NULL)
+	if(is.element("region_var",names(obj.list[[1]]$dm.go.enrich))){
+	  dm.go.enrich.comb$region_var <- list()
+	}
+  if(is.element("region_var",names(obj.list[[1]]$dm.lola.enrich))){
+    dm.lola.enrich.comb$region_var <- list()
+  }
 
 	# helper to check whether two lola DB objects are the same
 	# necessary to check for compatibility
@@ -626,16 +632,24 @@ combine.diffMeth.objs <- function(obj.list){
 		#merge dm.go.enrich parts
 		if (!is.null(obj.list[[i]]$dm.go.enrich)) {
 			dmer <- obj.list[[i]]$dm.go.enrich$region
+			dmer.var <- NULL
 			#add empty lists for new comparisons
 			new.comp.list.empty <- rep(list(ontol.list.empty),n.new.comps)
 			names(new.comp.list.empty) <- new.comps
 			dm.go.enrich.comb$region <- c(dm.go.enrich.comb$region,new.comp.list.empty)
+			if(is.element("region_var",names(obj.list[[i]]$dm.go.enrich))){
+			  dmer.var <- obj.list[[i]]$dm.go.enrich$region_var
+			  dm.go.enrich.comb$region_var <- c(dm.go.enrich.comb$region_var,new.comp.list.empty)
+			}
 			#fill in the empty entries with the new entries
 			for (cc in names(dmer)){
 				for (oo in names(dmer[[cc]])){
 					for (rr in names(dmer[[cc]][[oo]])){
 						if (!is.element(rr,names(dm.go.enrich.comb$region[[cc]][[oo]]))){
 							dm.go.enrich.comb$region[[cc]][[oo]][[rr]] <- dmer[[cc]][[oo]][[rr]]
+							if(!is.null(dmer.var)){
+							  dm.go.enrich.comb$region_var[[cc]][[oo]][[rr]] <- dmer.var[[cc]][[oo]][[rr]]
+							}
 						}
 					}
 				}
@@ -651,15 +665,23 @@ combine.diffMeth.objs <- function(obj.list){
 				}
 			}
 			dmer <- obj.list[[i]]$dm.lola.enrich$region
+			dmer.var <- NULL
 			#add empty lists for new comparisons
 			new.comp.list.empty <- rep(list(list()),n.new.comps)
 			names(new.comp.list.empty) <- new.comps
 			dm.lola.enrich.comb$region <- c(dm.lola.enrich.comb$region,new.comp.list.empty)
+			if(is.element("region_var",names(obj.list[[i]]$dm.lola.enrich))){
+			  dmer.var <- obj.list[[i]]$dm.lola.enrich$region_var
+			  dm.lola.enrich.comb$region_var <- c(dm.lola.enrich.comb$region_var,new.comp.list.empty)
+			}
 			#fill in the empty entries with the new entries
 			for (cc in names(dmer)){
 				for (rr in names(dmer[[cc]])){
 					if (!is.element(rr,names(dm.lola.enrich.comb$region[[cc]]))){
 						dm.lola.enrich.comb$region[[cc]][[rr]] <- dmer[[cc]][[rr]]
+						if(!is.null(dmer.var)){
+						  dm.lola.enrich.comb$region_var[[cc]][[rr]] <- dmer.var[[cc]][[rr]]
+						}
 					}
 				}
 			}

@@ -7,6 +7,7 @@
 \usage{
 \S4method{initialize}{RnBDiffMeth}(.Object,
   site.test.method = rnb.getOption("differential.site.test.method"),
+  variability.method = rnb.getOption("differential.variability.method"),
   covg.thres = rnb.getOption("filtering.coverage.threshold"),
   disk.dump = FALSE, disk.path = NULL)
 }
@@ -14,6 +15,9 @@
 \item{.Object}{New instance of \code{RnBDiffMeth}.}
 
 \item{site.test.method}{method which was applied to obtain the site-level p-values.}
+
+\item{variability.method}{method to be used to calculate differentially variable sites. Has to be one of: `diffVar' or 
+`iEVORA'.}
 
 \item{covg.thres}{coverage threshold. Important for certain columns of the differential methylation tables.
 See \code{computeDiffMeth.bin.site} and \code{computeDiffMeth.bin.region} for details.}

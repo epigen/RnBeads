@@ -1089,7 +1089,47 @@ plot(dmrs[, "mean.mean.diff"], -log10(dmrs[, "comb.p.val"]),
 
         	\caption{\label{fig:volcanoDMRs} Volcano plots for promoter differential methylation comparing hESCs against hiPSCs.}
         \end{figure}
-
+        
+        \subsubsection{Differential Variability Analysis}
+        
+        In addition to comparing mean methylation levels inside groups with each other, the variances inside each group can be used to detect differences among them. For this purpose, \cs{RnBeads} employs a similar approach to the one used for differential methylation. To conduct differential variability (together with differential methylation) analysis, execute the following lines of code:
+<<eval=FALSE>>=
+rnb.options("differential.variability"=TRUE)
+rnb.run.differential(rnb.set,report.dir)
+@
+        
+        To conduct solely differential variability analysis (without report generation), one can call:
+<<eval=FALSE>>=
+cmp.cols <- "Sample_Group"
+reg.types <- c("genes","promoters")
+diff.var <- rnb.execute.diffVar(rnb.set,cmp.cols,region.types=reg.types)
+comparison <- get.comparisons(diff.var)[1]
+tab.sites <- get.table(diff.var,comparison,"sites",return.data.frame=TRUE)
+tab.genes <- get.table(diff.var,comparison,"genes",return.data.frame=TRUE)
+@
+        
+        After this operation, the tables contained in the \cs{diff.var} object (of class \cs{RnBDiffMeth}) possess different columns in comparison to differential methylation. Those columns are (from \cs{tab.sites} above):
+        \begin{description}
+        	\item[\cs{var.g1, var.g2:}] variances in each of the two groups
+        	\item[\cs{var.diff:}] differences between the variances found is the two groups: \cs{var.g1-var.g2}.
+        	\item[\cs{var.log.ratio:}] log2 of the quotient of variances: $\log_2 \frac{\cs{var.g1}+\epsilon}{\cs{var.g2}+\epsilon}$, with $\epsilon=0.01$.
+        	\item[\cs{diffVar.p.val:}] p-value resulting from employing the differential variability test specified in the option differential.variability.method. Those are either `diffVar' from the `missMethyl' package or the iEVORA algorithm.
+        	\item[\cs{diffVar.p.adj.fdr:}] FDR adjustment of the above p-value.
+        	\item[\cs{combinedRank.var:}] \cs{var.diff}, \cs{var.log.ratio} and \cs{diffVar.p.val} for all sites. The rank is computed as the maximum, i.e. worst rank among these values.
+        \end{description}
+        
+        For the table \cs{tab.genes} (i.e. the region level), the columns are:
+        
+        \begin{description}
+        	\item[\cs{mean.var.g1, mean.var.g2:}] mean of variances for both groups across all sites in the region.
+        	\item[\cs{mean.var.diff:}] mean difference between the probe variances in the two groups.
+        	\item[\cs{mean.var.log.ratio:}] mean difference between the probe quotients in the two groups.
+        	\item[\cs{comb.p.val.var:}] combined p-value for the region, combined as for differential methylation.
+        	\item[\cs{comb.p.adj.var.fdr:}] FDR adjustment of the above p-value.
+        	\item[\cs{combinedRank.var:}] \cs{mean.var.diff, mean.var.log.ratio} and \cs{comb.p.val.var} for all regions. The rank is computed as the worst rank among those. 
+        \end{description}
+        
+        Similar to differential methylation, the differential variability module adds diagnostic plots to the \cs{RnBeads} report in \cs{differential.html}. Enrichment analysis is performed analogously to differential methylation (see below).
         \subsubsection{Paired Analysis}
 
         Upon specifying the corresponding options, \cs{RnBeads} can also take into account sample pairing information when computing p-values.

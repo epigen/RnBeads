@@ -10,7 +10,7 @@ lolaBarPlot(lolaDb, lolaRes, scoreCol = "pValueLog", orderCol = scoreCol,
   groupByCollection = TRUE, orderDecreasing = NULL)
 }
 \arguments{
-\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}}
+\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}}
 
 \item{lolaRes}{LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package}
 
@@ -26,7 +26,7 @@ lolaBarPlot(lolaDb, lolaRes, scoreCol = "pValueLog", orderCol = scoreCol,
 
 \item{maxTerms}{maximum number of items to be included in the plot}
 
-\item{colorpanel}{colors to be used for coloring the bars according to "target" (see \link{\code{getTargetFromLolaDb}}). An empty
+\item{colorpanel}{colors to be used for coloring the bars according to "target" (see \code{\link{getTargetFromLolaDb}}). An empty
 vector indicates that black will be used for all bars.}
 
 \item{groupByCollection}{facet the plot by collection}

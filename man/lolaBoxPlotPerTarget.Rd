@@ -11,7 +11,7 @@ lolaBoxPlotPerTarget(lolaDb, lolaRes, scoreCol = "pValueLog",
   scoreDecreasing = NULL)
 }
 \arguments{
-\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}}
+\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}}
 
 \item{lolaRes}{LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package}
 
@@ -27,7 +27,7 @@ lolaBoxPlotPerTarget(lolaDb, lolaRes, scoreCol = "pValueLog",
 
 \item{maxTerms}{maximum number of items to be included in the plot}
 
-\item{colorpanel}{colors to be used for coloring the bars according to "target" (see \link{\code{getTargetFromLolaDb}}). An empty
+\item{colorpanel}{colors to be used for coloring the bars according to "target" (see \code{\link{getTargetFromLolaDb}}). An empty
 vector indicates that black will be used for all bars.}
 
 \item{groupByCollection}{facet the plot by collection}
@@ -42,7 +42,7 @@ to increasing). \code{NULL} (default) for automatic determination.}
 ggplot object containing the plot
 }
 \description{
-plot a boxplot showing LOLA enrichment results per "target" group (see \link{\code{getTargetFromLolaDb}} for an explanation of
+plot a boxplot showing LOLA enrichment results per "target" group (see \code{\link{getTargetFromLolaDb}} for an explanation of
 "target").
 }
 \examples{

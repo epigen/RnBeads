@@ -74,7 +74,7 @@ rnb.set <- rnb.execute.import(data.source = data.source, data.type = "idat.dir")
 }
 \seealso{
 \code{\link{read.data.dir}}, \code{\link{read.idat.files}}, \code{\link{read.GS.report}},
-         \code{\link{read.geo}}, \code{\link{read.bed.files}}
+         \code{\link{rnb.read.geo}}, \code{\link{read.bed.files}}
 #'
 }
 \author{

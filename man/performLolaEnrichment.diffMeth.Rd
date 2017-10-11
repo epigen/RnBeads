@@ -28,7 +28,7 @@ a DiffMeth.lola.enrich object (S3) containing the following attributes
 \item{region}{Enrichment information for differential methylation on the region level. A \code{data.table} object
 as returned by the \code{runLOLA} function from the \code{LOLA} package for furthert details. Each element will contain different
 user sets for different rank cutoffs and hyper/hypomethylation events(\code{userSet} column)}
-\item{lolaDb}{The loaded \code{lolaDb} object containing the merged databases as returned by \link{\code{loadLolaDbs}}}
+\item{lolaDb}{The loaded \code{lolaDb} object containing the merged databases as returned by \code{\link{loadLolaDbs}}}
 }
 \description{
 performs LOLA enrichment analysis for a given differential methylation table.

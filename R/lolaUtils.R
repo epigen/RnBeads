@@ -10,7 +10,7 @@
 #'
 #' retrieve or guess cell types from a LOLA DB object
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @return character vector with cell types
 #'
 #' @author Fabian Mueller
@@ -47,7 +47,7 @@ getCellTypesFromLolaDb <- function(lolaDb){
 #' refers to antibodies for ChIP-seq experiments, but could also refer to other annotations
 #' (e.g. motifs in TF motif databases, annotation according to UCSC features etc.)
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @return character vector with targets
 #'
 #' @author Fabian Mueller
@@ -98,7 +98,7 @@ getTargetFromLolaDb <- function(lolaDb){
 #'
 #' get human readable names from a LOLA DB object
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @param addCollectionNames  attach the name of the collection to the name
 #' @param addDbId  attach the index of the item in the LOLA DB object to the name
 #' @return character vector with human readable names
@@ -143,7 +143,7 @@ getNamesFromLolaDb <- function(lolaDb, addCollectionNames=FALSE, addDbId=TRUE){
 #'
 #' Helper function for preparing a data.frame for multiple LOLA plots
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @param lolaRes  LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package
 #' @param scoreCol column name in \code{lolaRes} to be plotted
 #' @param orderCol column name in \code{lolaRes} which is used for sorting the results
@@ -151,7 +151,7 @@ getNamesFromLolaDb <- function(lolaDb, addCollectionNames=FALSE, addDbId=TRUE){
 #' @param includedCollections vector of collection names to be included in the plot. If empty (default), all collections are used
 #' @param pvalCut p-value cutoff to be employed for filtering the results
 #' @param maxTerms maximum number of items to be included in the plot
-#' @param colorpanel colors to be used for coloring the bars according to "target" (see \link{\code{getTargetFromLolaDb}}). An empty
+#' @param colorpanel colors to be used for coloring the bars according to "target" (see \code{\link{getTargetFromLolaDb}}). An empty
 #'                 vector indicates that black will be used for all bars.
 #' @param groupByCollection facet the plot by collection
 #' @param orderDecreasing flag indicating whether the value in \code{orderCol} should be considered as decreasing (as opposed
@@ -261,7 +261,7 @@ lolaPrepareDataFrameForPlot <- function(lolaDb, lolaRes, scoreCol="pValueLog", o
 #'
 #' plot a volcano plot showing LOLA enrichment results: LOLA p-value against the log-odds score. Colored by rank
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @param lolaRes  LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package
 #' @param includedCollections vector of collection names to be included in the plot. If empty (default), all collections are used
 #' @param signifCol column name of the significance score in \code{lolaRes}. Should be one of \code{c("pValueLog", "qValue")}.
@@ -352,7 +352,7 @@ lolaVolcanoPlot <- function(lolaDb, lolaRes, includedCollections=c(), signifCol=
 #'
 #' plot a barplot of LOLA enrichment results
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @param lolaRes  LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package
 #' @param scoreCol column name in \code{lolaRes} to be plotted
 #' @param orderCol column name in \code{lolaRes} which is used for sorting the results
@@ -360,7 +360,7 @@ lolaVolcanoPlot <- function(lolaDb, lolaRes, includedCollections=c(), signifCol=
 #' @param includedCollections vector of collection names to be included in the plot. If empty (default), all collections are used
 #' @param pvalCut p-value cutoff to be employed for filtering the results
 #' @param maxTerms maximum number of items to be included in the plot
-#' @param colorpanel colors to be used for coloring the bars according to "target" (see \link{\code{getTargetFromLolaDb}}). An empty
+#' @param colorpanel colors to be used for coloring the bars according to "target" (see \code{\link{getTargetFromLolaDb}}). An empty
 #'                 vector indicates that black will be used for all bars.
 #' @param groupByCollection facet the plot by collection
 #' @param orderDecreasing flag indicating whether the value in \code{orderCol} should be considered as decreasing (as opposed
@@ -431,10 +431,10 @@ lolaBarPlot <- function(lolaDb, lolaRes, scoreCol="pValueLog", orderCol=scoreCol
 
 #' lolaBarPlot.hyp
 #'
-#' Adaptation of  \link{\code{lolaBarPlot}} to plot hypo and hpermethylated regions side by side
+#' Adaptation of  \code{\link{lolaBarPlot}} to plot hypo and hpermethylated regions side by side
 #' Hyper-/hypomethylation is assumed to be annotated in the userSet column of lolaRes
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @param lolaRes  LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package
 #' @param scoreCol column name in \code{lolaRes} to be plotted
 #' @param orderCol column name in \code{lolaRes} which is used for sorting the results
@@ -442,7 +442,7 @@ lolaBarPlot <- function(lolaDb, lolaRes, scoreCol="pValueLog", orderCol=scoreCol
 #' @param includedCollections vector of collection names to be included in the plot. If empty (default), all collections are used
 #' @param pvalCut p-value cutoff (negative log10) to be employed for filtering the results
 #' @param maxTerms maximum number of items to be included in the plot
-#' @param colorpanel colors to be used for coloring the bars according to "target" (see \link{\code{getTargetFromLolaDb}}). An empty
+#' @param colorpanel colors to be used for coloring the bars according to "target" (see \code{\link{getTargetFromLolaDb}}). An empty
 #'                 vector indicates that black will be used for all bars.
 #' @param groupByCollection facet the plot by collection
 #' @param orderDecreasing flag indicating whether the value in \code{orderCol} should be considered as decreasing (as opposed
@@ -489,10 +489,10 @@ lolaBarPlot.hyp <- function(lolaDb, lolaRes, scoreCol="pValueLog", orderCol=scor
 
 #' lolaBoxPlotPerTarget
 #'
-#' plot a boxplot showing LOLA enrichment results per "target" group (see \link{\code{getTargetFromLolaDb}} for an explanation of
+#' plot a boxplot showing LOLA enrichment results per "target" group (see \code{\link{getTargetFromLolaDb}} for an explanation of
 #' "target").
 #'
-#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}
+#' @param lolaDb   LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}
 #' @param lolaRes  LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package
 #' @param scoreCol column name in \code{lolaRes} to be plotted
 #' @param orderCol column name in \code{lolaRes} which is used for sorting the results
@@ -500,7 +500,7 @@ lolaBarPlot.hyp <- function(lolaDb, lolaRes, scoreCol="pValueLog", orderCol=scor
 #' @param includedCollections vector of collection names to be included in the plot. If empty (default), all collections are used
 #' @param pvalCut  p-value cutoff to be employed for filtering the results
 #' @param maxTerms maximum number of items to be included in the plot
-#' @param colorpanel colors to be used for coloring the bars according to "target" (see \link{\code{getTargetFromLolaDb}}). An empty
+#' @param colorpanel colors to be used for coloring the bars according to "target" (see \code{\link{getTargetFromLolaDb}}). An empty
 #'                 vector indicates that black will be used for all bars.
 #' @param groupByCollection facet the plot by collection
 #' @param orderDecreasing flag indicating whether the value in \code{orderCol} should be considered as decreasing (as opposed

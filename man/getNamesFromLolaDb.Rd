@@ -7,7 +7,7 @@
 getNamesFromLolaDb(lolaDb, addCollectionNames = FALSE, addDbId = TRUE)
 }
 \arguments{
-\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}}
+\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}}
 
 \item{addCollectionNames}{attach the name of the collection to the name}
 

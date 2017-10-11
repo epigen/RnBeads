@@ -19,7 +19,7 @@ performGOenrichment.diffMeth.entrez(gids, uids, ontology, assembly = "hg19",
 \item{...}{arguments passed on to the parameters of \code{GOHyperGParams} from the \code{GOstats} package}
 }
 \value{
-a \code{GOHyperGresult} object (see the \code{GOstats} package for furthert details)
+a \code{GOHyperGresult} object (see the \code{GOstats} package for further details)
 }
 \description{
 performs Gene Ontology (GO) enrichment analysis for a list of Entrez identifiers

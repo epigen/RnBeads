@@ -7,7 +7,7 @@
 getTargetFromLolaDb(lolaDb)
 }
 \arguments{
-\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}}
+\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}}
 }
 \value{
 character vector with targets

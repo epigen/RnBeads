@@ -21,7 +21,7 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 #'   \item{\code{sites}}{List of differential methylation tables on site level (see \code{computeDiffMeth.bin.site} for details).
 #' 					Indexed by comparison.}
 #'   \item{\code{regions}}{List of lists of differential methylation tables on region levels (see \code{computeDiffMeth.bin.region} for details).
-#' 					Indexed by region type on the top level and comparison on the lower level.} 
+#' 					Indexed by region type on the top level and comparison on the lower level.}
 #'   \item{\code{comparisons}}{character vector of all comparisons stored in the objects. Vector indices correspond to indices in the \code{sites} and
 #' 					\code{regions} list slots.}
 #'   \item{\code{region.types}}{character vector of all region types stored in the objects. Vector indices correspond to indices in
@@ -30,8 +30,8 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 #'   \item{\code{comparison.info}}{A list containing comparison information for each comparison. See \code{\link{get.comparison.info}} for details.}
 #'   \item{\code{includesSites}}{Logical indicating whether the object contains site-level differential methylation information.}
 #'   \item{\code{site.test.method}}{method which was applied to obtain the site-level p-values.}
-#'   \item{\code{covg.thres}}{coverage threshold. Important for certain columns of the differential methylation tables.
-#' 					See \code{computeDiffMeth.bin.site} and \code{computeDiffMeth.bin.region} for details.}
+#'   \item{\code{variability.method}}{method to be used to detect differentially variable sites.}
+#'   \item{\code{covg.thres}}{coverage threshold. Important for certain columns of the differential methylation tables.}
 #'   \item{\code{disk.dump}}{Flag indicating whether the tables should be stored on disk rather than in the main memory}
 #'   \item{\code{disk.path}}{path on the disk for DMTs.Only meaningful if \code{disk.dump} is \code{TRUE}}
 #' }
@@ -65,6 +65,7 @@ setClass("RnBDiffMeth",
 		comparison.info="list",
 		includesSites="logical",
 		site.test.method="characterOrNULL",
+		variability.method="characterOrNULL",
 		covg.thres="integer",
 		disk.dump="logical",
 		disk.path="characterOrNULL"
@@ -78,6 +79,7 @@ setClass("RnBDiffMeth",
 		comparison.info=list(),
 		includesSites=FALSE,
 		site.test.method=NULL,
+		variability.method=NULL,
 		covg.thres=-1L,
 		disk.dump=FALSE,
 		disk.path=NULL
@@ -92,6 +94,8 @@ setClass("RnBDiffMeth",
 #' @param site.test.method method which was applied to obtain the site-level p-values.
 #' @param covg.thres  coverage threshold. Important for certain columns of the differential methylation tables.
 #' 					  See \code{computeDiffMeth.bin.site} and \code{computeDiffMeth.bin.region} for details.
+#' @param variability.method method to be used to calculate differentially variable sites. Has to be one of: `diffVar' or 
+#'            `iEVORA'.
 #' @param disk.dump   Flag indicating whether the tables should be stored on disk rather than in the main memory
 #' @param disk.path   Path on the disk for DMTs.Only meaningful if \code{disk.dump} is \code{TRUE}
 #'
@@ -101,6 +105,7 @@ setClass("RnBDiffMeth",
 setMethod("initialize", "RnBDiffMeth",
 	function(.Object,
 		site.test.method=rnb.getOption("differential.site.test.method"),
+		variability.method=rnb.getOption("differential.variability.method"),
 		covg.thres=rnb.getOption("filtering.coverage.threshold"),
 		disk.dump=FALSE,disk.path=NULL){
 			#create directory in which to dump the matrices to file. must be a non-existing directory
@@ -119,6 +124,7 @@ setMethod("initialize", "RnBDiffMeth",
 			.Object@comparison.grouplabels <- matrix(ncol=2,nrow=0)
 			.Object@includesSites <- FALSE
 			.Object@site.test.method <- site.test.method
+			.Object@variability.method <- variability.method
 			.Object@covg.thres <- covg.thres
 			.Object@comparison.info <- list()
 			.Object@disk.dump <- disk.dump
@@ -313,6 +319,30 @@ setMethod("get.site.test.method", signature(object="RnBDiffMeth"),
 			return(rnb.getOption("differential.site.test.method"))
 		}
 	}
+)
+
+if (!isGeneric("get.variability.method")) setGeneric("get.variability.method", function(object) standardGeneric("get.variability.method"))
+#' get.variability.method-methods
+#'
+#' Gets the variability testing method used to obtain the p-values in the differential varibiality tables
+#'
+#' @param object RnBDiffMeth object
+#' @return character describing the variability method
+#'
+#' @rdname get.variability.method-RnBDiffMeth-methods
+#' @docType methods
+#' @author Michael Scherer
+#' @aliases get.variability.method
+#' @aliases get.variability.method,RnBDiffMeth-method
+#' @export
+setMethod("get.variability.method", signature(object="RnBDiffMeth"),
+          function(object){
+            if (.hasSlot(object,"variability.method")) { 
+              return(object@variability.method)
+            } else {
+              return(rnb.getOption("differential.variability.method"))
+            }
+          }
 )
 
 if (!isGeneric("get.covg.thres")) setGeneric("get.covg.thres", function(object) standardGeneric("get.covg.thres"))
@@ -812,9 +842,10 @@ if (!isGeneric("join.diffMeth")) setGeneric("join.diffMeth", function(obj1,obj2,
 #' }
 setMethod("join.diffMeth", signature(obj1="RnBDiffMeth",obj2="RnBDiffMeth"),
 	function(obj1,obj2){
-		is.compatible <- (includes.sites(obj1) == includes.sites(obj2)) && 
+		is.compatible <- (includes.sites(obj1) == includes.sites(obj2)) &&
 						 (obj1@site.test.method == obj2@site.test.method) &&
 						 (obj1@covg.thres == obj2@covg.thres) && 
+		         (obj1@variability.method == obj2@variability.method) &&
 						 (obj1@disk.dump == obj2@disk.dump)
 		if (!is.compatible){
 			stop("incompatible RnBDiffMeth objects")

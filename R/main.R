@@ -1462,7 +1462,8 @@ rnb.run.differential <- function(rnb.set, dir.reports,
 
 	report <- init.pipeline.report("differential_methylation", dir.reports, init.configuration)
 	optionlist <- rnb.options("analyze.sites", "differential.report.sites", "region.types", "differential.permutations", "differential.comparison.columns",
-		"differential.comparison.columns.all.pairwise","columns.pairing","differential.site.test.method","covariate.adjustment.columns",
+		"differential.comparison.columns.all.pairwise","columns.pairing","differential.site.test.method",
+	  "differential.variability","differential.variability.method","covariate.adjustment.columns",
 		"differential.adjustment.sva","differential.adjustment.celltype","differential.enrichment.go","differential.enrichment.lola","differential.enrichment.lola.dbs")
 	report <- rnb.add.optionlist(report, optionlist)
 	permutations <- rnb.getOption("differential.permutations")
@@ -1508,12 +1509,18 @@ rnb.run.differential <- function(rnb.set, dir.reports,
 		if (!is.null(diffmeth) && (length(reg.types)>0) && (rnb.getOption("differential.enrichment.go") || rnb.getOption("differential.enrichment.lola"))){
 			if (rnb.getOption("differential.enrichment.go")){
 				dm.go.enrich <- performGoEnrichment.diffMeth(rnb.set,diffmeth,verbose=TRUE)
+				if(rnb.getOption("differential.variability")){
+				  dm.go.enrich <- performGOEnrichment.diffVar(rnb.set,diffmeth,enrich.diffMeth = dm.go.enrich)
+				}
 				rnb.cleanMem()
 			}
 			if (rnb.getOption("differential.enrichment.lola")){
 				lolaDbPaths <- prepLolaDbPaths(assembly(rnb.set), downloadDir=rnb.get.directory(report, "data", absolute=TRUE))
 				if (length(lolaDbPaths) > 0){
 					dm.lola.enrich <- performLolaEnrichment.diffMeth(rnb.set, diffmeth, lolaDbPaths, verbose=TRUE)
+					if(rnb.getOption("differential.variability")){
+					  dm.lola.enrich <- performLolaEnrichment.diffVar(rnb.set,diffmeth,enrich.diffMeth=dm.lola.enrich,lolaDbPaths,verbose=TRUE)
+					}
 					rnb.cleanMem()
 				} else {
 					logger.warning(c("No LOLA DB found for assembly", assembly(rnb.set), "--> continuing without LOLA enrichment"))

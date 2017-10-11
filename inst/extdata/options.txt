@@ -92,6 +92,8 @@ exploratory.gene.symbols	character.vector	no	yes		NULL
 exploratory.custom.loci.bed	character	no	yes		NULL
 differential	logical	no	no		TRUE
 differential.site.test.method	character	no	no	(limma,ttest,refFreeEWAS)	limma
+differential.variability	logical	no	no		FALSE
+differential.variability.method	character	no	no	(diffVar,iEVORA)	diffVar
 differential.permutations	integer	no	no	[0,	0
 differential.comparison.columns	integer.vector	no	yes		NULL
 differential.comparison.columns.all.pairwise	integer.vector	no	yes		NULL

@@ -1196,6 +1196,7 @@ rnb.execute.imputation <- function(rnb.set,method=rnb.getOption("imputation.meth
   if(method=='knn'){
     rnb.set <- knn.imputation(rnb.set,...)
   }
+  rnb.set@imputed <- TRUE
   logger.completed()
   return(rnb.set)
 }

@@ -15,4 +15,6 @@ sftp-config.json
 .Rproj.user
 .Rbuildignore
 RnBeads.Rproj
+.Rhistory
+.gitignore
 /vignettes/figure

@@ -8,7 +8,7 @@ lolaVolcanoPlot(lolaDb, lolaRes, includedCollections = c(),
   signifCol = "qValue", colorBy = "maxRnk", colorpanel = c())
 }
 \arguments{
-\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \link{\code{loadLolaDbs}}}
+\item{lolaDb}{LOLA DB object as returned by \code{LOLA::loadRegionDB} or \code{\link{loadLolaDbs}}}
 
 \item{lolaRes}{LOLA enrichment result as returned by the \code{runLOLA} function from the \code{LOLA} package}
 

@@ -36,6 +36,7 @@ used: \code{\linkS4class{RnBeadRawSet}} and \code{\linkS4class{RnBeadSet}} for I
   \item{\code{inferred.covariates}}{\code{list} with covariate information.
 		Can contain elements \code{"sva"} and \code{"cell.types"}.}
 	 \item{\code{version}}{Package version in which the dataset was created.}
+	 \item{\code{imputed}}{Flag indicating if methylation matrix has been imputed.}
 }
 }
 
@@ -55,6 +56,7 @@ used: \code{\linkS4class{RnBeadRawSet}} and \code{\linkS4class{RnBeadSet}} for I
   \item{\code{\link[BiocGenerics]{combine}}}{Combines two datasets.}
   \item{\code{\link{regionMapping,RnBSet-method}}}{Retrieve the sites mapping to a given region type}
   \item{\code{\link[=rnb.sample.summary.table,RnBSet-method]{rnb.sample.summary.table}}}{Creates a sample summary table from an RnBSet object.}
+  \item{\code{\link{isImputed,RnBSet-method}}}{Getter for the imputation slot.}
 }
 }
 

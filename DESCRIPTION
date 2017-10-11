@@ -44,6 +44,8 @@ Suggests:
     GLAD,
     IlluminaHumanMethylation450kanno.ilmn12.hg19,
     scales,
+    missMethyl,
+    impute,
     RUnit
 Depends:
     R (>= 3.0.0),
@@ -98,6 +100,7 @@ Collate:
     'dataExport.R'
     'dataImport.R'
     'differentialMethylation.R'
+    'differentialVariability.R'
     'enmix.R'
     'enrichment.R'
     'filtering.R'

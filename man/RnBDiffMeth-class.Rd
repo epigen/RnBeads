@@ -17,7 +17,7 @@ as R objects or on disk
   \item{\code{sites}}{List of differential methylation tables on site level (see \code{computeDiffMeth.bin.site} for details).
 					Indexed by comparison.}
   \item{\code{regions}}{List of lists of differential methylation tables on region levels (see \code{computeDiffMeth.bin.region} for details).
-					Indexed by region type on the top level and comparison on the lower level.} 
+					Indexed by region type on the top level and comparison on the lower level.}
   \item{\code{comparisons}}{character vector of all comparisons stored in the objects. Vector indices correspond to indices in the \code{sites} and
 					\code{regions} list slots.}
   \item{\code{region.types}}{character vector of all region types stored in the objects. Vector indices correspond to indices in
@@ -26,8 +26,8 @@ as R objects or on disk
   \item{\code{comparison.info}}{A list containing comparison information for each comparison. See \code{\link{get.comparison.info}} for details.}
   \item{\code{includesSites}}{Logical indicating whether the object contains site-level differential methylation information.}
   \item{\code{site.test.method}}{method which was applied to obtain the site-level p-values.}
-  \item{\code{covg.thres}}{coverage threshold. Important for certain columns of the differential methylation tables.
-					See \code{computeDiffMeth.bin.site} and \code{computeDiffMeth.bin.region} for details.}
+  \item{\code{variability.method}}{method to be used to detect differentially variable sites.}
+  \item{\code{covg.thres}}{coverage threshold. Important for certain columns of the differential methylation tables.}
   \item{\code{disk.dump}}{Flag indicating whether the tables should be stored on disk rather than in the main memory}
   \item{\code{disk.path}}{path on the disk for DMTs.Only meaningful if \code{disk.dump} is \code{TRUE}}
 }
