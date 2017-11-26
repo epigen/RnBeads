@@ -999,6 +999,7 @@ if (!isGeneric("mergeSamples")) {
 #' @param object input RnBSet object
 #' @param grp.col a column name (string) of \code{pheno(rnb.set)} that contains unique identifiers for sample groups/replicates
 #' 		  to be combined
+#' @param cov.weighted weight methylation values using coverage
 #' @return the modified RnBSet object
 #' @details combines phenotype information, coverage information and methylation information
 #' methylation is combined by taking the average. Detection p-values are combined using Fisher's method.
@@ -1025,7 +1026,7 @@ if (!isGeneric("mergeSamples")) {
 # TODOs:
 # - incorporate weighted methylation average (coverage)
 setMethod("mergeSamples", signature(object = "RnBSet"),
-	function(object, grp.col){
+	function(object, grp.col, cov.weighted = FALSE){
 		ph <- pheno(object)
 		if (!is.element(grp.col,colnames(ph))){
 			stop("Could not merge samples: phenotype column does not exist")
@@ -1051,6 +1052,11 @@ setMethod("mergeSamples", signature(object = "RnBSet"),
 		colnames(pheno.new) <- c(colnames(ph),"rnb_number_merged_samples")
 
 		if (class(object) == "RnBiseqSet"){
+            if(cov.weighted){
+                merge_fun=function(X.sub,iis){rowMeans((X.sub * cov.site.new[,iis]), na.rm=TRUE)/rowSums(cov.site.new[,iis])}
+            }else{
+                merge_fun=function(X.sub,iis){rowMeans(X.sub, na.rm=TRUE)}
+            }
 			meth.site.new <- mergeColumns(meth(object,type="sites",row.names=FALSE),replicate.list)
 			covg.site.new <- NULL
 			if (!is.null(object@covg.sites)){

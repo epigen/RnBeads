@@ -1434,7 +1434,7 @@ getMergeList <- function(rnbs, pheno.col){
 ## @author Fabian Mueller
 mergeColumns <- function(X, mergeList, mergeFun=function(X.sub){rowMeans(X.sub, na.rm=TRUE)}){
 	res <- do.call("cbind", lapply(mergeList,FUN=function(iis){
-		do.call(mergeFun, list(X.sub=X[,iis, drop=FALSE]))
+		do.call(mergeFun, list(X.sub=X[,iis, drop=FALSE], sub=iis))
 	}))
 	return(res)
 }
