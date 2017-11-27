@@ -1036,7 +1036,7 @@ setMethod("mergeSamples", signature(object = "RnBSet"),
 		num.replicates <- sapply(replicate.list,length)
 		phm <- sapply(ph, format, trim=TRUE, justify="none") #fomat to matrix, avoiding padded whitespaces
 		ph.t <- t(phm)
-		mf.pheno <- function(X.sub){
+		mf.pheno <- function(X.sub, sub=NULL){
 			sapply(1:nrow(X.sub),FUN=function(i){
 				if (length(unique(X.sub[i,]))==1 && sum(is.na(X.sub[i,]))==0) {
 					return(X.sub[i,1])
@@ -1053,14 +1053,14 @@ setMethod("mergeSamples", signature(object = "RnBSet"),
 
 		if (class(object) == "RnBiseqSet"){
             if(cov.weighted){
-                merge_fun=function(X.sub,iis){rowMeans((X.sub * cov.site.new[,iis]), na.rm=TRUE)/rowSums(cov.site.new[,iis])}
+                merge_fun=function(X.sub,sub){rowMeans((X.sub * cov.site.new[,sub]), na.rm=TRUE)/rowSums(cov.site.new[,sub])}
             }else{
-                merge_fun=function(X.sub,iis){rowMeans(X.sub, na.rm=TRUE)}
+                merge_fun=function(X.sub,sub=NULL){rowMeans(X.sub, na.rm=TRUE)}
             }
 			meth.site.new <- mergeColumns(meth(object,type="sites",row.names=FALSE),replicate.list)
 			covg.site.new <- NULL
 			if (!is.null(object@covg.sites)){
-				covg.site.new <- mergeColumns(covg(object,type="sites"),replicate.list,mergeFun=function(X.sub){rowSums(X.sub,na.rm=TRUE)})
+				covg.site.new <- mergeColumns(covg(object,type="sites"),replicate.list,mergeFun=function(X.sub,sub=NULL){rowSums(X.sub,na.rm=TRUE)})
 			}
 			# res <- new("RnBiseqSet",
 			# 		pheno=data.frame(pheno.new),
