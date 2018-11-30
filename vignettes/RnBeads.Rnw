@@ -936,7 +936,20 @@ for raw coefficients of the projection model,
 ct.obj$contributions.constr
 @
 to get constrained (non-negative) coefficients which resemble cell
-type counts and sum up to a small value $<1$ .
+type counts and sum up to a small value $<1$.
+
+Figure~\ref{fig:cell_type_estimation} gives a schematic overview of the cell type
+proportion estimation procedure implemented in RnBeads.
+
+
+\begin{figure}
+	\noindent \begin{centering}
+		\includegraphics[width=0.99\textwidth]{"figures/cell_type_estimation"}
+	\par \end{centering}
+	\caption{Estimation of cell type proportions using constrained projection
+	(Houseman's) method implemented in RnBeads.}
+	\label{fig:cell_type_estimation}
+\end{figure}
 
 \subsubsection{Age Prediction}
 
