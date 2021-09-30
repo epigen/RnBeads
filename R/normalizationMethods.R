@@ -175,6 +175,148 @@ rnb.bgcorr.subtr<-function(rnb.set, bg.quant=0.05, offset=0){
     
 }
 
+#
+# NOOB method as implemented in SeSAME
+#
+noob.sesame <- function(rnb.set, offset=15) {
+    
+    annot<-annotation(rnb.set)
+    
+    ## if no Infinium-I probes
+    if (nrow(InfIG(sdf)) == 0 && nrow(InfIR(sdf)) == 0) { return(sdf) }
+    
+    ##################### GRN CHANNEL ESTIMATION
+    ## background
+    oobG <- rbind(
+            rnb.set@M0[annot$Design=="I" & annot$Color=="Grn",], 
+            rnb.set@U0[annot$Design=="I" & annot$Color=="Grn",])
+    oobG[oobG == 0] <- 1
+    
+    ## if not enough out-of-band signal
+    if (sum(oobG > 0, na.rm=TRUE) < 100) { return(rnb.set) }
+    
+    ## foreground
+    #ibG = c(InfIG(sdf)$MG, InfIG(sdf)$UG, InfII(sdf)$UG)
+    ibG <- rbind(
+            rnb.set@M[annot$Design=="I" & annot$Color=="Grn",], 
+            rnb.set@U[annot$Design=="I" & annot$Color=="Grn",],
+            rnb.set@M[annot$Design=="II",]
+            )
+    
+    ibG[ibG == 0] <- 1 # set signal to 1 if 0
+    
+    #fitG = backgroundCorrectionNoobFit(ibG, oobG)
+    fitG <- sapply(seq(ncol(ibG)), function(i) backgroundCorrectionNoobFit(ibG[,i],oobG[,i]))
+   
+    ##################### RED CHANNEL ESTIMATION
+    oobR <- rbind(
+            rnb.set@M0[annot$Design=="I" & annot$Color=="Red",], 
+            rnb.set@U0[annot$Design=="I" & annot$Color=="Red",])
+    oobR[oobR == 0] <- 1
+    
+    if (sum(oobR > 0, na.rm=TRUE) < 100) { return(rnb.set) }
+    
+    ibR <- rbind(
+            rnb.set@M[annot$Design=="I" & annot$Color=="Red",], 
+            rnb.set@U[annot$Design=="I" & annot$Color=="Red",],
+            rnb.set@U[annot$Design=="II",]
+    )
+    ibR[ibR == 0] <- 1 # set signal to 1 if 0
+    
+    #fitR = backgroundCorrectionNoobFit(ibR, oobR)
+    fitR <- sapply(seq(ncol(ibR)), function(i) backgroundCorrectionNoobFit(ibR[,i],oobR[,i]))
+    
+    ####### CORRECTION
+    
+    mg.ind<-which(annot$Color=="Grn" | annot$Design=="II")
+    ug.ind<-which(annot$Color=="Grn" )
+    
+    mr.ind<-which(annot$Color=="Red" )
+    ur.ind<-which(annot$Color=="Red" | annot$Design=="II")
+    
+    slot_names<-c("M", "U", "M0", "U0")
+    ind.lists<-list("Grn"=list(), "Red"=list())
+    
+    ind.lists[["Grn"]][["M"]]<-mg.ind
+    ind.lists[["Grn"]][["U"]]<-ug.ind
+    ind.lists[["Grn"]][["M0"]]<-ug.ind
+    ind.lists[["Grn"]][["U0"]]<-ug.ind
+    
+    ind.lists[["Red"]][["M"]]<-mr.ind
+    ind.lists[["Red"]][["U"]]<-ur.ind
+    ind.lists[["Red"]][["M0"]]<-mr.ind
+    ind.lists[["Red"]][["U0"]]<-mr.ind
+    
+    fit_param<-list("Grn"=fitG, "Red"=fitR)
+    
+    for(sl in slot_names){
+        if(!is.null(rnb.set@status) && rnb.set@status$disk.dump){
+            mat_temp<-convert.to.ff.matrix.tmp(matrix(NA_real_, nrow=dim(rnb.set@M)[1], ncol=dim(rnb.set@M)[2]))
+        }else{
+            mat_temp<-matrix(NA_real_, nrow=nrow(rnb.set@M), ncol=ncol(rnb.set@M))
+        }
+        for(col in c("Grn", "Red")){
+            for(i in seq(ncol(rnb.set@M))){
+                mat_temp[ind.lists[[col]][[sl]], i]<-normExpSignal(
+                        fit_param[[col]][,i]$mu, 
+                        fit_param[[col]][,i]$sigma, 
+                        fit_param[[col]][,i]$alpha, 
+                        slot(rnb.set,sl)[ind.lists[[col]][[sl]],i]) + offset
+            }
+        }
+        if(!is.null(rnb.set@status) && rnb.set@status$disk.dump && isTRUE(rnb.set@status$discard.ff.matrices)){
+            delete(slot(rnb.set,sl))
+        }
+        
+        slot(rnb.set,sl)<-mat_temp
+        
+        if(!is.null(rnb.set@status) && rnb.set@status$disk.dump){
+            rm(mat_temp); rnb.cleanMem()
+        }
+    }
+    
+    rnb.set<-update.meth(rnb.set)
+    
+    return(rnb.set)
+}
+
+backgroundCorrectionNoobFit <- function(ib, bg) {
+    e = MASS::huber(bg)
+    mu = e$mu
+    sigma = e$s
+    alpha = pmax(MASS::huber(ib)$mu-mu, 10)
+    list(mu = mu, sigma = sigma, alpha = alpha)
+}
+
+# the following is adapted from Limma
+## normal-exponential deconvolution (conditional expectation of
+## xs|xf; WEHI code)
+normExpSignal <- function(mu, sigma, alpha, x)  {
+    
+    sigma2 <- sigma * sigma
+    
+    if (alpha <= 0)
+        stop("alpha must be positive")
+    if (sigma <= 0)
+        stop("sigma must be positive")
+    
+    mu.sf <- x - mu - sigma2/alpha
+    signal <- mu.sf + sigma2 * exp(
+            dnorm(0, mean = mu.sf, sd = sigma, log = TRUE) -
+                    pnorm(
+                            0, mean = mu.sf, sd = sigma,
+                            lower.tail = FALSE, log.p = TRUE))
+    
+    o <- !is.na(signal)
+    if (any(signal[o] < 0)) {
+        warning("Limit of numerical accuracy reached with very
+                        low intensity or very high background:\nsetting adjusted intensities
+                        to small value")
+        signal[o] <- pmax(signal[o], 1e-06)
+    }
+    signal
+}
+
 
 get.platform.tokens<-function(platform){
     
