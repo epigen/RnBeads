@@ -178,18 +178,18 @@ rnb.bgcorr.subtr<-function(rnb.set, bg.quant=0.05, offset=0){
 #
 # NOOB method as implemented in SeSAME
 #
-noob.sesame <- function(rnb.set, offset=15) {
+noob.sesame <- function(rnb.set, background=c("internal", "bleed-through")[1L], offset=15) {
     
     annot<-annotation(rnb.set)
     
     ## if no Infinium-I probes
-    if (nrow(InfIG(sdf)) == 0 && nrow(InfIR(sdf)) == 0) { return(sdf) }
+    #if (nrow(InfIG(sdf)) == 0 && nrow(InfIR(sdf)) == 0) { return(sdf) }
     
     ##################### GRN CHANNEL ESTIMATION
     ## background
     oobG <- rbind(
-            rnb.set@M0[annot$Design=="I" & annot$Color=="Grn",], 
-            rnb.set@U0[annot$Design=="I" & annot$Color=="Grn",])
+            rnb.set@M0[annot$Design=="I" & annot$Color=="Red",], 
+            rnb.set@U0[annot$Design=="I" & annot$Color=="Red",])
     oobG[oobG == 0] <- 1
     
     ## if not enough out-of-band signal
@@ -199,35 +199,68 @@ noob.sesame <- function(rnb.set, offset=15) {
     #ibG = c(InfIG(sdf)$MG, InfIG(sdf)$UG, InfII(sdf)$UG)
     ibG <- rbind(
             rnb.set@M[annot$Design=="I" & annot$Color=="Grn",], 
-            rnb.set@U[annot$Design=="I" & annot$Color=="Grn",],
-            rnb.set@M[annot$Design=="II",]
+            rnb.set@U[annot$Design=="I" & annot$Color=="Grn",]
             )
-    
+
+    if(background == "internal") ibG <- rbind(ibG, rnb.set@M[annot$Design=="II",])
+
     ibG[ibG == 0] <- 1 # set signal to 1 if 0
     
-    #fitG = backgroundCorrectionNoobFit(ibG, oobG)
-    fitG <- sapply(seq(ncol(ibG)), function(i) backgroundCorrectionNoobFit(ibG[,i],oobG[,i]))
    
     ##################### RED CHANNEL ESTIMATION
     oobR <- rbind(
-            rnb.set@M0[annot$Design=="I" & annot$Color=="Red",], 
-            rnb.set@U0[annot$Design=="I" & annot$Color=="Red",])
+            rnb.set@M0[annot$Design=="I" & annot$Color=="Grn",], 
+            rnb.set@U0[annot$Design=="I" & annot$Color=="Grn",])
     oobR[oobR == 0] <- 1
     
     if (sum(oobR > 0, na.rm=TRUE) < 100) { return(rnb.set) }
     
     ibR <- rbind(
             rnb.set@M[annot$Design=="I" & annot$Color=="Red",], 
-            rnb.set@U[annot$Design=="I" & annot$Color=="Red",],
-            rnb.set@U[annot$Design=="II",]
-    )
+            rnb.set@U[annot$Design=="I" & annot$Color=="Red",]
+            )
+    
+    if(background == "internal") ibR <- rbind(ibR, rnb.set@U[annot$Design=="II",])
+    
     ibR[ibR == 0] <- 1 # set signal to 1 if 0
     
-    #fitR = backgroundCorrectionNoobFit(ibR, oobR)
-    fitR <- sapply(seq(ncol(ibR)), function(i) backgroundCorrectionNoobFit(ibR[,i],oobR[,i]))
-    
+    if(background=="internal"){
+        
+        #fitG = backgroundCorrectionNoobFit(ibG, oobG)
+        fitG <- sapply(seq(ncol(ibG)), function(i) backgroundCorrectionNoobFit(ibG[,i],oobG[,i]))
+        
+        #fitR = backgroundCorrectionNoobFit(ibR, oobR)
+        fitR <- sapply(seq(ncol(ibR)), function(i) backgroundCorrectionNoobFit(ibR[,i],oobR[,i]))
+        
+    }else if(background=="bleed-through"){
+        
+        bg.GpredictR <- lapply(seq(ncol(ibG)), function(i) {f<-train.model.lm(ibG[,i], oobR[,i]); return(f)})
+        ##ibR.other.channel
+        ibR_other<-rbind(oobG, rnb.set@M[annot$Design=="II",])
+        pp.bg.ibR<-sapply(seq(ncol(ibR_other)), function(i) bg.GpredictR[[i]](ibR_other[,i]))
+        ibG_other<-NULL; rm(ibG_other)
+        ##sset$IG
+        pp.bg.oobR<-sapply(seq(ncol(ibG)), function(i) bg.GpredictR[[i]](ibG[,i]))
+        
+        ibRR<-rbind(ibR, rnb.set@U[annot$Design=="II",])
+        alphaR<-sapply(seq(ncol(ibRR)), function(i) pmax(MASS::huber(ibRR[,i] - pp.bg.ibR[,i]$mu)$mu, offset-5))
+        ibRR<-NULL; rm(ibRR)
+        
+        bg.RpredictG <- lapply(seq(ncol(ibR)), function(i) {f<-train.model.lm(ibR[,i], oobG[,i]); return(f)})
+        ##ibG.other.channel
+        ibG_other<-rbind(oobR, rnb.set@U[annot$Design=="II",])
+        pp.bg.ibG<-sapply(seq(ncol(ibG_other)), function(i) bg.RpredictG[[i]](ibG_other[,i]))
+        ibR_other<-NULL; rm(ibR_other)
+        ##sset$IR
+        pp.bg.oobG<-sapply(seq(ncol(ibR)), function(i) bg.RpredictG[[i]](ibR[,i]))
+        
+        ibGG<-rbind(ibG, rnb.set@M[annot$Design=="II",])
+        alphaG<-sapply(seq(ncol(ibGG)), function(i) pmax(MASS::huber(ibGG[,i] - pp.bg.ibG[,i]$mu)$mu, offset-5))
+        ibRR<-NULL; rm(ibRR)
+
+    }
     ####### CORRECTION
-    
+    tII.len<-sum(annot$Design=="II")
     mg.ind<-which(annot$Color=="Grn" | annot$Design=="II")
     ug.ind<-which(annot$Color=="Grn" )
     
@@ -239,15 +272,65 @@ noob.sesame <- function(rnb.set, offset=15) {
     
     ind.lists[["Grn"]][["M"]]<-mg.ind
     ind.lists[["Grn"]][["U"]]<-ug.ind
-    ind.lists[["Grn"]][["M0"]]<-ug.ind
-    ind.lists[["Grn"]][["U0"]]<-ug.ind
+    ind.lists[["Grn"]][["M0"]]<-mr.ind
+    ind.lists[["Grn"]][["U0"]]<-mr.ind
     
     ind.lists[["Red"]][["M"]]<-mr.ind
     ind.lists[["Red"]][["U"]]<-ur.ind
-    ind.lists[["Red"]][["M0"]]<-mr.ind
-    ind.lists[["Red"]][["U0"]]<-mr.ind
+    ind.lists[["Red"]][["M0"]]<-ug.ind
+    ind.lists[["Red"]][["U0"]]<-ug.ind
     
-    fit_param<-list("Grn"=fitG, "Red"=fitR)
+    if(background=="internal"){
+        
+        fit_param<-list("Grn"=fitG, "Red"=fitR)
+        
+    }else if(background=="bleed-through"){
+        
+        ir<-expand.grid(seq(nrow(pp.bg.ibG)), seq(ncol(pp.bg.ibG)))
+        
+        pp.bg.ibG_M<-pp.bg.ibG
+        for(ind in 1:nrow(ir)) pp.bg.ibG_M[[ir[ind,1],ir[ind,2]]]<-pp.bg.ibG_M[[ir[ind,1],ir[ind,2]]][c(seq(ug.ind),(2*length(ug.ind)+1):(2*length(ug.ind)+tII.len))]
+        pp.bg.ibG_U<-pp.bg.ibG
+        for(ind in 1:nrow(ir)) pp.bg.ibG_U[[ir[ind,1],ir[ind,2]]]<-pp.bg.ibG_U[[ir[ind,1],ir[ind,2]]][c((length(ug.ind)+1):(2*length(ug.ind)))]
+        pp.bg.ibR_M<-pp.bg.ibR
+        for(ind in 1:nrow(ir)) pp.bg.ibR_M[[ir[ind,1],ir[ind,2]]]<-pp.bg.ibR_M[[ir[ind,1],ir[ind,2]]][c(seq(mr.ind))]
+        pp.bg.ibR_U<-pp.bg.ibR
+        for(ind in 1:nrow(ir)) pp.bg.ibR_U[[ir[ind,1],ir[ind,2]]]<-pp.bg.ibR_U[[ir[ind,1],ir[ind,2]]][c((length(mr.ind)+1):(2*length(mr.ind)+tII.len))]
+
+        pp.bg.oobG_M<-pp.bg.oobG
+        for(ind in 1:nrow(ir)) pp.bg.oobG_M[[ir[ind,1],ir[ind,2]]]<-pp.bg.oobG_M[[ir[ind,1],ir[ind,2]]][seq(mr.ind)]
+        pp.bg.oobG_U<-pp.bg.oobG
+        for(ind in 1:nrow(ir)) pp.bg.oobG_U[[ir[ind,1],ir[ind,2]]]<-pp.bg.oobG_U[[ir[ind,1],ir[ind,2]]][(length(mr.ind)+1):(2*length(mr.ind))]
+        pp.bg.oobR_M<-pp.bg.oobR
+        for(ind in 1:nrow(ir)) pp.bg.oobR_M[[ir[ind,1],ir[ind,2]]]<-pp.bg.oobR_M[[ir[ind,1],ir[ind,2]]][seq(ug.ind)]
+        pp.bg.oobR_U<-pp.bg.oobR
+        for(ind in 1:nrow(ir)) pp.bg.oobR_U[[ir[ind,1],ir[ind,2]]]<-pp.bg.oobR_U[[ir[ind,1],ir[ind,2]]][(length(ug.ind)+1):(2*length(ug.ind))]
+        
+        fit_param<-list(
+                "Grn"=list(
+                        "M"=list(
+                            "IB"=pp.bg.ibG_M,
+                            "OB"=pp.bg.oobG_M
+                        ),
+                        "U"=list(
+                             "IB"=pp.bg.ibG_U,
+                             "OB"=pp.bg.oobG_U
+                        ),
+                        "alpha"=alphaG
+                        ), 
+                "Red"=list(
+                        "M"=list(
+                            "IB"=pp.bg.ibR_M,
+                            "OB"=pp.bg.oobR_M
+                        ),
+                        "U"=list(
+                            "IB"=pp.bg.ibR_U,
+                            "OB"=pp.bg.oobR_U
+                        ),
+                        "alpha"=alphaR
+                        )
+        )
+    }
     
     for(sl in slot_names){
         if(!is.null(rnb.set@status) && rnb.set@status$disk.dump){
@@ -257,11 +340,20 @@ noob.sesame <- function(rnb.set, offset=15) {
         }
         for(col in c("Grn", "Red")){
             for(i in seq(ncol(rnb.set@M))){
-                mat_temp[ind.lists[[col]][[sl]], i]<-normExpSignal(
-                        fit_param[[col]][,i]$mu, 
-                        fit_param[[col]][,i]$sigma, 
-                        fit_param[[col]][,i]$alpha, 
-                        slot(rnb.set,sl)[ind.lists[[col]][[sl]],i]) + offset
+                if(background=="internal"){
+                    mat_temp[ind.lists[[col]][[sl]], i]<-normExpSignal(
+                            fit_param[[col]][,i]$mu, 
+                            fit_param[[col]][,i]$sigma, 
+                            fit_param[[col]][,i]$alpha, 
+                            slot(rnb.set,sl)[ind.lists[[col]][[sl]],i]) + offset
+                }else{
+                    token_mu<-gsub("0","",sl)
+                    token_band<-c("IB", "OB")[1L+grepl("0", sl)]
+                    mat_temp[ind.lists[[col]][[sl]], i]<-backgroundCorrCh1(
+                            fit_param[[col]][[token_mu]][[token_band]][,i],
+                            fit_param[[col]]$alpha[i], 
+                            slot(rnb.set,sl)[ind.lists[[col]][[sl]],i]) + offset
+                }
             }
         }
         if(!is.null(rnb.set@status) && rnb.set@status$disk.dump && isTRUE(rnb.set@status$discard.ff.matrices)){
@@ -317,6 +409,42 @@ normExpSignal <- function(mu, sigma, alpha, x)  {
     signal
 }
 
+#####
+
+train.model.lm <- function(input, output) {
+    fitdata <- data.frame(IB=as.vector(input)+1, LOB=log(as.vector(output)+1))
+    m <- lm(LOB~IB, data=fitdata)
+    #m <- MASS::rlm(LOB~IB, data=fitdata)
+    function(d) {
+        force(m)
+        pp <- predict(m, newdata=data.frame(IB=as.vector(d)), interval='prediction', level=0.8)
+        # use upper bound for mu since true signal is often much higher than noise
+        list(mu=exp(pp[,'upr']), sigma=(exp(pp[,'upr'])-exp(pp[,'lwr']))/10.13)
+        # list(mu=exp(pp[,'upr']), sigma=log(exp(pp[,'upr'])-exp(pp[,'lwr'])))
+    }
+}
+
+backgroundCorrCh1 <- function(pp, alpha, x) {
+    mu.bg <- pp$mu
+    sigma <- pp$sigma
+    sigma2 <- sigma * sigma
+    if (alpha <= 0)
+        stop("alpha must be positive")
+    if (any(na.omit(sigma) <= 0))
+        stop("sigma must be positive")
+    mu.sf <- x - mu.bg - sigma2/alpha
+    signal <- mu.sf + sigma2 * exp(
+            dnorm(0, mean = mu.sf, sd = sigma, log = TRUE) -
+                    pnorm(0, mean = mu.sf, sd = sigma, lower.tail = FALSE, log.p = TRUE))
+    o <- !is.na(signal)
+    if (any(signal[o] < 0)) {
+        warning("Limit of numerical accuracy reached with very low intensity or very high background:\nsetting adjusted intensities to small value")
+        signal[o] <- pmax(signal[o], 1e-06)
+    }
+    signal.min <- min(signal, na.rm = TRUE)
+    signal <- signal - signal.min
+    signal
+}
 
 get.platform.tokens<-function(platform){
     
@@ -326,26 +454,26 @@ get.platform.tokens<-function(platform){
     dict<-list()
     
     if(platform=="probes27"){
-        dict$norm_token["Cy5"] <- 'Norm.G'
-        dict$norm_token["Cy3"] <- 'Norm.R'
+        dict$norm_token["Cy3"] <- 'Norm.G'
+        dict$norm_token["Cy5"] <- 'Norm.R'
         dict$bg_token<-"Negative"
         dict$id_col<-"ID"
         dict$trg_col<-"Target"
     } else if(platform=="probes450"){
-        dict$norm_token["Cy5"] <- 'NORM_(C|G)'
-        dict$norm_token["Cy3"] <- 'NORM_(A|T)'
+        dict$norm_token["Cy3"] <- 'NORM_(C|G)'
+        dict$norm_token["Cy5"] <- 'NORM_(A|T)'
         dict$bg_token<-"NEGATIVE"
         dict$id_col<-"ID"
         dict$trg_col<-"Target"
     } else if(platform=="probesEPIC"){
-        dict$norm_token["Cy5"] <- 'NORM_(C|G)'
-        dict$norm_token["Cy3"] <- 'NORM_(A|T)'
+        dict$norm_token["Cy3"] <- 'NORM_(C|G)'
+        dict$norm_token["Cy5"] <- 'NORM_(A|T)'
         dict$bg_token<-"NEGATIVE"
         dict$id_col<-"ID"
         dict$trg_col<-"Target"
     }else if(platform=="probesMMBC"){
-        dict$norm_token["Cy5"] <- 'NORM_(C|G)'
-        dict$norm_token["Cy3"] <- 'NORM_(A|T)'
+        dict$norm_token["Cy3"] <- 'NORM_(C|G)'
+        dict$norm_token["Cy5"] <- 'NORM_(A|T)'
         dict$bg_token<-"NEGATIVE"
         dict$id_col<-"ID"
         dict$trg_col<-"Target"
