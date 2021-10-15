@@ -167,6 +167,12 @@ rnb.execute.normalization<-function(
 
 			if (bgcorr.method=="subtraction"){
                 object<-rnb.bgcorr.subtr(object)
+            }else if (any(grepl("sesame.noob", bgcorr.method))){
+                if(bgcorr.method=="sesame.noobsb"){
+                    object<-noob.sesame(object, background="bleed-through")
+                }else{
+                    object<-noob.sesame(object, background="internal")
+                }
             }else if (any(grepl("methylumi", bgcorr.method))) {
 				bgcorr.methylumi<-gsub("methylumi\\.", "", bgcorr.method)
 				pheno.columns<-colnames(pheno(object))
@@ -212,7 +218,7 @@ rnb.execute.normalization<-function(
 	if (inherits(object, "RnBeadSet") && object@target == "probes27" && !(method %in% accepted)) {
 		disable.method(TRUE, 'not supported for Infinium 27k')
 	}
-	accepted <- c("none", "scaling", "bmiq", "swan", "minfi.funnorm", "wm.dasen")
+	accepted <- c("none", "scaling", "scaling.internal", "scaling.reference", "bmiq", "swan", "minfi.funnorm", "wm.dasen")
 	if (inherits(object, "RnBeadSet") && object@target == "probesEPIC" && !(method %in% accepted)) {
 		disable.method(TRUE, 'not supported for HumanMethylationEPIC')
 	}
@@ -222,9 +228,15 @@ rnb.execute.normalization<-function(
     }
     
 	## Perform normalization
-	if (method=="scaling") {
+	if (any(grepl("scaling", method))) {
         
-        object<-rnb.norm.scaling(object)
+        if(method=="scaling") {
+            sc.method="internal"
+        }else{
+            sc.method<-gsub("scaling.", "", method)
+        }
+        
+        object<-rnb.norm.scaling(object, method=sc.method)
         
         object@status$normalized<-"scaling"
         object@status$background<-bgcorr.method

@@ -48,8 +48,8 @@ qc.cnv	logical	no	no		FALSE
 qc.cnv.refbased	logical	no	no		FALSE
 preprocessing	logical	no	no		TRUE
 normalization	logical	no	yes		NULL
-normalization.method	character	no	no	(none,scaling,bmiq,illumina,methylumi.illumina,swan,minfi.funnorm,wm.dasen,wm.nasen,wm.betaqn,wm.naten,wm.nanet,wm.nanes,wm.danes,wm.danet,wm.danen,wm.daten1,wm.daten2,wm.tost,wm.fuks,wm.swan)	wm.dasen
-normalization.background.method	character	no	no	(none,subtraction,methylumi.noob,methylumi.goob,enmix.oob)	none
+normalization.method	character	no	no	(none,scaling,scaling.internal,scaling.reference,bmiq,illumina,methylumi.illumina,swan,minfi.funnorm,wm.dasen,wm.nasen,wm.betaqn,wm.naten,wm.nanet,wm.nanes,wm.danes,wm.danet,wm.danen,wm.daten1,wm.daten2,wm.tost,wm.fuks,wm.swan)	wm.dasen
+normalization.background.method	character	no	no	(none,subtraction,sesame.noob,sesame.noobsb,methylumi.noob,methylumi.goob,enmix.oob)	none
 normalization.plot.shifts	logical	no	no		TRUE
 filtering.whitelist	character	no	yes		NULL
 filtering.blacklist	character	no	yes		NULL
