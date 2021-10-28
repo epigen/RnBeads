@@ -1492,7 +1492,7 @@ rnb.execute.high.dpval.masking <- function(rnb.set, dpval.threshold = 0.05) {
 
 rnb.execute.high.dpval.masking.internal <- function(rnb.set, sites2ignore, dpval.threshold) {
     # coverage.matrix <- covg(rnb.set)
-    if (!is.null(rnb.set@pval.sites)) {
+    if (is.null(rnb.set@pval.sites)) {
         return(NULL)
     }
     # mask <- (coverage.matrix < covg.threshold) & (!is.na(coverage.matrix)) & (!is.na(meth(rnb.set)))
