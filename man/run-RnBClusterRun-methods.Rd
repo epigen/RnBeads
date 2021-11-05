@@ -12,7 +12,8 @@
   config.xml,
   split.differential = TRUE,
   dry.run = FALSE,
-  long.cmd.thres = 1024L
+  long.cmd.thres = 1024L,
+  queue = NULL
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ into seperate jobs according to sample annotation column and region type.}
 
 \item{long.cmd.thres}{commands that are longer than this number will be encapsulated in shell scripts
 rather than being submitted as direct command}
+
+\item{queue}{The name of the queue the jobs are going to be submitted to}
 }
 \value{
 Nothing of importance

@@ -202,6 +202,7 @@ if (!isGeneric("run")) setGeneric("run", function(object,...) standardGeneric("r
 #' @param dry.run Prevent the actual job submission. Rather only write to a shell script file
 #' @param long.cmd.thres commands that are longer than this number will be encapsulated in shell scripts
 #' 		  rather than being submitted as direct command
+#' @param queue The name of the queue the jobs are going to be submitted to
 #' @return Nothing of importance
 #'
 #' @rdname run-RnBClusterRun-methods
@@ -236,7 +237,8 @@ setMethod("run",
 		config.xml,
 		split.differential=TRUE,
 		dry.run=FALSE,
-		long.cmd.thres=1024L
+		long.cmd.thres=1024L,
+        queue=NULL
 	) {
 		rnb.cr <- object
 		arch = rnb.cr@architecture
@@ -280,7 +282,11 @@ setMethod("run",
 		shell.script.dir <- cluster.dir
 		submit.job <- function(name,cmd.tokens,...){
 			r.cmd <- paste(cmd.tokens,collapse=" ")
-			cmd <- getSubCmdStr(arch, cmd.tokens, ...)
+            if(is.null(queue)){
+    			cmd <- getSubCmdStr(arch, cmd.tokens, ...)
+            }else{
+    			cmd <- getSubCmdStr(arch, cmd.tokens, queue=queue, ...)
+            }
 			#make sure the command is not too long. else, wrap it in a shell script
 			if (shell.script.for.long.commands){
 				if (nchar(r.cmd)>long.cmd.thres){
@@ -290,7 +296,11 @@ setMethod("run",
 					close(fileConn)
 					Sys.chmod(shell.script.file, mode = "0755")
 					cmd.tokens.shell <- c(shell.script.file)
-					cmd <- getSubCmdStr(arch, cmd.tokens.shell, sub.binary=FALSE, ...)
+                    if(is.null(queue)){
+					    cmd <- getSubCmdStr(arch, cmd.tokens.shell, sub.binary=FALSE, ...)
+                    }else{
+					    cmd <- getSubCmdStr(arch, cmd.tokens.shell, sub.binary=FALSE, queue=queue, ...)
+                    }
 				}
 			}
 

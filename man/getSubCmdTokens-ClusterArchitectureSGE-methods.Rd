@@ -13,7 +13,8 @@
   res.req = character(0),
   depend.jobs = character(0),
   sub.binary = TRUE,
-  quote.cmd = TRUE
+  quote.cmd = TRUE,
+  queue = NULL
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ the names should specify the resource name}
 \item{sub.binary}{treat the command as binary (see \code{-b} flag of \code{qsub} of the SGE documentation)}
 
 \item{quote.cmd}{Flag indicating whether the submitted cammed should also be wrapped in quotes}
+
+\item{queue}{The name of the queue to submit jobs to}
 }
 \value{
 A character vector containing the submission command tokens

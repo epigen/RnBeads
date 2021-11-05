@@ -73,6 +73,7 @@ setMethod("initialize","ClusterArchitectureSGE",
 #' @param depend.jobs character vector containg names or ids of jobs the submitted job will depend on.
 #' @param sub.binary treat the command as binary (see \code{-b} flag of \code{qsub} of the SGE documentation)
 #' @param quote.cmd Flag indicating whether the submitted cammed should also be wrapped in quotes
+#' @param queue The name of the queue to submit jobs to
 #' @return A character vector containing the submission command tokens
 #'
 #' @rdname getSubCmdTokens-ClusterArchitectureSGE-methods
@@ -99,7 +100,8 @@ setMethod("getSubCmdTokens",
 		res.req = character(0),
 		depend.jobs = character(0),
 		sub.binary = TRUE,
-		quote.cmd = TRUE
+		quote.cmd = TRUE,
+        queue = NULL
 	) {
 		res.req.tokens <- NULL
 		if (length(res.req) > 0){
@@ -129,6 +131,7 @@ setMethod("getSubCmdTokens",
 			"qsub",
 			"-V",
 			res.req.tokens,
+            ifelse(is.null(queue),"",paste0("-q ",queue)),
 			log.token,
 			"-j","y",
 			job.name.token,
