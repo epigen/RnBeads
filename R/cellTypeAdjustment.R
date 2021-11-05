@@ -81,7 +81,7 @@ refFreeEWASP <- function(
 
 	if(!is.null(adjustment.table)){
 		formula.text <- paste0(c("~0",colnames(adjustment.table)),collapse="+")
-		design.adj <- model.matrix(as.formula(formula.text),data=adjustment.table)
+		design.adj <- model.matrix(as.formula(formula.text),data=adjustment.table[ind.vec,])
 		design<-cbind(design[,-1,drop=FALSE], design.adj)
 		rnb.warning("Adjusting for covariates in the RefFreeEWAS model is an experimental feature, use with caution.")		
 	}
