@@ -230,7 +230,7 @@ limmaP <- function(X,inds.g1,inds.g2=-inds.g1,adjustment.table=NULL,fun.conversi
 	df <- data.frame(xg = factor(rep(c("group1","group2"), c(n.g1,n.g2)), levels=c("group1","group2")))
 	if (!is.null(adjustment.table)){
 		## Add covariates to adjust for
-		df <- cbind(df,adjustment.table[ind.vec,])
+		df <- cbind(df,adjustment.table)
 	}
 	if (paired){
 		## Add a covariate for pairing

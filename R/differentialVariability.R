@@ -118,7 +118,7 @@ diffVar <- function(meth.matrix,inds.g1,inds.g2,adjustment.table=NULL,paired=FAL
   meth.matrix <- rnb.beta2mval(meth.matrix[,ind.vec,drop=FALSE])
   df <- data.frame(xg = factor(rep(c("group1","group2"), c(n.g1,n.g2)), levels=c("group1","group2")))
   if (!is.null(adjustment.table)){
-    df <- cbind(df,adjustment.table[ind.vec,])
+    df <- cbind(df,adjustment.table)
   }
   if(paired){
     if(n.g1 != n.g2){
