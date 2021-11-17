@@ -8,6 +8,7 @@
 
 #' refFreeEWASP
 #'
+#' NOTE: This function is deprecated, since the RefFreeEWAS package is not supported and available anymore
 #' Applies the reference-free cell-type heterogeneity adjustment model from [1] and 
 #' returns corrected p-values
 #' 
@@ -40,96 +41,99 @@ refFreeEWASP <- function(
 		ignore.na=TRUE,
 		rescale.residual=TRUE) {
 
-	rnb.require("RefFreeEWAS")
-	if (paired && utils::packageVersion("RefFreeEWAS")<'1.3'){
-		rnb.warning("RefFreeEWAS version >=1.3 is required for paired analysis, pairing will be disregarded")
-		paired<-FALSE
-	}
-	## TODO: Validate parameter values
-	if(rescale.residual){
-		ranges<-apply(X,1,range,na.rm=TRUE)
-		range.diff<-apply(ranges, 2, function(rng) rng[2]-rng[1])
-		if(any(range.diff==0)){
-			rescale.residual<-FALSE
-			rnb.warning("Found non-variable rows in the methylation data, residual scaling was disabled")
-		}
-	}
-	
-	ind.vec <- c(inds.g1,inds.g2)
-	if (length(ind.vec) < 2) rnb.error("need at least two samples indices to compare")
-	X <- X[,ind.vec,drop=FALSE]
+    rnb.warning(paste("This function is deprecated, since the RefFreeEWAS package is not supported and available anymore.",
+        "If you have a local version of the package, check out the branch RefFreeEWAS in the RnBeads github https://github.com/epigen/RnBeads"))
+#	rnb.require("RefFreeEWAS")
+#	if (paired && utils::packageVersion("RefFreeEWAS")<'1.3'){
+#		rnb.warning("RefFreeEWAS version >=1.3 is required for paired analysis, pairing will be disregarded")
+#		paired<-FALSE
+#	}
+#	## TODO: Validate parameter values
+#	if(rescale.residual){
+#		ranges<-apply(X,1,range,na.rm=TRUE)
+#		range.diff<-apply(ranges, 2, function(rng) rng[2]-rng[1])
+#		if(any(range.diff==0)){
+#			rescale.residual<-FALSE
+#			rnb.warning("Found non-variable rows in the methylation data, residual scaling was disabled")
+#		}
+#	}
+#	
+#	ind.vec <- c(inds.g1,inds.g2)
+#	if (length(ind.vec) < 2) rnb.error("need at least two samples indices to compare")
+#	X <- X[,ind.vec,drop=FALSE]
 
-	rnb.logger.start("Fitting the reference-free EWAS model")
+#	rnb.logger.start("Fitting the reference-free EWAS model")
 
-	if (is.logical(inds.g1)) inds.g1 <- which(inds.g1)
-	if (is.logical(inds.g2)) inds.g2 <- which(inds.g2)
-	n.g1 <- length(inds.g1)
-	n.g2 <- length(inds.g2)
+#	if (is.logical(inds.g1)) inds.g1 <- which(inds.g1)
+#	if (is.logical(inds.g2)) inds.g2 <- which(inds.g2)
+#	n.g1 <- length(inds.g1)
+#	n.g2 <- length(inds.g2)
 
-	ncgs<-nrow(X)
-	if(ignore.na){
-		nnas<-apply(is.na(X), 1, sum)
-		notna.rows<-which(nnas==0)
-		X<-X[notna.rows,]
-	}else{
-		nnas<-rep(0,ncgs)
-	}
-	
-	design<-matrix(1L, ncol(X), 2)
-	design[inds.g2,2]<-0L
-	colnames(design)<-c("(Icept)", "group.f")
+#	ncgs<-nrow(X)
+#	if(ignore.na){
+#		nnas<-apply(is.na(X), 1, sum)
+#		notna.rows<-which(nnas==0)
+#		X<-X[notna.rows,]
+#	}else{
+#		nnas<-rep(0,ncgs)
+#	}
+#	
+#	design<-matrix(1L, ncol(X), 2)
+#	design[inds.g2,2]<-0L
+#	colnames(design)<-c("(Icept)", "group.f")
 
-	if(!is.null(adjustment.table)){
-		formula.text <- paste0(c("~0",colnames(adjustment.table)),collapse="+")
-		design.adj <- model.matrix(as.formula(formula.text),data=adjustment.table)
-		design<-cbind(design[,-1,drop=FALSE], design.adj)
-		rnb.warning("Adjusting for covariates in the RefFreeEWAS model is an experimental feature, use with caution.")		
-	}
+#	if(!is.null(adjustment.table)){
+#		formula.text <- paste0(c("~0",colnames(adjustment.table)),collapse="+")
+#		design.adj <- model.matrix(as.formula(formula.text),data=adjustment.table)
+#		design<-cbind(design[,-1,drop=FALSE], design.adj)
+#		rnb.warning("Adjusting for covariates in the RefFreeEWAS model is an experimental feature, use with caution.")		
+#	}
 
-	tmpBstar <- (X %*% design %*% solve(t(design)%*%design))
-	
-	## rescaling the residuals, and addition by Andres
-	R <- X-tmpBstar %*% t(design)
-	if(rescale.residual){
-		R <- t(scale(t(R)))
-	}
-	d<-EstDimRMT(R)$dim
-	
-	rnb.info(c("Estimated number of latent components is", d))
-	
-	test <- RefFreeEwasModel(X, design, d)
+#	tmpBstar <- (X %*% design %*% solve(t(design)%*%design))
+#	
+#	## rescaling the residuals, and addition by Andres
+#	R <- X-tmpBstar %*% t(design)
+#	if(rescale.residual){
+#		R <- t(scale(t(R)))
+#	}
+#	d<-EstDimRMT(R)$dim
+#	
+#	rnb.info(c("Estimated number of latent components is", d))
+#	
+#	test <- RefFreeEwasModel(X, design, d)
 
-	rnb.status("Fitted the RefFreeEWAS model")
-	
-	if(paired){
-		pair.id <- rep(1:n.g1, 2)[order(c(inds.g1,inds.g2))]
-		testBoot <- PairsBootRefFreeEwasModel(test, nboot, pair.id)
-	}else{
-		testBoot <- BootRefFreeEwasModel(test,nboot)
-	}
-	rnb.status("Pefrormed the bootstrap")
-	
-	smry<-summary(testBoot)
-	rnb.status("Summarized the results")
+#	rnb.status("Fitted the RefFreeEWAS model")
+#	
+#	if(paired){
+#		pair.id <- rep(1:n.g1, 2)[order(c(inds.g1,inds.g2))]
+#		testBoot <- PairsBootRefFreeEwasModel(test, nboot, pair.id)
+#	}else{
+#		testBoot <- BootRefFreeEwasModel(test,nboot)
+#	}
+#	rnb.status("Pefrormed the bootstrap")
+#	
+#	smry<-summary(testBoot)
+#	rnb.status("Summarized the results")
 
-	if(!is.null(adjustment.table)){
-		tstatBeta<-smry[,1,1,1]/smry[,1,1,2]
-	}else{
-		tstatBeta<-smry[,2,1,1]/smry[,2,1,2]
-	}
+#	if(!is.null(adjustment.table)){
+#		tstatBeta<-smry[,1,1,1]/smry[,1,1,2]
+#	}else{
+#		tstatBeta<-smry[,2,1,1]/smry[,2,1,2]
+#	}
 
-	# proper df calculation, added by Andres
-	pvals <- pt(-abs(tstatBeta), df=nrow(design)-ncol(design)-nnas)
-		
-	rnb.logger.completed()
-	
-	if(ignore.na){
-		notna.pvals<-pvals
-		pvals<-rep(NA,ncgs)
-		pvals[notna.rows]<-notna.pvals
-	}
-	
-	return(pvals)
+#	# proper df calculation, added by Andres
+#	pvals <- pt(-abs(tstatBeta), df=nrow(design)-ncol(design)-nnas)
+#		
+#	rnb.logger.completed()
+#	
+#	if(ignore.na){
+#		notna.pvals<-pvals
+#		pvals<-rep(NA,ncgs)
+#		pvals[notna.rows]<-notna.pvals
+#	}
+#	
+#	return(pvals)
+    return(NA)
 }
 
 #######################################################################################################################

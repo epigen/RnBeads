@@ -1,3 +1,8 @@
+RnBeads 2.13.2
+=============
+
+ * Removed support for RefFreeEWAS, since the package is not supported anymore
+
 RnBeads 2.9.3
 =============
 

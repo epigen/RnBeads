@@ -21,7 +21,6 @@ Suggests:
     Gviz,
     IlluminaHumanMethylation450kmanifest,
     RPMM,
-    RefFreeEWAS,
     RnBeads.hg19,
     RnBeads.mm9,
     XML,
@@ -143,4 +142,4 @@ Collate:
     'sva.R'
     'utilities.R'
     'wbcInference.R'
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

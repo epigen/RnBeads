@@ -37,6 +37,7 @@ index in  \code{inds.g2} and so on.}
 vector of p-values for the "adjusted" regression coefficients from the Reference-free EWAS model
 }
 \description{
+NOTE: This function is deprecated, since the RefFreeEWAS package is not supported and available anymore
 Applies the reference-free cell-type heterogeneity adjustment model from [1] and 
 returns corrected p-values
 }
