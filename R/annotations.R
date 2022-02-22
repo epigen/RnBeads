@@ -838,7 +838,7 @@ rnb.set.annotation <- function(type, regions, description = NULL, assembly = "hg
 	}
 	if (!(ncol(regions) >= 3 && all(c("Chromosome", "Start", "End") %in% colnames(regions)) &&
 			(is.character(regions[["Chromosome"]]) || is.factor(regions[["Chromosome"]])) &&
-			is.integer(regions[["Start"]]) && is.integer(regions[["End"]]))) {
+			is.numeric(regions[["Start"]]) && is.numeric(regions[["End"]]))) {
 		stop("invalid format for regions")
 	}
 	if (!is.null(description)) {
