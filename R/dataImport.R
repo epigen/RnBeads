@@ -574,6 +574,7 @@ read.idat.files <- function(base.dir,
 		barcodes = NULL,
 		sample.sheet = NULL,
 		sep.samples=rnb.getOption("import.table.separator"),
+		dpval.method="controls",
 		useff = FALSE,
 		verbose = TRUE){
 
@@ -682,7 +683,7 @@ read.idat.files <- function(base.dir,
 		txt <- c("probes27"="HumanMethylation27",
 			"probes450"="HumanMethylation450",
 			"probesEPIC"="MethylationEPIC",
-            "probesMMBC"="MouseMethylationBeadChip")
+			"probesMMBC"="MouseMethylationBeadChip")
 		rnb.info(paste("Detected platform:", txt[platform]))
 		rm(txt)
 	}
@@ -811,6 +812,18 @@ read.idat.files <- function(base.dir,
 		qc.int$Cy5[!is.na(ctrls.indexes),sid]<-int.files[["Red"]]$Quant[na.omit(ctrls.indexes),1L]
 		qc.int$Cy3[!is.na(ctrls.indexes),sid]<-int.files[["Grn"]]$Quant[na.omit(ctrls.indexes),1L]
 
+		if(dpval.method=="pOOBAH"){
+ 			cr<-unlist(annot[annot$"Cross-reactive"!=0,c("AddressA", "AddressB")])
+			grn_probes<-setdiff(probe.categories[["typeIgrn"]]$Maddress, cr)
+			red_probes<-setdiff(probe.categories[["typeIred"]]$Maddress, cr)
+
+			Gmap<-match(grn_probes, int.files[["Red"]]$MidBlock)
+			Rmap<-match(red_probes, int.files[["Grn"]]$MidBlock)
+			bgG <- int.files[["Red"]]$Quant[Gmap,1L]
+			bgR <- int.files[["Grn"]]$Quant[Rmap,1L]
+			oob.bg<-list("Red"=ecdf(bgG), "Grn"=ecdf(bgR))
+			rm(bgG); rm(bgR)
+		}
 		for(pc in probe.categories){
 
 			Mmap<-match(pc$Maddress, int.files[[pc$Msource]]$MidBlock)
@@ -826,9 +839,13 @@ read.idat.files <- function(base.dir,
 
 			beadsM[pc$Indices,sid]<-int.files[[pc$Msource]]$Quant[Mmap,3L]
 			beadsU[pc$Indices,sid]<-int.files[[pc$Usource]]$Quant[Umap,3L]
-
-			Mdist.fun<-ecdf(qc.int[[translate.channel.name(pc$Msource)]][neg.ctrl.indexes,sid])
-			Udist.fun<-ecdf(qc.int[[translate.channel.name(pc$Usource)]][neg.ctrl.indexes,sid])
+			if(dpval.method=="pOOBAH"){
+				Mdist.fun<-oob.bg[[pc$Msource]]
+				Udist.fun<-oob.bg[[pc$Usource]]
+			}else{
+				Mdist.fun<-ecdf(qc.int[[translate.channel.name(pc$Msource)]][neg.ctrl.indexes,sid])
+				Udist.fun<-ecdf(qc.int[[translate.channel.name(pc$Usource)]][neg.ctrl.indexes,sid])
+			}
 
 			mpval<-1-Mdist.fun(M[pc$Indices,sid])
 			upval<-1-Udist.fun(U[pc$Indices,sid])

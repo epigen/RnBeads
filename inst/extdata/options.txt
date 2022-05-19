@@ -30,6 +30,7 @@ import.skip.object.check	logical	no	no		FALSE
 import.idat.chunk.size	integer	no	yes	(1,	NULL
 import.idat.platform	character	no	no	(probes27,probes450,probesEPIC,auto)	auto
 import.sex.prediction	logical	no	no		TRUE
+import.dpval.method	character	no	no	(controls,pOOBAH)	controls
 qc	logical	no	no		TRUE
 qc.boxplots	logical	no	no		TRUE
 qc.barplots	logical	no	no		TRUE
