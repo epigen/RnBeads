@@ -1,17 +1,29 @@
 RnBeads 2.15.1
 =============
 
- * Added custom reimplementations of dye-bias and background correction methods from Sesame
+ * Added custom reimplementations of dye-bias and background correction methods from SeSaMe
 
 RnBeads 2.13.2
 =============
 
  * Removed support for RefFreeEWAS, since the package is not supported anymore
 
+RnBeads 2.13.0
+=============
+
+ * Compatibility fixes with SeSaMe by zwdzwd
+ * Minor bugfixes
+
+RnBeads 2.11.0
+=============
+
+ * Bugfixes in MMBC support
+
 RnBeads 2.9.4
 =============
 
  * Added initial version of the Mouse Methylation Bead Chip support
+ * Native implementations of basic dye-bias and background correction methods (methylumi dependency removed)
 
 RnBeads 2.9.3
 =============
