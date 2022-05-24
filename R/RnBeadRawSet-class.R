@@ -306,7 +306,7 @@ RnBeadRawSet<-function(
 			rownames(bead.counts.U)<-NULL
 			U[,][bead.counts.U[,]<1]<-NA
 			if(!is.null(U0)){
-				U0[,][bead.counts.M[,]<1]<-NA
+				U0[,][bead.counts.U[,]<1]<-NA
 			}
 		}
 		

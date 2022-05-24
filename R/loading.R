@@ -131,7 +131,7 @@ rnb.execute.import<-function(data.source, data.type=rnb.getOption("import.defaul
 		}
 
 		if(length(data.source)==1L){
-			result <- read.idat.files(base.dir=data.source[[1]], useff=rnb.getOption("disk.dump.big.matrices"), verbose=verbose )
+			result <- read.idat.files(base.dir=data.source[[1]], useff=rnb.getOption("disk.dump.big.matrices"), dpval.method=rnb.getOption("import.dpval.method"), verbose=verbose )
 		}else{
 			if (!is.data.frame(data.source[[2]])) {
 				if(!file.exists(data.source[[2]]) || file.info(data.source[[2]])[1,"isdir"]){
@@ -139,7 +139,7 @@ rnb.execute.import<-function(data.source, data.type=rnb.getOption("import.defaul
 				}
 			}
 			result <- read.idat.files(base.dir=data.source[[1]], sample.sheet=data.source[[2]],
-					useff=rnb.getOption("disk.dump.big.matrices"), verbose=verbose)
+					useff=rnb.getOption("disk.dump.big.matrices"),  dpval.method=rnb.getOption("import.dpval.method"), verbose=verbose)
 		}
 		gc()
 		rnb.cleanMem()
