@@ -553,6 +553,9 @@ read.idat.files2 <- function(base.dir,
 #'                       barcode.
 #' @param sep.samples	 \code{character} string used as field separator in the sample sheet file.
 #' 						 Default value is taken by the call to \code{rnb.getOption("import.table.separator")}
+#' @param dpval.method   \code{character} indicating which method is to be used to compute detection p-values
+#' 				By default, \code{'controls'} uses the built-in control probes, while the
+#' 				\code{'pOOBAH'} method from the sesame package is also available.
 #' @param useff			 If \code{TRUE} \code{ff} package is used to store large matrices on the hard disk
 #' @param verbose        Flag specifying whether the messages to the logger should be sent. Note that the logger
 #'                       must be initialized prior to calling this function. Logging is useful for keeping a

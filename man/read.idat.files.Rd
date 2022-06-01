@@ -9,6 +9,7 @@ read.idat.files(
   barcodes = NULL,
   sample.sheet = NULL,
   sep.samples = rnb.getOption("import.table.separator"),
+  dpval.method = "controls",
   useff = FALSE,
   verbose = TRUE
 )
@@ -29,6 +30,10 @@ barcode.}
 
 \item{sep.samples}{\code{character} string used as field separator in the sample sheet file.
 Default value is taken by the call to \code{rnb.getOption("import.table.separator")}}
+
+\item{dpval.method}{\code{character} indicating which method is to be used to compute detection p-values
+By default, \code{'controls'} uses the built-in control probes, while the
+\code{'pOOBAH'} method from the sesame package is also available.}
 
 \item{useff}{If \code{TRUE} \code{ff} package is used to store large matrices on the hard disk}
 
