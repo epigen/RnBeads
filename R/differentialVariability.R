@@ -1215,11 +1215,12 @@ cols.to.rank.region <- function(diff.var){
 #' @param variability.method method to use for calculating p-values. One of `diffVar` or `iEVORA`
 #' @param paired Should paired analysis be conducted? If yes, the first entry in \code{inds.g1} should correspond to the first
 #'        in \code{indg.g2} and so on.
+#' @param eps Epsilon for computing quotients (avoid division by 0 by adding this value to denominator and enumerator before calculating the quotient)
 #' @param adjustment.table Table specifying the variables to be adjusted for in the analysis.
 #' @noRd
 computeDiffVar.bin.site <- function(X,inds.g1,inds.g2,
                                     variability.method=rnb.getOption("differential.variability.method"),
-                                    paired=FALSE, adjustment.table=NULL){
+                                    paired=FALSE, adjustment.table=NULL, eps=0.01){
   p.vals.var <- rep(as.double(NA),nrow(X))
   do.p.vals <- ncol(X[,inds.g1]) > 1 || ncol(X[inds.g2]) > 1
   if (do.p.vals) {
@@ -1281,8 +1282,8 @@ computeDiffVar.bin.site <- function(X,inds.g1,inds.g2,
   var.g2 <- apply(tab.g2,1,var)
   if(paired){
     var.diff <- apply(tab.g1 - tab.g2,1,var)
-    var.log.ratio <- apply(X,1,function(X,inds.g1,inds.g2){
-      var((X[,inds.g1]+eps)/(X[.inds.g2]+eps))
+    var.log.ratio <- apply(X,1,function(x){
+      log2(var(x[inds.g1]+eps)/var(x[inds.g2]+eps))
     })
   }else{
     var.diff <- var.g1-var.g2

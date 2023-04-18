@@ -437,8 +437,8 @@ computeDiffTab.default.site <- function(X,inds.g1,inds.g2,
 	  
 	  if(paired){
 	    var.diff <- apply(tab.g1 - tab.g2,1,var)
-	    var.log.ratio <- apply(X,1,function(X,inds.g1,inds.g2){
-	      var((X[,inds.g1]+eps)/(X[.inds.g2]+eps))
+	    var.log.ratio <- apply(X,1,function(x){
+	      log2(var(x[inds.g1]+eps)/var(x[inds.g2]+eps))
 	    })
 	  }else{
 	    var.diff <- var.g1-var.g2
