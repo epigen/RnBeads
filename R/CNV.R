@@ -242,8 +242,11 @@ getCGCounts<-function(cnv.profiles, rnb.set){
 
 rnb.execute.cnv<-function(object){
 	
-	glad.profiles <- getGLADProfiles(object)
-	cg.counts <- getCGCounts(glad.profiles, object)
+    logger.warning("CNV calling currently not supported due to dependency issues")
+	#glad.profiles <- getGLADProfiles(object)
+	#cg.counts <- getCGCounts(glad.profiles, object)
+    glad.profiles <- NULL
+    cg.counts <- NULL
 	
 	list(cnv.profiles=glad.profiles, cg.counts=cg.counts)
 	
@@ -316,8 +319,10 @@ rnb.section.cnv<-function(report, cnv.data){
 #' @author Pavlo Lutsik
 #' @export
 rnb.step.cnv<-function(rnb.set, report){
+
+    logger.warning("CNV calling currently not supported due to dependency issues")
   
-	rnb.require("GLAD")
+	#rnb.require("GLAD")
 
 	if (!inherits(report, "Report")) {
 		stop("invalid value for report")
@@ -327,7 +332,7 @@ rnb.step.cnv<-function(rnb.set, report){
 	
 	cnv.data<-rnb.execute.cnv(rnb.set)
 	
-	report<-rnb.section.cnv(report, cnv.data)
+	#report<-rnb.section.cnv(report, cnv.data)
 	
 	logger.completed()
 	

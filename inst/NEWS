@@ -1,3 +1,8 @@
+RnBeads 2.17.1
+=============
+
+ * Temporarily removed the GLAD dependency and CNV functionality
+
 RnBeads 2.17.0
 =============
 

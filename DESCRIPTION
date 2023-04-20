@@ -13,8 +13,8 @@ Authors@R: c(
     role = c("aut")),
     person("Fabian", "Mueller", email = "team@rnbeads.org",
     role = c("aut", "cre")))
-Date: 2022-05-24
-Version: 2.17.0
+Date: 2023-04-20
+Version: 2.17.1
 Suggests:
     Category,
     GOstats,
@@ -46,7 +46,6 @@ Suggests:
     qvalue,
     argparse,
     glmnet,
-    GLAD,
     IlluminaHumanMethylation450kanno.ilmn12.hg19,
     scales,
     missMethyl,
