@@ -153,8 +153,8 @@ rnb.plot.GLAD.profile<-function(glad.profile, label, sample.names = NA, numeric.
 					ifelse(!is.na(sample.names) && numeric.names, 
 							match(label, sample.names), gsub("[ |_]", ".", label)) , sep="_"), ...)
 		
-	GLAD::plotProfile(glad.profile,cytoband=get("cytoband", envir = cytoband_env), Bkp=TRUE, Smoothing="Smoothing", main=paste(label),
-	                  labels=F)
+	#GLAD::plotProfile(glad.profile,cytoband=get("cytoband", envir = cytoband_env), Bkp=TRUE, Smoothing="Smoothing", main=paste(label),
+	#                  labels=F)
 		
 	off(plot.file)
 	return(plot.file)
