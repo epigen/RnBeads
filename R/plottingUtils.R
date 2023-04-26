@@ -1244,7 +1244,8 @@ plotCGHProfile <- function(profileCGH, variable="LogRatio", Chromosome=NULL,
 		
 		for (i in 1:NbChr)
 		{
-			GLAD::plotCytoBand(cytobandNew, Chromosome=LabelChrCyto[i], labels=labels, y=0, height=2, colCytoBand=colCytoBand, colCentro=colCentro)
+            logger.warning('GLAD package currently not available')
+			#GLAD::plotCytoBand(cytobandNew, Chromosome=LabelChrCyto[i], labels=labels, y=0, height=2, colCytoBand=colCytoBand, colCentro=colCentro)
 		}
 		
 		par(mar=c(4,4,0,2))
