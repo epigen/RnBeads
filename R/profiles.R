@@ -105,7 +105,7 @@ index.list.2.factor <- function(ll,n){
 	res <- rep(NA,n)
 	ggs <- names(ll)
 	if(is.null(ggs)) ggs <- 1:length(ll)
-	inds.names.na <- which(is.na(ggs)||(ggs==""))
+	inds.names.na <- which(is.na(ggs)|(ggs==""))
 	ggs[inds.names.na] <- inds.names.na
 	for(i in 1:length(ll)){
 		if (any(!is.na(res[ll[[i]]]))) stop("Non-disjoint index sets")
