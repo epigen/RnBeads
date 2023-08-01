@@ -1,3 +1,8 @@
+RnBeads 2.19.0
+=============
+
+ * Fixed issue with logical having a length greater than 1
+
 RnBeads 2.17.1
 =============
 
