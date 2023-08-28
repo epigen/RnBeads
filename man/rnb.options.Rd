@@ -46,6 +46,9 @@ is available (see below). Attempting to get or set the value of a non-existing o
   \item{\bold{\code{analyze.sites}}\code{ = TRUE}}{
        Flag indicating if analysis on site or probe level is to be conducted. Note that the preprocessing module
        always operates on the site level (only), regardless of the value of this option.}
+  \item{\bold{\code{preanalysis.script}}\code{no default}}{
+       Path to an R script that is executed before every module. This options is useful
+       if e.g., if you specify custom regions that have to be present in a cluster enviroment.}
   \item{\bold{\code{region.types}}\code{ = NULL}}{
        Region types to carry out analysis on, in the form of a \code{character} vector. \code{NULL} (default value)
        signifies that all available region annotations (as returned by \code{\link{rnb.region.types}}) are summarized

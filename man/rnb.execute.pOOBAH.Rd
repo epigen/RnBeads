@@ -44,7 +44,7 @@ In addition, unreliable low-intensity probes might also be masked.
 \examples{
 library(RnBeads.hg19) 
 data(small.example.object)
-filtered <- rnb.execute.pOOBAH(rnb.set.example)
+
 
 }
 \author{
