@@ -570,7 +570,7 @@ rnb.step.import <- function(data.source, data.type = rnb.getOption("import.defau
 	logger.status(c("Loaded data from", d.source))
 
 	## Perform sex prediction
-	if (rnb.getOption("import.sex.prediction") && inherits(object, c("RnBeadRawSet","RnBiseqSet")) && object@target %in% c("probes450","probesEPIC","CpG")) {
+	if (rnb.getOption("import.sex.prediction") && inherits(object, c("RnBeadRawSet","RnBiseqSet")) && object@target %in% c("probes450","probesEPIC","probesEPICv2","CpG")) {
 		object <- rnb.execute.sex.prediction(object)
 		if (is.null(object@inferred.covariates$sex)) {
 			object@inferred.covariates$sex <- FALSE

@@ -173,7 +173,7 @@ RnBeadRawSet<-function(
 		beta.offset=100,
 		summarize.bead.counts=TRUE,
 		summarize.regions=TRUE,
-		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", "hg19")),
+		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", "hg19"))),
 		useff=rnb.getOption("disk.dump.big.matrices"),
 		ffcleanup=FALSE){
 		
@@ -248,6 +248,9 @@ RnBeadRawSet<-function(
 		if (platform =="EPIC") {
 			target <- "probesEPIC"
 			assembly <- "hg19"
+		}else if (platform =="EPICv2") {
+			target <- "probesEPICv2"
+			assembly <- "hg38"
 		}else if (platform =="450k") {
 			target <- "probes450"
 			assembly <- "hg19"
@@ -261,6 +264,8 @@ RnBeadRawSet<-function(
 			rnb.error("Invalid value for platform")
 		}
 		
+
+		saveRDS(probes, "/Users/baris.kalem/Code/RnBeads/probes.RDS")
 		res<-match.probes2annotation(probes, target, assembly)
 		sites<-res[[1]]
 		site.ids<-res[[2]]
@@ -415,6 +420,8 @@ setAs("MethyLumiSet", "RnBeadRawSet",
 			
 			if(annotation(from)=="IlluminaMethylationEPIC"){
 				platform="EPIC"
+			}else if(annotation(from)=="IlluminaMethylationEPIC"){
+				platform="EPICv2"
 			}else if(annotation(from)=="IlluminaHumanMethylation450k"){
 				platform="450k"
 			}else if(annotation(from)=="IlluminaHumanMethylation27k"){
@@ -497,6 +504,9 @@ setAs("RnBeadRawSet","MethyLumiSet",
 					## TODO remove this after annotation has been fixed
 					index<-rnb.update.controlsEPIC.enrich(rnb.get.annotation("controlsEPIC"))[,"Index"]
 					probeIDs<-paste(probeIDs, index, sep=".")
+				}else if(from@target == "probesEPICv2"){
+					probeIDs<-rnb.get.annotation("controlsEPICv2")[,"Target"]
+					probeIDs<-paste(probeIDs, unlist(sapply(table(probeIDs)[unique(probeIDs)], seq, from=1 )), sep=".")
 				}else if(from@target == "probes450"){
 					probeIDs<-rnb.get.annotation("controls450")[,"Target"]
 					probeIDs<-paste(probeIDs, unlist(sapply(table(probeIDs)[unique(probeIDs)], seq, from=1 )), sep=".")
@@ -509,6 +519,8 @@ setAs("RnBeadRawSet","MethyLumiSet",
 								
 				if(from@target == "probesEPIC"){
 					annotation(mset@QC) <- "IlluminaMethylationEPIC"
+				}else if(from@target == "probesEPICv2"){
+					annotation(mset@QC) <- "IlluminaMethylationEPICv2"
 				}else if(from@target == "probes450"){
 					annotation(mset@QC) <- "IlluminaHumanMethylation450k"
 				}else if(from@target == "probes27"){
@@ -518,6 +530,8 @@ setAs("RnBeadRawSet","MethyLumiSet",
 			
 			if(from@target == "probesEPIC"){
 				annotation(mset) <- "IlluminaMethylationEPIC"
+			}else if(from@target == "probesEPICv2"){
+				annotation(mset) <- "IlluminaMethylationEPICv2"
 			}else if(from@target == "probes450"){
 				annotation(mset) <- "IlluminaHumanMethylation450k"
 			}else if(from@target == "probes27"){
@@ -541,6 +555,9 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 		if (assay.name == "IlluminaHumanMethylationEPIC") {
 			assay.name <- "probesEPIC"
 			platform.name <- "EPIC"
+		} else if (assay.name == "IlluminaHumanMethylationEPICv2") {
+			assay.name <- "probesEPICv2"
+			platform.name <- "EPICv2"
 		} else if (assay.name == "IlluminaHumanMethylation450k") {
 			assay.name <- "probes450"
 			platform.name <- "450k"
@@ -552,7 +569,7 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 		}
 	
 		## Use RnBeads' mapping from probe IDs to addresses
-		probes.all <- rnb.get.annotation(assay.name, "hg19")
+		probes.all <- rnb.get.annotation(assay.name, ifelse(assay.name=="probesEPICv2", "hg38", "hg19"))
 		probes.all <- lapply(probes.all, function(x) {
 				result <- as.data.frame(mcols(x)[, c("Design", "Color", "AddressA", "AddressB")])
 				rownames(result) <- names(x)
@@ -560,7 +577,7 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 			}
 		)
 		probes.all <- do.call(rbind, unname(probes.all))
-		controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), "hg19")
+		controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", "hg19"))
 		controls.all <- controls.all[, "ID"]
 
 		## Extract data on signals
@@ -656,7 +673,7 @@ setAs("RnBeadRawSet", "RGChannelSet", function(from, to){
 #	)
 #	probes.all <- do.call(rbind, unname(probes.all))
 	probes.all <- annotation(from)[,c("Design", "Color", "AddressA", "AddressB")]
-	controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), "hg19")
+	controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", "hg19"))
 	controls.all <- controls.all[, "ID"]
 
 	# Obtain methylated and unmethylated intensities
@@ -727,6 +744,8 @@ setAs("RnBeadRawSet", "RGChannelSet", function(from, to){
 
 	if(assay.name %in% "probesEPIC"){
 		anno <- "IlluminaHumanMethylationEPIC"
+	}else if(assay.name %in% "probesEPICv2"){
+		anno <- "IlluminaHumanMethylationEPICv2"
 	}else if(assay.name %in% "probes450"){
 		anno <- "IlluminaHumanMethylation450k"
 	}else if(assay.name %in% "probes27"){
@@ -1156,6 +1175,11 @@ intensities.by.color<-function(raw.set,
   if (raw.set@target == "probesEPIC") {
     rnb.require("IlluminaHumanMethylationEPICmanifest")
     manifest.object <- IlluminaHumanMethylationEPICmanifest
+
+#   } else if (raw.set@target == "probesEPICv2") {
+#     rnb.require("IlluminaHumanMethylationEPICv2manifest") ## TODO: Doesn't exist!
+#     manifest.object <- IlluminaHumanMethylationEPICv2manifest
+
   } else if (raw.set@target == "probes450") {
     rnb.require("IlluminaHumanMethylation450kmanifest")
     manifest.object <- IlluminaHumanMethylation450kmanifest
@@ -1278,7 +1302,7 @@ intensities.by.color<-function(raw.set,
   }
   
   if (add.controls) {
-    ncd <- rnb.get.annotation(ifelse(raw.set@target == "probesEPIC", "controlsEPIC", "controls450"))
+    ncd <- rnb.get.annotation(ifelse(raw.set@target == "probesEPIC", "controlsEPIC", ifelse(raw.set@target == "probesEPICv2", "controlsEPICv2", "controls450")))
     #ncd <- ncd[ncd[["Target"]] == "NEGATIVE", ]
     ncd$Target <- tolower(ncd$Target)
     controls.by.channel <- qc(raw.set)

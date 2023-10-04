@@ -542,7 +542,7 @@ rnb.is.option <- function(txt) {
 #'		  \code{'probes450'} or \code{'probesEPIC'}. If \code{'auto'}, the platform is automatically detected
 #'		  from the IDAT file names.}
 #'   \item{\bold{\code{import.sex.prediction}}\code{ = TRUE}}{
-#'        Flag indicating if sex prediction is to be performed. Sex prediction is supported for Infinium 450k, EPIC
+#'        Flag indicating if sex prediction is to be performed. Sex prediction is supported for Infinium 450k, EPIC, EPICv2
 #'        and bisulfite sequencing datasets with signal intensity or coverage information.
 #'        The value of this option is ignored for 27k datasets.}
 #'   \item{\bold{\code{qc}}\code{ = TRUE}}{

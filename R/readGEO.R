@@ -306,7 +306,7 @@ rnb.geo.parse.series.matrix <- function(fname, verbose) {
 
 #' Import methylation data from GEO
 #'
-#' Imports Infinium 450K or MethylationEPIC data series from the Gene Expression Omnibus. This function uses the
+#' Imports Infinium 450K, MethylationEPIC or MethylationEPIC2 data series from the Gene Expression Omnibus. This function uses the
 #' series matrix file.
 #'
 #' @param accession  Character string, starting with \code{"GSE"}, representing the GEO series for download and parsing.
@@ -320,10 +320,10 @@ rnb.geo.parse.series.matrix <- function(fname, verbose) {
 #'                   directory. Keep in mind that GEO series can be demanding in terms of storage space.
 #' @return \code{\linkS4class{RnBeadSet}} object with phenotypic and beta value information.
 #'
-#' @author Yassen Assenov
+#' @author Yassen Assenov, modified by Baris Kalem
 #' @export
 rnb.read.geo <- function(accession = NULL, verbose = logger.isinitialized(), destdir = tempdir()) {
-
+	## TODO: Make it compatible with EPIC v2
 	if (verbose) {
 		rnb.logger.start("Loading GEO Data Series")
 	}
@@ -360,6 +360,6 @@ rnb.read.geo <- function(accession = NULL, verbose = logger.isinitialized(), des
 
 	## Parse the series matrix file
 	result <- rnb.geo.parse.series.matrix(fname, verbose)
-	x <- c("probes27" = "27k", "probes450" = "450k", "probesEPIC" = "EPIC")[result[[3]]]
+	x <- c("probes27" = "27k", "probes450" = "450k", "probesEPIC" = "EPIC", "probesEPICv2" = "EPICv2")[result[[3]]]
 	RnBeadSet(pheno = result[[1]], betas = result[[2]], platform = x)
 }

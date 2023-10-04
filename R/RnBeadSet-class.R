@@ -141,7 +141,7 @@ setMethod("initialize", "RnBeadSet",
 					meth.sites=meth.sites,
 					covg.sites=covg.sites,
 					status=status,
-					assembly=ifelse(target=="probesMMBC", "mm10", "hg19"),
+					assembly=ifelse(target=="probesMMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", "hg19")),
 					target=target
 			)
 			
@@ -178,7 +178,7 @@ RnBeadSet<-function(
 		qc = NULL,
 		platform = "450k",
 		summarize.regions = TRUE,
-		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", "hg19")),
+		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", "hg19"))),
 		useff=rnb.getOption("disk.dump.big.matrices")
 		){
 		
@@ -240,6 +240,9 @@ RnBeadSet<-function(
 		if (platform == "EPIC") {
 			target <- "probesEPIC"
 			assembly <- "hg19"
+		}else if (platform == "EPICv2") {
+			target <- "probesEPICv2"
+			assembly <- "hg38"
 		}else if (platform == "450k") {
 			target <- "probes450"
 			assembly <- "hg19"
@@ -742,7 +745,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 		stop("wrong value for probes")
 	}
 	
-	if(!all(grepl("^cg|^ch|^rs", probes))){
+	if(!all(grepl("^cg|^ch|^rs|^nv", probes))){ ## TODO: nv is EPICv2 only
 		stop("probes contains invalid IDs")
 	}
 	

@@ -42,7 +42,7 @@ RNB.MODULES.LOG.MSG <- c(
 	"exploratory_analysis"="Exploratory Analysis",
 	"differential_methylation"="Differential Methylation"
 )
-RNB.PLATFORMS <- c("Bisulfite Sequencing"="biseq", "Illumina EPIC"="illEpic", "Illumina 450k"="ill450k", "Illumina27k"="ill27k")
+RNB.PLATFORMS <- c("Bisulfite Sequencing"="biseq", "Illumina EPIC"="illEpic", "Illumina EPIC v2"="illEpicv2", "Illumina 450k"="ill450k", "Illumina27k"="ill27k")
 RNB.ASSEMBLIES <- rnb.get.assemblies()
 RNB.TABLE.SEPS <- c("comma" = ",", "tab"="\t")
 RNB.BED.STYLES <- c("BisSNP"="BisSNP", "ENCODE"="Encode", "EPP"="EPP", "Bismark cytosine"="bismarkCytosine", "Bismark coverage"="bismarkCov")

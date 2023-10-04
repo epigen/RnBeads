@@ -2820,7 +2820,7 @@ get.comparison.info <- function(x, pheno.cols=rnb.getOption("differential.compar
 
 		pheno.cols.all.pairwise <- intersect(pheno.cols.all.pairwise,names(group.info.all.pairwise))
 		if (length(pheno.cols.all.pairwise)<1) {
-			logger.warning("No pariwise comparison specifier could be matched to the comparisons conducted")
+			logger.warning("No pairwise comparison specifier could be matched to the comparisons conducted")
 		} else {
 			logger.info(c("Conducting all pairwise comparisons for columns:",paste(pheno.cols.all.pairwise,collapse=",")))
 			logger.info("All pairwise comparisons are performed on a subset of sample groupings. Caution: this could increase the runtime significantly

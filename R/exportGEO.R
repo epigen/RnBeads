@@ -46,13 +46,14 @@ prepareGEOSampleInfoTemplate<-function(rnb.set, pheno.cols=1:ncol(pheno(rnb.set)
 		sample.descr<-NULL
 	}
 	
-	platform <- c("HumanMethylation27", "HumanMethylation450", "HumanMethylationEPIC")[match(rnb.set@target, c('probes27','probes450','probesEPIC'))]
+	platform <- c("HumanMethylation27", "HumanMethylation450", "HumanMethylationEPIC", "HumanMethylationEPICv2")[match(rnb.set@target, c('probes27','probes450','probesEPIC', 'probesEPICv2'))]
 	chipVersion<-"unknown"
 	organism <- c("Homo sapiens", "Mus muscullus", "Rattus norvegicus")[which(!is.na(pmatch( c('hg','mm','rn'), assembly(rnb.set))))]
 	platformID<-c(
 			"HumanMethylation27"="GPL8490",
 			"HumanMethylation450"="GPL13534",
-			"HumanMethylationEPIC"="GPL23976")[platform]
+			"HumanMethylationEPIC"="GPL23976",
+			"HumanMethylationEPICv2"="GPL33022")[platform]
 	
 	templateTitle <- c(
 			"Sample_title", 

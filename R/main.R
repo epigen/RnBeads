@@ -1604,7 +1604,7 @@ rnb.run.differential <- function(rnb.set, dir.reports,
 		}
 	logger.completed()
 
-	if (TRUE){
+	if (!is.null(diffmeth)){
 		logger.start("Saving temp objects for debugging")
 			dataDir <- rnb.get.directory(report, "data", absolute=TRUE)
 			diffmeth.path <- file.path(dataDir, "differential_rnbDiffMeth")
