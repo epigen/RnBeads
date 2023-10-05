@@ -744,8 +744,14 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	if(!is.character(probes)){
 		stop("wrong value for probes")
 	}
+
+	probe.identifiers.pattern <- "^cg|^ch|^rs"
+	## EPIC v2 has a new probe type "nv"
+	if (target == "probesEPICv2") {
+		probe.identifiers.pattern <- paste(probe.identifiers.pattern, "|^nv", sep="")
+	}
 	
-	if(!all(grepl("^cg|^ch|^rs|^nv", probes))){ ## TODO: nv is EPICv2 only
+	if(!all(grepl(probe.identifiers.pattern, probes))){
 		stop("probes contains invalid IDs")
 	}
 	
