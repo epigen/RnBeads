@@ -98,7 +98,7 @@ EPIC.CONTROL.TARGETS <- c(
 	"staining" = "STAINING",
 	"target removal" = "TARGET REMOVAL")
 
-EPICv2.CONTROL.TARGETS <- c(
+EPICv2.CONTROL.TARGETS <- c( ## TODO: Not tested for EPIC v2 (I assume it's compatible)
 	"bisulfite conversion I" = "BISULFITE CONVERSION I",
 	"bisulfite conversion II" = "BISULFITE CONVERSION II",
 	"extension" = "EXTENSION",
@@ -470,7 +470,6 @@ data.frame2GRanges <- function(dframe, ids = rownames(dframe), chrom.column = "C
 #' @author Yassen Assenov
 #' @noRd
 load.annotations <- function(assembly = NULL, sites = NULL) {
-	# "assembly:hg38 sites:probesEPICv2"
 	load.f <- function(fname, pname = paste0("RnBeads.", assembly)) {
 		if (pname != "RnBeads") {
 			if (!suppressPackageStartupMessages(require(pname, character.only = TRUE))) {

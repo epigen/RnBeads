@@ -748,7 +748,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	probe.identifiers.pattern <- "^cg|^ch|^rs"
 	## EPIC v2 has a new probe type "nv"
 	if (target == "probesEPICv2") {
-		probe.identifiers.pattern <- paste(probe.identifiers.pattern, "|^nv", sep="")
+		probe.identifiers.pattern <- paste(probe.identifiers.pattern, "|^nv", sep="") ## TODO: EPIC v2: Add "nv" functionality
 	}
 	
 	if(!all(grepl(probe.identifiers.pattern, probes))){

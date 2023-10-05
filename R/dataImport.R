@@ -899,26 +899,25 @@ read.idat.files <- function(base.dir,
     
     ### solve the problem of duplicated probes
     ### in each pair select those that have a lower detection p-value
-    # if(rnb.platform=="MMBC"){ ## TODO: Uncomment this 'if' block
+    if(rnb.platform=="MMBC"){
        
-    #    probe_names<-annot[["Name"]]
-    #    dup_probe_names<-unique(probe_names[duplicated(probe_names)])
-    #    dup_ind<-which(probe_names %in% dup_probe_names)
-    #    dup_ind<-dup_ind[order(probe_names[dup_ind])]
-    #    dup_probe_names<-probe_names[dup_ind]
-    #    keep<-unlist(tapply(dup_ind, dup_probe_names, function(ind) ind[which.max(rowSums(dpvals[ind,]==colMins(dpvals[ind,])))]))
-    #    remove<-setdiff(dup_ind,keep)
+       probe_names<-annot[["Name"]]
+       dup_probe_names<-unique(probe_names[duplicated(probe_names)])
+       dup_ind<-which(probe_names %in% dup_probe_names)
+       dup_ind<-dup_ind[order(probe_names[dup_ind])]
+       dup_probe_names<-probe_names[dup_ind]
+       keep<-unlist(tapply(dup_ind, dup_probe_names, function(ind) ind[which.max(rowSums(dpvals[ind,]==colMins(dpvals[ind,])))]))
+       remove<-setdiff(dup_ind,keep)
        
-    #    probes<-probes[-remove]
-    #    M<-M[-remove,]
-    #    U<-U[-remove,]
-    #    M0<-M0[-remove,]
-    #    U0<-U0[-remove,]
-    #    beadsM<-beadsM[-remove,]
-    #    beadsU<-beadsU[-remove,]
-    #    dpvals<-dpvals[-remove,]
-    # }
-
+       probes<-probes[-remove]
+       M<-M[-remove,]
+       U<-U[-remove,]
+       M0<-M0[-remove,]
+       U0<-U0[-remove,]
+       beadsM<-beadsM[-remove,]
+       beadsU<-beadsU[-remove,]
+       dpvals<-dpvals[-remove,]
+    }
 
 	object<-RnBeadRawSet(
 			pheno = sample.sheet,
