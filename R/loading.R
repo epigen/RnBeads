@@ -404,6 +404,9 @@ rnb.section.import<-function(report, object, data.source, data.type=rnb.getOptio
 	if(data.type %in% c("rnb.set", "rnb.set.dir")) dtype="RnBead Set object"
 	descr<-c(
 		   "Data type",
+		   if (dtype == ".idat files"){
+			"Infinium platform"
+		   },
 	       "Data source",
 		   if(class(object)=="RnBiseqSet") "Genome assembly used" else NULL,
            "Number of samples",
@@ -413,6 +416,15 @@ rnb.section.import<-function(report, object, data.source, data.type=rnb.getOptio
            if(inherits(object, "RnBeadSet")) "Quality control information" else NULL)
 
 	vals<-c(dtype,
+			if (dtype == ".idat files"){
+				platform <- rnb.detect.infinium.platform(list.files(path = data.source$data.dir, full.names = TRUE))
+				txt <- c("probes27"="HumanMethylation27",
+				"probes450"="HumanMethylation450",
+				"probesEPIC"="MethylationEPIC",
+				"probesEPICv2"="MethylationEPICv2",
+				"probesMMBC"="MouseMethylationBeadChip")
+				txt[platform]
+		   },
 		if(is.list(data.source)){ 
 					if(is.null(data.source[[1]])){
 						NA_character_

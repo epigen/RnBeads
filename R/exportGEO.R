@@ -52,7 +52,7 @@ prepareGEOSampleInfoTemplate<-function(rnb.set, pheno.cols=1:ncol(pheno(rnb.set)
 	platformID<-c(
 			"HumanMethylation27"="GPL8490",
 			"HumanMethylation450"="GPL13534",
-			"HumanMethylationEPIC"="GPL23976",
+			"HumanMethylationEPIC"="GPL23976", ## Alternative: GPL21145
 			"HumanMethylationEPICv2"="GPL33022")[platform]
 	
 	templateTitle <- c(
