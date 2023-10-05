@@ -766,8 +766,7 @@ rnb.get.assemblies <- function() {
 #' \donttest{
 #' rnb.get.annotation("promoters")
 #' }
-rnb.get.annotation <- function(type = "CpG", assembly = "hg38") {
-	## TODO: Make it hg38 compatible
+rnb.get.annotation <- function(type = "CpG", assembly = "hg19") {
 	if (!(is.character(type) && length(type) == 1 && (!is.na(type)))) {
 		stop("invalid value for type")
 	}

@@ -265,7 +265,6 @@ RnBeadRawSet<-function(
 		}
 		
 
-		saveRDS(probes, "/Users/baris.kalem/Code/RnBeads/probes.RDS")
 		res<-match.probes2annotation(probes, target, assembly)
 		sites<-res[[1]]
 		site.ids<-res[[2]]

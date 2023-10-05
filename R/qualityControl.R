@@ -392,7 +392,7 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
 	  cmd <- rnb.get.annotation("controlsEPIC")
 	  ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPIC")[c(14,4,3,15,1:2,12:13,6,11)]]
   }else if(object@target=="probesEPICv2"){
-	  cmd <- rnb.get.annotation("controlsEPICv2")
+	  cmd <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
 	  ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPICv2")[c(14,4,3,15,1:2,12:13,6,11)]]
   }else if(object@target=="probes450"){
   	cmd <- rnb.get.annotation("controls450")

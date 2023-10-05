@@ -60,7 +60,7 @@ rnb.plot.control.boxplot <- function(
 	if(rnb.set@target=="probesEPIC"){
 		meta <- rnb.get.annotation("controlsEPIC")
 	}else if(rnb.set@target=="probesEPICv2"){
-		meta <- rnb.get.annotation("controlsEPICv2")
+		meta <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
 	}else if(rnb.set@target=="probes450"){
 		meta <- rnb.get.annotation("controls450")
 	}else if(rnb.set@target=="probes27"){
