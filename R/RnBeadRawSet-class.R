@@ -1176,7 +1176,7 @@ intensities.by.color<-function(raw.set,
     manifest.object <- IlluminaHumanMethylationEPICmanifest
 
 #   } else if (raw.set@target == "probesEPICv2") {
-#     rnb.require("IlluminaHumanMethylationEPICv2manifest") ## TODO: Doesn't exist!
+#     rnb.require("IlluminaHumanMethylationEPICv2manifest") ## TODO: Doesn't exist for EPIC v2!
 #     manifest.object <- IlluminaHumanMethylationEPICv2manifest
 
   } else if (raw.set@target == "probes450") {

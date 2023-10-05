@@ -12,7 +12,8 @@ GEO.PLATFORMS <- c(
 	"GPL8490" = "probes27",
 	"GPL13534" = "probes450",
 	"GPL16304" = "probes450",
-	"GPL21145" = "probesEPIC")
+	"GPL21145" = "probesEPIC",
+	"GPL33022" = "probesEPICv2") ## https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GPL33022
 
 ## F U N C T I O N S ###################################################################################################
 
@@ -138,6 +139,7 @@ rnb.geo.parse.ids <- function(txt) {
 #' @author Yassen Assenov
 #' @noRd
 rnb.geo.init.matrix <- function(txt, N.expected, assay.type) {
+	## TODO: Implement for EPICv2
 	sample.ids <- rnb.geo.parse.ids(txt)
 	if (length(sample.ids) != N.expected) {
 		stop("Inconsistent sample characteristics and series matrix table")

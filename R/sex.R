@@ -55,7 +55,7 @@ rnb.get.XY.shifts <- function(rnb.set, signal.type = "raw") {
 	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
 	} else if(target == 'probesEPICv2'){
 	  #' There is no 'cross-active' annotation available for probes in the EPICv2 annotation
-	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
+	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) }) ## TODO: EPIC v2 SNPs need to be more strict.
 	} else{
 	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0) | (mcols(x)[, "Cross-reactive"] != 0)) })
 	}
