@@ -273,7 +273,7 @@ rnb.execute.normalization<-function(
 			intensities.by.channel<-intensities.by.color(object)
 			rga <- rga[gsub("^probes", "", object@target), ]
 		}
-		if (grepl("EPIC", rga[1])) {
+		if (grepl("EPIC", rga[1])) { ## FIXME: No EPICv2 manifest from minfi! This condition passes for EPIC v2
 			rnb.require("IlluminaHumanMethylationEPICmanifest")
 		} else {
 			rnb.require("IlluminaHumanMethylation450kmanifest")

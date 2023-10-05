@@ -1171,7 +1171,7 @@ intensities.by.color<-function(raw.set,
                                    add.controls = !is.null(qc(raw.set)),
                                    add.missing = TRUE,
                                    re.separate = FALSE) {
-  if (raw.set@target == "probesEPIC") {
+  if (raw.set@target == "probesEPIC") { ## FIXME: No minfi support for EPIC v2!
     rnb.require("IlluminaHumanMethylationEPICmanifest")
     manifest.object <- IlluminaHumanMethylationEPICmanifest
 
