@@ -58,7 +58,7 @@ rnb.plot.control.boxplot <- function(
 
 	## Extract intensities of the control probes
 	if(rnb.set@target=="probesEPIC"){
-		meta <- rnb.get.annotation("controlsEPIC")
+		meta <- rnb.get.annotation("controlsEPIC") ## TODO: EPICv1 will be hg38 compatible
 	}else if(rnb.set@target=="probesEPICv2"){
 		meta <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
 	}else if(rnb.set@target=="probes450"){
@@ -221,7 +221,7 @@ rnb.plot.negative.boxplot<- function(
 
 	
 	if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMMBC" ){
-		meta <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"="hg19", "probesMMBC"="mm10", "probesEPICv2"="hg38")[rnb.set@target])
+		meta <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"="hg19", "probesMMBC"="mm10", "probesEPICv2"="hg38")[rnb.set@target]) ## TODO: EPICv1 will be hg38 compatible
 		## Extract intensities of the control probes
 		### TODO: Remove the following passage
 		### for testing purposes only!
@@ -367,7 +367,7 @@ rnb.plot.control.barplot<-function(
 	
 	
 	if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMMBC"){
-		control.meta.data <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"="hg19", "probesEPICv2"="hg38", "probesMMBC"="mm10")[rnb.set@target])
+		control.meta.data <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"="hg19", "probesEPICv2"="hg38", "probesMMBC"="mm10")[rnb.set@target]) ## TODO: EPICv1 will be hg38 compatible
 		### TODO: Remove the following passage
 		### for testing purposes only!
 		#if(rnb.set@target=="probesEPIC"){

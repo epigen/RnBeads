@@ -247,7 +247,7 @@ RnBeadRawSet<-function(
 		
 		if (platform =="EPIC") {
 			target <- "probesEPIC"
-			assembly <- "hg19"
+			assembly <- "hg19" ## TODO: EPICv1 will be hg38 compatible
 		}else if (platform =="EPICv2") {
 			target <- "probesEPICv2"
 			assembly <- "hg38"

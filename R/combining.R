@@ -132,7 +132,7 @@ rnb.combine.arrays <- function(dataset1, dataset2, type="common") {
 		stop("Incompatible assemblies")
 	}
 	i <- c(dataset1@target, dataset2@target)
-	common.platform <- c("probesEPICv2" = "EPICv2", "probesEPIC" = "EPIC", "probes450" = "450k", "probes27" = "27k")
+	common.platform <- c("probesEPICv2" = "EPICv2", "probesEPIC" = "EPIC", "probes450" = "450k", "probes27" = "27k") ## TODO: Validate for EPICv2 (on EPICv1 ?)
 	if (!(i[1] %in% names(common.platform))) {
 		stop("Unsupported platform for dataset1")
 	}

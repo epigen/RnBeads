@@ -55,7 +55,7 @@ rnb.execute.batch.qc <- function(rnb.set, pcoordinates, permutations = NULL) {
 		type.col<-"Target"
 		ctrls<-"controlsEPIC"
 	} else if(rnb.set@target=="probesEPICv2"){
-		CONTROL.TYPES <- rnb.infinium.control.targets("probesEPICv2")[c(1:4, 6, 11:14)]
+		CONTROL.TYPES <- rnb.infinium.control.targets("probesEPICv2")[c(1:4, 6, 11:14)] ## TODO: Validate for EPICv2
 		id.col<-"ID"
 		type.col<-"Target"
 		ctrls<-"controlsEPICv2"

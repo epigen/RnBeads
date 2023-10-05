@@ -884,7 +884,7 @@ read.idat.files <- function(base.dir,
         assembly<-"hg19"
 	}else if(platform %in% "probesEPIC"){
 		rnb.platform<-"EPIC"
-        assembly<-"hg19"
+        assembly<-"hg19" ## TODO: EPICv1 will be hg38 compatible
 	}else if(platform %in% "probesEPICv2"){
 		rnb.platform<-"EPICv2"
         assembly<-"hg38"

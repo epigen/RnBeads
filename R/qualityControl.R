@@ -389,11 +389,11 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
   descr="Quality control bar plots."
 
   if(object@target=="probesEPIC"){
-	  cmd <- rnb.get.annotation("controlsEPIC")
+	  cmd <- rnb.get.annotation("controlsEPIC") ## TODO: EPICv1 will be hg38 compatible
 	  ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPIC")[c(14,4,3,15,1:2,12:13,6,11)]]
   }else if(object@target=="probesEPICv2"){
 	  cmd <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
-	  ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPICv2")[c(14,4,3,15,1:2,12:13,6,11)]]
+	  ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPICv2")[c(14,4,3,15,1:2,12:13,6,11)]] ## TODO: Validate for EPICv2
   }else if(object@target=="probes450"){
   	cmd <- rnb.get.annotation("controls450")
   	ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probes450")[c(13,4,14,3,1:2,11:12,6)]]
@@ -402,7 +402,7 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
 	ctypes<-unique(cmd$Type)[unique(cmd$Type) %in% rnb.infinium.control.targets("probes27")[c(10,3,2,11,1,9,6)]]
   }else if(object@target=="probesMMBC"){
     cmd <- rnb.get.annotation("controlsMMBC", assembly="mm10")
-    ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPIC")[c(14,4,3,15,1:2,12:13,6,11)]]
+    ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesMMBC")[c(14,4,3,15,1:2,12:13,6,11)]]
   }
   nsamp<-length(samples(object))
 
