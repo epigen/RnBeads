@@ -356,7 +356,7 @@ rnb.section.snp.probes <- function(report, object) {
 ########################################################################################################################
 
 add.qc.boxplots<-function(report, object){
-  ## TODO: EPICv2 
+  ## TODO: EPICv2: Check column positions
   descr<-"Quality control box plots."
 
   if(object@target=="probesEPIC"){
@@ -385,7 +385,7 @@ add.qc.boxplots<-function(report, object){
 #######################################################################################################################
 
 add.qc.barplots<-function(report, object, sample.batch.size=50){
-  ## TODO: EPICv2
+  ## TODO: EPICv2: Check column positions
   descr="Quality control bar plots."
 
   if(object@target=="probesEPIC"){

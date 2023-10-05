@@ -221,7 +221,7 @@ rnb.execute.normalization<-function(
 		disable.method(TRUE, 'not supported for Infinium 27k')
 	}
 	accepted <- c("none", "scaling", "scaling.internal", "scaling.reference", "bmiq", "swan", "minfi.funnorm", "wm.dasen")
-	## TODO: for EPICv2
+	## TODO: No support for EPICv2?
 	if (inherits(object, "RnBeadSet") && object@target == "probesEPIC" && !(method %in% accepted)) {
 		disable.method(TRUE, 'not supported for HumanMethylationEPIC')
 	}
@@ -258,11 +258,11 @@ rnb.execute.normalization<-function(
 	}else if (method=="swan"){
 
 		rnb.require("minfi")
-		rnb.require("IlluminaHumanMethylation450kmanifest")
+		rnb.require("IlluminaHumanMethylation450kmanifest") 
 		if(inherits(object,"MethyLumiSet") && (is.null(methylated(object))||is.null(unmethylated(object)))) {
 			rnb.error("Invalid value for object; missing intensity information")
 		}
-		## TODO: EPIC v2
+		## TODO: No support for EPIC v2?
 		rga <- c("IlluminaHumanMethylationEPIC", "ilm10b2.hg19", "IlluminaHumanMethylation450k", "ilmn12.hg19")
 		rga <- matrix(rga, 2, 2, TRUE, list(c("EPIC", "450"), c("array", "annotation")))
 		if(inherits(object,"MethyLumiSet")){
