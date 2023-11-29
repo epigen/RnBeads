@@ -419,7 +419,7 @@ setAs("MethyLumiSet", "RnBeadRawSet",
 			
 			if(annotation(from)=="IlluminaMethylationEPIC"){
 				platform="EPIC"
-			}else if(annotation(from)=="IlluminaMethylationEPIC"){
+			}else if(annotation(from)=="IlluminaMethylationEPICv2"){
 				platform="EPICv2"
 			}else if(annotation(from)=="IlluminaHumanMethylation450k"){
 				platform="450k"
