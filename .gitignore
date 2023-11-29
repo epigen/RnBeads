@@ -19,5 +19,4 @@ RnBeads.Rproj
 .Rhistory
 .gitignore
 /vignettes/figure
-analysis_script.R
 .vscode/
