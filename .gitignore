@@ -19,3 +19,4 @@ RnBeads.Rproj
 .Rhistory
 .gitignore
 /vignettes/figure
+.vscode/

@@ -356,10 +356,12 @@ rnb.section.snp.probes <- function(report, object) {
 ########################################################################################################################
 
 add.qc.boxplots<-function(report, object){
-
+  ## TODO: EPICv2: Check column positions
   descr<-"Quality control box plots."
 
   if(object@target=="probesEPIC"){
+	  ctypes<-rnb.infinium.control.targets(object@target)[c(14,4,3,15,1:2,12:13,6,11)]
+  }else if(object@target=="probesEPICv2"){
 	  ctypes<-rnb.infinium.control.targets(object@target)[c(14,4,3,15,1:2,12:13,6,11)]
   }else if(object@target=="probes450"){
   	ctypes<-rnb.infinium.control.targets(object@target)[c(13,4,3,14,1:2,11:12,6)]
@@ -383,12 +385,15 @@ add.qc.boxplots<-function(report, object){
 #######################################################################################################################
 
 add.qc.barplots<-function(report, object, sample.batch.size=50){
-
+  ## TODO: EPICv2: Check column positions
   descr="Quality control bar plots."
 
   if(object@target=="probesEPIC"){
-	  cmd <- rnb.get.annotation("controlsEPIC")
+	  cmd <- rnb.get.annotation("controlsEPIC") ## TODO: EPICv1 will be hg38 compatible
 	  ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPIC")[c(14,4,3,15,1:2,12:13,6,11)]]
+  }else if(object@target=="probesEPICv2"){
+	  cmd <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
+	  ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPICv2")[c(14,4,3,15,1:2,12:13,6,11)]] ## TODO: Validate for EPICv2
   }else if(object@target=="probes450"){
   	cmd <- rnb.get.annotation("controls450")
   	ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probes450")[c(13,4,14,3,1:2,11:12,6)]]
@@ -397,7 +402,7 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
 	ctypes<-unique(cmd$Type)[unique(cmd$Type) %in% rnb.infinium.control.targets("probes27")[c(10,3,2,11,1,9,6)]]
   }else if(object@target=="probesMMBC"){
     cmd <- rnb.get.annotation("controlsMMBC", assembly="mm10")
-    ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesEPIC")[c(14,4,3,15,1:2,12:13,6,11)]]
+    ctypes<-unique(cmd$Target)[unique(cmd$Target) %in% rnb.infinium.control.targets("probesMMBC")[c(14,4,3,15,1:2,12:13,6,11)]]
   }
   nsamp<-length(samples(object))
 
@@ -415,7 +420,7 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
 
 	  cplots<-lapply(ctypes, function(type){
 
-		if(object@target=="probes450" || object@target=="probesEPIC" || object@target=="probesMMBC"){
+		if(object@target=="probes450" || object@target=="probesEPIC" || object@target=="probesMMBC" || object@target=="probesEPICv2"){
 			cmdt <- cmd[cmd[["Target"]] == type, ]
 			pn<-paste(type, 1:(dim(cmdt)[1]),  sep=".")
 		}else if(object@target=="probes27"){
@@ -429,7 +434,7 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
 				report=report, writeToFile=TRUE, numeric.names=TRUE, width=8, height=6, low.png=100, high.png=300, verbose=TRUE,
 				name.prefix=portions[portion.id])
 
-		if(object@target=="probes450" || object@target=="probesEPIC" || object@target=="probesMMBC"){
+		if(object@target=="probes450" || object@target=="probesEPIC" || object@target=="probesMMBC" || object@target=="probesEPICv2"){
 			names(plots)<-paste(type, 1:(dim(cmdt)[1]))
 		}else if(object@target=="probes27"){
 			names(plots)<-as.character(cmdt$Name)
@@ -451,7 +456,7 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
 
 
   names(sn[[1]])<-portions
-  if(object@target=="probes450" || object@target=="probesEPIC" || object@target == "probesMMBC"){
+  if(object@target=="probes450" || object@target=="probesEPIC" || object@target == "probesMMBC" || object@target == "probesEPICv2"){
   	names(sn[[2]])<-1:length(plot.names)
   }else if(object@target=="probes27"){
 	names(sn[[2]])<-match(plot.names,cmd$Name[cmd$Type %in% rnb.infinium.control.targets("probes27")[c(10,3,2,11,1,9,6)]])

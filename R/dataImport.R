@@ -20,6 +20,10 @@ INTENSITY.SUMMARIZATION.INFO<-list(
                 "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
                 "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
                 "typeII"=list(Design="II", Color="Both", Msource="Grn", Usource="Red", Maddress="AddressA", Uaddress="AddressA")),
+		probesEPICv2=list( ## TODO: Not tested for EPIC v2 (I assume it's compatible)
+                "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
+                "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
+                "typeII"=list(Design="II", Color="Both", Msource="Grn", Usource="Red", Maddress="AddressA", Uaddress="AddressA")),
         probes450=list(
                 "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
                 "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
@@ -275,9 +279,13 @@ read.data.dir<-function(dir,
 			
 			platform <- rnb.getOption("import.idat.platform")
 			if(platform=="auto"){
-				platform <- ifelse(nrow(beta.table)>500000L,"EPIC",ifelse(nrow(beta.table)<30000L,"27k","450k"))
+				platform <- ifelse(nrow(beta.table)>500000L,ifelse(nrow(beta.table)>900000L,"EPICv2","EPIC"),
+							ifelse(nrow(beta.table)<30000L,"27k","450k"))
 			}else{
-				platform <- ifelse(platform=="probesEPIC","EPIC",ifelse(platform=="probes27","27k","450k"))
+				platform.dict <- list("probesEPIC" = "EPIC", "probesEPICv2" = "EPICv2",
+									  "probes27" = "27k", "probes450" = "450k")
+				platform <- platform.dict$platform
+				rm(platform.dict)
 			}				
 			
 			data.set<-RnBeadSet(
@@ -686,6 +694,7 @@ read.idat.files <- function(base.dir,
 		txt <- c("probes27"="HumanMethylation27",
 			"probes450"="HumanMethylation450",
 			"probesEPIC"="MethylationEPIC",
+			"probesEPICv2"="MethylationEPICv2",
 			"probesMMBC"="MouseMethylationBeadChip")
 		rnb.info(paste("Detected platform:", txt[platform]))
 		rm(txt)
@@ -695,6 +704,7 @@ read.idat.files <- function(base.dir,
             "probes27"="hg19",
             "probes450"="hg19",
             "probesEPIC"="hg19",
+			"probesEPICv2"="hg38",
             "probesMMBC"="mm10")
     
     annot_gr<-rnb.get.annotation(platform, genome[platform])
@@ -708,6 +718,11 @@ read.idat.files <- function(base.dir,
 	ncprobes<-nrow(annot.ctrls)
 	
 	if(platform=="probesEPIC"){
+        id.col<-"ID"
+		ctrls.address.col<-"ID"
+		ctrls.target.col<-"Target"
+		neg.ctrl.indexes<-which(annot.ctrls[["Target"]]=="NEGATIVE")
+	}else if(platform=="probesEPICv2"){
         id.col<-"ID"
 		ctrls.address.col<-"ID"
 		ctrls.target.col<-"Target"
@@ -869,7 +884,10 @@ read.idat.files <- function(base.dir,
         assembly<-"hg19"
 	}else if(platform %in% "probesEPIC"){
 		rnb.platform<-"EPIC"
-        assembly<-"hg19"
+        assembly<-"hg19" ## TODO: EPICv1 will be hg38 compatible
+	}else if(platform %in% "probesEPICv2"){
+		rnb.platform<-"EPICv2"
+        assembly<-"hg38"
 	}else{
         rnb.platform<-"MMBC"
         assembly<-"mm10"
@@ -900,7 +918,6 @@ read.idat.files <- function(base.dir,
        beadsU<-beadsU[-remove,]
        dpvals<-dpvals[-remove,]
     }
-
 
 	object<-RnBeadRawSet(
 			pheno = sample.sheet,
@@ -1743,7 +1760,9 @@ rnb.detect.infinium.platform <- function(idat.fnames){
   		if (length(file.sizes) == 0) {
   			rnb.error("Undefined platform; cannot read the specified IDAT files")
   		}
-        
+        if (all(file.sizes>14000000)) {
+  			return("probesEPICv2")
+  		}
   		if (all(file.sizes>10000000)) {
   			return("probesEPIC")
   		}

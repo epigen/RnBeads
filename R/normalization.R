@@ -155,7 +155,9 @@ rnb.execute.normalization<-function(
 
 			if (object@target == "probes27") {
 				disable.method(FALSE, 'not supported for Infinium 27k')
-			} else if (bgcorr.method == "methylumi.noob" && object@target == "probesEPIC") {
+			} else if (bgcorr.method == "methylumi.noob" && object@target == "probesEPICv2") {
+				disable.method(FALSE, 'methylumi.noob is not supported for MethylationEPICv2')
+            } else if (bgcorr.method == "methylumi.noob" && object@target == "probesEPIC") {
 				disable.method(FALSE, 'methylumi.noob is not supported for MethylationEPIC')
             } else if (bgcorr.method == "methylumi.noob" && object@target == "probesMMBC") {
                 disable.method(FALSE, 'methylumi.noob is not supported for MethylationMMBC')
@@ -219,6 +221,7 @@ rnb.execute.normalization<-function(
 		disable.method(TRUE, 'not supported for Infinium 27k')
 	}
 	accepted <- c("none", "scaling", "scaling.internal", "scaling.reference", "bmiq", "swan", "minfi.funnorm", "wm.dasen")
+	## TODO: No support for EPICv2?
 	if (inherits(object, "RnBeadSet") && object@target == "probesEPIC" && !(method %in% accepted)) {
 		disable.method(TRUE, 'not supported for HumanMethylationEPIC')
 	}
@@ -255,11 +258,11 @@ rnb.execute.normalization<-function(
 	}else if (method=="swan"){
 
 		rnb.require("minfi")
-		rnb.require("IlluminaHumanMethylation450kmanifest")
+		rnb.require("IlluminaHumanMethylation450kmanifest") 
 		if(inherits(object,"MethyLumiSet") && (is.null(methylated(object))||is.null(unmethylated(object)))) {
 			rnb.error("Invalid value for object; missing intensity information")
 		}
-
+		## TODO: No support for EPIC v2?
 		rga <- c("IlluminaHumanMethylationEPIC", "ilm10b2.hg19", "IlluminaHumanMethylation450k", "ilmn12.hg19")
 		rga <- matrix(rga, 2, 2, TRUE, list(c("EPIC", "450"), c("array", "annotation")))
 		if(inherits(object,"MethyLumiSet")){
@@ -270,7 +273,7 @@ rnb.execute.normalization<-function(
 			intensities.by.channel<-intensities.by.color(object)
 			rga <- rga[gsub("^probes", "", object@target), ]
 		}
-		if (grepl("EPIC", rga[1])) {
+		if (grepl("EPIC", rga[1])) { ## FIXME: No EPICv2 manifest from minfi! This condition passes for EPICv2
 			rnb.require("IlluminaHumanMethylationEPICmanifest")
 		} else {
 			rnb.require("IlluminaHumanMethylation450kmanifest")
