@@ -150,7 +150,7 @@ rnb.combine.arrays <- function(dataset1, dataset2, type="common") {
 
 	## Identify common probes
     if(type == "common"){
-	    common.sites <- intersect(rownames(dataset1@sites), rownames(dataset2@sites))
+	    common.sites <- intersect(rownames(dataset1@sites), rownames(dataset2@sites)) ## TODO: Match EPICv2 probe ids. e.g. EPICv2: cg123_12, EPICv1: cg123
     }else if(type == "all.x"){
         common.sites <- rownames(dataset1@sites)
     }else if(type == "all.y"){

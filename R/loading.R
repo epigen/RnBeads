@@ -407,6 +407,7 @@ rnb.section.import<-function(report, object, data.source, data.type=rnb.getOptio
 		   if (dtype == ".idat files"){
 			"Infinium platform"
 		   },
+		   "Annotation package",
 	       "Data source",
 		   if(class(object)=="RnBiseqSet") "Genome assembly used" else NULL,
            "Number of samples",
@@ -425,6 +426,7 @@ rnb.section.import<-function(report, object, data.source, data.type=rnb.getOptio
 				"probesMMBC"="MouseMethylationBeadChip")
 				txt[platform]
 		   },
+		   paste0("RnBeads.", rnb.getOption("assembly")),
 		if(is.list(data.source)){ 
 					if(is.null(data.source[[1]])){
 						NA_character_

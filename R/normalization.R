@@ -221,9 +221,12 @@ rnb.execute.normalization<-function(
 		disable.method(TRUE, 'not supported for Infinium 27k')
 	}
 	accepted <- c("none", "scaling", "scaling.internal", "scaling.reference", "bmiq", "swan", "minfi.funnorm", "wm.dasen")
-	## TODO: No support for EPICv2?
+
 	if (inherits(object, "RnBeadSet") && object@target == "probesEPIC" && !(method %in% accepted)) {
 		disable.method(TRUE, 'not supported for HumanMethylationEPIC')
+	}
+	if (inherits(object, "RnBeadSet") && object@target == "probesEPICv2" && !(method %in% accepted)) {
+		disable.method(TRUE, 'not supported for HumanMethylationEPICv2')
 	}
     accepted<-setdiff(.rnb.options[["accepted"]][["normalization.method"]], c("illumina", "minfi.funnorm", "swan", "wm.tost","wm.fuks", "wm.swan"))
     if (inherits(object, "RnBeadSet") && object@target == "probesMMBC" && !(method %in% accepted)) {

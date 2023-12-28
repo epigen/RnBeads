@@ -135,13 +135,15 @@ setMethod("initialize", "RnBeadSet",
 			
 			.Object@qc<-qc
 			
+			genome.assembly<-rnb.getOption("assembly")
+
 			callNextMethod(.Object,
 					pheno=pheno,
 					sites=sites,
 					meth.sites=meth.sites,
 					covg.sites=covg.sites,
 					status=status,
-					assembly=ifelse(target=="probesMMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", "hg19")),
+					assembly=ifelse(target=="probesMMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", genome.assembly)),
 					target=target
 			)
 			
@@ -178,7 +180,7 @@ RnBeadSet<-function(
 		qc = NULL,
 		platform = "450k",
 		summarize.regions = TRUE,
-		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", "hg19"))),
+		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", rnb.getOption("assembly"))),
 		useff=rnb.getOption("disk.dump.big.matrices")
 		){
 		
@@ -237,19 +239,23 @@ RnBeadSet<-function(
 			stop("invalid value for useff: should be a logical of length one")
 		}
 		
+		genome.assembly <- rnb.getOption("assembly")
 		if (platform == "EPIC") {
 			target <- "probesEPIC"
-			assembly <- "hg19" ## TODO: EPICv1 will be hg38 compatible
-		}else if (platform == "EPICv2") {
+			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
+		} else if (platform == "EPICv2") {
 			target <- "probesEPICv2"
 			assembly <- "hg38"
-		}else if (platform == "450k") {
+		} else if (platform == "450k") {
 			target <- "probes450"
-			assembly <- "hg19"
+			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
 		} else if(platform == "27k"){ 
 			target <- "probes27"
 			assembly <- "hg19"
-		}else{
+		} else if(platform == "MMBC"){
+            target <- "probesMMBC"
+            assembly <- "mm10"
+		} else{
 			stop("Invalid value for platform")
 		}
 		mr<-match.probes2annotation(probes, target, assembly)
@@ -315,7 +321,7 @@ rnb.show.rnbeadset <- function(object) {
 	probe.types <- rownames(object@sites)
 	if (!is.null(probe.types)) {
 		probe.types <- sapply(c("^cg", "^ch", "^rs"), function(type) { sum(grepl(type, probe.types)) })
-		cat(sprintf("\tof which: %g CpG, %g CpH, and %g rs\n", probe.types[1], probe.types[2], probe.types[3]))
+		cat(sprintf("\tof which: %g CpG, %g CpH, and %g rs\n", probe.types[1], probe.types[2], probe.types[3])) ## TODO: EPICv2 nv probe compatibility
 	}
 	if (!is.null(object@regions)) {
 		cat("Region types:\n")

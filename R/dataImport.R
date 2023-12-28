@@ -527,8 +527,8 @@ read.idat.files2 <- function(base.dir,
 		#gc()
 
 		rnb.options(region.types=rt)
-
-		for (region.type in rnb.region.types.for.analysis("hg19")) {
+		genome.assembly<-rnb.getOption("assembly") ## TODO: Improve genome build selection 
+		for (region.type in rnb.region.types.for.analysis(genome.assembly)) {
 			mls <- summarize.regions(mls, region.type)
 		}
 		rnb.cleanMem()
@@ -690,6 +690,7 @@ read.idat.files <- function(base.dir,
 
 	## Detect Infinium platform
 	platform<-rnb.detect.infinium.platform(idat.fnames)
+	genome.assembly<-rnb.getOption("assembly")
 	if(verbose) {
 		txt <- c("probes27"="HumanMethylation27",
 			"probes450"="HumanMethylation450",
@@ -697,13 +698,19 @@ read.idat.files <- function(base.dir,
 			"probesEPICv2"="MethylationEPICv2",
 			"probesMMBC"="MouseMethylationBeadChip")
 		rnb.info(paste("Detected platform:", txt[platform]))
+		if (platform == "probesEPICv2" && genome.assembly != "hg38") {
+			rnb.info(paste0("MethylationEPICv2 is not supported for this session's genome assembly: ", genome.assembly, ". Changing genome assembly to: hg38"))
+			rnb.options(assembly = "hg38") ## EPICv2 is only annotated in the RnBeads.hg38 package
+			genome.assembly<-rnb.getOption("assembly")
+		}
+		rnb.info(paste("Annotation package genome assembly version:", genome.assembly))
 		rm(txt)
 	}
 	
     genome<-c(
             "probes27"="hg19",
-            "probes450"="hg19",
-            "probesEPIC"="hg19",
+            "probes450"=ifelse(genome.assembly == "hg19", "hg19", "hg38"),
+            "probesEPIC"=ifelse(genome.assembly == "hg19", "hg19", "hg38"),
 			"probesEPICv2"="hg38",
             "probesMMBC"="mm10")
     
@@ -879,12 +886,17 @@ read.idat.files <- function(base.dir,
 		rnb.logger.completed()
 	}
 
-	if(platform %in% c("probes27", "probes450")){
-		rnb.platform<-paste0(gsub("probes", "", platform), "k")
+	genome.assembly<-rnb.getOption("assembly")
+	if(platform %in% "probes27"){
+		rnb.platform<-"27k"
         assembly<-"hg19"
-	}else if(platform %in% "probesEPIC"){
+	}else if(platform %in% "probes450"){
+		rnb.platform<-"450k"
+		assembly<-ifelse(genome.assembly == "hg19", "hg19", "hg38")
+	}
+	else if(platform %in% "probesEPIC"){
 		rnb.platform<-"EPIC"
-        assembly<-"hg19" ## TODO: EPICv1 will be hg38 compatible
+        assembly<-ifelse(genome.assembly == "hg19", "hg19", "hg38")
 	}else if(platform %in% "probesEPICv2"){
 		rnb.platform<-"EPICv2"
         assembly<-"hg38"
@@ -899,7 +911,7 @@ read.idat.files <- function(base.dir,
     
     ### solve the problem of duplicated probes
     ### in each pair select those that have a lower detection p-value
-    if(rnb.platform=="MMBC"){
+    if(rnb.platform=="MMBC" || rnb.platform=="EPICv2"){
        
        probe_names<-annot[["Name"]]
        dup_probe_names<-unique(probe_names[duplicated(probe_names)])

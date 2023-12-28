@@ -766,6 +766,10 @@ rnb.get.assemblies <- function() {
 #' rnb.get.annotation("promoters")
 #' }
 rnb.get.annotation <- function(type = "CpG", assembly = "hg19") {
+	if (type == "probesEPICv2" || type == "controlsEPICv2") {
+		assembly = "hg38"
+	}
+
 	if (!(is.character(type) && length(type) == 1 && (!is.na(type)))) {
 		stop("invalid value for type")
 	}
