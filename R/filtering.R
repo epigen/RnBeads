@@ -634,13 +634,16 @@ rnb.step.snp.removal <- function(rnb.set, report) {
 	if (rnb.getOption("logging") && logger.isinitialized() == FALSE) {
 		logger.start(fname = NA) # initialize console logger
 	}
+	logger.info("#############")
+	logger.info(rnb.set@assembly)
+	print("HERE")
 	is.hg38 <- ifelse(rnb.set@assembly == "hg38", TRUE, FALSE)
 	result <- rnb.step.snp.removal.internal(class(rnb.set), integer(), report,
 		annotation(rnb.set, add.names = TRUE), is.hg38)
 	return(list(dataset = remove.sites(rnb.set, result$filtered), report = result$report))
 }
 
-rnb.step.snp.removal.internal <- function(dataset.class, sites2ignore, report, anno.table, is.hg38 = FALSE) {
+rnb.step.snp.removal.internal <- function(dataset.class, sites2ignore, report, anno.table, is.hg38) {
 	## TODO: Improve for hg38 annotation.
 	if (is.hg38) {
 		logger.info("HG38 *********************")
