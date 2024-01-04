@@ -484,6 +484,11 @@ rnb.execute.snp.removal.internal <- function(sites2ignore, snp, is.infinium, ann
 		if (is.infinium) {
 			## Infinium datasets
 			snp.overlap.column <- paste("SNPs", ifelse(snp %in% c("3", "5"), snp, "Full"))
+
+			if ("SNPs 3 Alternative" %in% colnames(anno.table)) { ## To detect EPICv2: only EPICv2 anno has this column
+				snp.overlap.column <- paste(snp.overlap.column, "Alternative")
+			}
+
 			if (snp.overlap.column %in% colnames(anno.table)) {
 				filtered <- setdiff(which(anno.table[, snp.overlap.column] > 0), sites2ignore)
 			} else {
@@ -567,7 +572,7 @@ rnb.section.snp.removal.internal <- function(report, dataset.class, filtered, an
 			txt <- paste(txt, "the last", snp, "bases of")
 		}
 		txt <- paste(txt, "their sequences overlap with SNPs.")
-	} else { # dataset.class == "RnBiseqSet"
+	} else { # dataset.class == "RnBiseqSet" ## FIXME: This passes for illumina platforms
 		if (N == 0) {
 			txt <- "No sites were found that overlap"
 		} else if (N == 1) {
@@ -580,12 +585,20 @@ rnb.section.snp.removal.internal <- function(report, dataset.class, filtered, an
 
 	if (N != 0) {
 		snp.overlap.column <- paste("SNPs", ifelse(snp %in% c("3", "5"), snp, "Full"))
+		is.epicv2 = FALSE
+		if ("SNPs 3 Alternative" %in% colnames(anno.table)) { ## To detect EPICv2: only EPICv2 anno has this column
+			snp.overlap.column <- paste(snp.overlap.column, "Alternative")
+			is.epicv2 = TRUE
+		}
 		p.columns <- c("ID", "Chromosome", "Start", "End", snp.overlap.column)
 		names(p.columns) <- c(p.columns[1:(length(p.columns) - 1)], "SNPs")
 		fname <- "removed_sites_snp.csv"
 		fname <- rnb.save.removed.sites(anno.table[filtered, ], report, fname, p.columns, names(p.columns))
 		txt <- paste(txt, "The", ifelse(N == 1, paste("removed", txt.site), paste("list of removed", txt.sites)),
 					 ' is available in a <a href="', fname, '">dedicated table</a> accompanying this report.')
+		if (is.epicv2) {
+			txt <- paste(txt, "For this step, dbSNP data from the MethylationEPICv2 manifest file is utilized.")
+		}
 	}
 	report <- rnb.add.section(report, txt.title, txt)
 	return(report)
@@ -621,12 +634,19 @@ rnb.step.snp.removal <- function(rnb.set, report) {
 	if (rnb.getOption("logging") && logger.isinitialized() == FALSE) {
 		logger.start(fname = NA) # initialize console logger
 	}
+	is.hg38 <- ifelse(rnb.set@assembly == "hg38", TRUE, FALSE)
 	result <- rnb.step.snp.removal.internal(class(rnb.set), integer(), report,
-		annotation(rnb.set, add.names = TRUE))
+		annotation(rnb.set, add.names = TRUE), is.hg38)
 	return(list(dataset = remove.sites(rnb.set, result$filtered), report = result$report))
 }
 
-rnb.step.snp.removal.internal <- function(dataset.class, sites2ignore, report, anno.table) {
+rnb.step.snp.removal.internal <- function(dataset.class, sites2ignore, report, anno.table, is.hg38 = FALSE) {
+	## TODO: Improve for hg38 annotation.
+	if (is.hg38) {
+		logger.info("HG38 *********************")
+	} else {
+		logger.info("HG19 **************") ## ??
+	}
 	logger.start("Removal of SNP-enriched Sites")
 	snp <- rnb.getOption("filtering.snp")
 	is.infinium <- !(dataset.class %in% c("RnBiseqSet", "RnBSet"))
