@@ -781,14 +781,14 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	chrs<-rnb.get.chromosomes(assembly)
 	
 	probe.id.column.name = "ID"
-	is.combining.arrays = FALSE
+	is.combining.epicv2.arrays = FALSE
 	annotated.probes<-do.call("c", lapply(probe.annotation, names))
 	if (!grepl("_", probes[1]) & grepl("_", annotated.probes[1])){
 		## FIXME: Bit of a hack - This part resolves the issue when combining
 		## EPICv2 with previous arrays; since the IlmnID's do not match. i.e. cg123_BT12 vs cg123
 		annotated.probes<-do.call("c", lapply(probe.annotation, function(x) mcols(x)[["Name"]]))
-		probe.id.column.name = "Name"
-		is.combining.arrays = TRUE
+		probe.id.column.name = "Name" ## For EPICv2 annotation
+		is.combining.epicv2.arrays = TRUE
 	}
 	if(length(which(probes %in% annotated.probes))<2){
 		err<-"Annotations could be found for less than two rows from the supplied beta value table"
@@ -801,7 +801,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	}
 	
 	x.data<-rnb.annotation2data.frame(probe.annotation)
-	if (!is.combining.arrays) {
+	if (!is.combining.epicv2.arrays) {
 		rownames(x.data)<-annotated.probes
 	}
 	rm(annotated.probes)
