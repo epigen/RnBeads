@@ -908,6 +908,8 @@ read.idat.files <- function(base.dir,
 	if(is.null(sample.sheet)){
 		sample.sheet<-data.frame(barcodes=barcode)
 	}
+
+	#  saveRDS(M, "/Users/baris.kalem/Code/RnBeads_Project/Kaur_CompareEPICv1_EPICv2/duplicated_probes_bug/M_good.RDS")
     
     ### solve the problem of duplicated probes
     ### in each pair select those that have a lower detection p-value
@@ -918,17 +920,35 @@ read.idat.files <- function(base.dir,
        dup_ind<-which(probe_names %in% dup_probe_names)
        dup_ind<-dup_ind[order(probe_names[dup_ind])]
        dup_probe_names<-probe_names[dup_ind]
-       keep<-unlist(tapply(dup_ind, dup_probe_names, function(ind) ind[which.max(rowSums(dpvals[ind,]==colMins(dpvals[ind,])))]))
+   
+	   if (dim(dpvals)[2] > 1){
+		keep<-unlist(tapply(dup_ind, dup_probe_names, function(ind) ind[which.max(rowSums(dpvals[ind,]==colMins(dpvals[ind,])))]))
+		is.one.dimensional <- FALSE
+	   } else {
+		keep<-unlist(tapply(dup_ind, dup_probe_names, function(ind) ind[which.max(dpvals[ind,]==dpvals[ind,])]))
+		is.one.dimensional <- TRUE
+	   }
        remove<-setdiff(dup_ind,keep)
-       
-       probes<-probes[-remove]
-       M<-M[-remove,]
-       U<-U[-remove,]
-       M0<-M0[-remove,]
-       U0<-U0[-remove,]
-       beadsM<-beadsM[-remove,]
-       beadsU<-beadsU[-remove,]
-       dpvals<-dpvals[-remove,]
+
+	   if (is.one.dimensional) {
+		probes<-data.matrix(probes[-remove])
+        M<-data.matrix(M[-remove,])
+        U<-data.matrix(U[-remove,])
+        M0<-data.matrix(M0[-remove,])
+        U0<-data.matrix(U0[-remove,])
+        beadsM<-data.matrix(beadsM[-remove,])
+        beadsU<-data.matrix(beadsU[-remove,])
+        dpvals<-data.matrix(dpvals[-remove,])
+	   } else {
+		probes<-probes[-remove]
+		M<-M[-remove,]
+		U<-U[-remove,]
+		M0<-M0[-remove,]
+		U0<-U0[-remove,]
+		beadsM<-beadsM[-remove,]
+		beadsU<-beadsU[-remove,]
+		dpvals<-dpvals[-remove,]
+	   }
     }
 
 	object<-RnBeadRawSet(

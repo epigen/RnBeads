@@ -139,6 +139,13 @@ rnb.combine.arrays <- function(dataset1, dataset2, type="common") {
 	if (!(i[2] %in% names(common.platform))) {
 		stop("Unsupported platform for dataset2")
 	}
+    if(i[1] == "probesEPICv2") {
+        rownames(dataset1@sites) <- sapply(strsplit(rownames(dataset1@sites),"_"), `[`, 1)
+    }
+    if(i[2] == "probesEPICv2") {
+        rownames(dataset2@sites) <- sapply(strsplit(rownames(dataset2@sites),"_"), `[`, 1)
+    }
+
 	common.platform <- common.platform[intersect(names(common.platform), unique(i))]
 	common.platform <- unname(common.platform[1])
 	is.raw <- (inherits(dataset1, "RnBeadRawSet") && inherits(dataset2, "RnBeadRawSet"))

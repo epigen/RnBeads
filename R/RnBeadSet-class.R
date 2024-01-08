@@ -780,7 +780,16 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	
 	chrs<-rnb.get.chromosomes(assembly)
 	
+	probe.id.column.name = "ID"
+	is.combining.arrays = FALSE
 	annotated.probes<-do.call("c", lapply(probe.annotation, names))
+	if (!grepl("_", probes[1]) & grepl("_", annotated.probes[1])){
+		## FIXME: Bit of a hack - This part resolves the issue when combining
+		## EPICv2 with previous arrays; since the IlmnID's do not match. i.e. cg123_BT12 vs cg123
+		annotated.probes<-do.call("c", lapply(probe.annotation, function(x) mcols(x)[["Name"]]))
+		probe.id.column.name = "Name"
+		is.combining.arrays = TRUE
+	}
 	if(length(which(probes %in% annotated.probes))<2){
 		err<-"Annotations could be found for less than two rows from the supplied beta value table"
 		rnb.error(err)		
@@ -792,7 +801,9 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	}
 	
 	x.data<-rnb.annotation2data.frame(probe.annotation)
-	rownames(x.data)<-annotated.probes
+	if (!is.combining.arrays) {
+		rownames(x.data)<-annotated.probes
+	}
 	rm(annotated.probes)
 	
 	#site.ids<-character()
@@ -800,7 +811,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	p.infos <- lapply(unique(x.data[["Chromosome"]]), 
 			function(chr) {
 				chr.map<-which(x.data[["Chromosome"]]==chr)
-				chr.ids<-x.data[chr.map, "ID"]
+				chr.ids<-x.data[chr.map, probe.id.column.name]
 				table<-match(probes, chr.ids)
 				present<-!is.na(table)
 				po<-order(table[present])
@@ -811,7 +822,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 						match(x.data[chr.map[table],"Chromosome"], names(chrs)), 
 						table),
 						ncol = 3, 
-						dimnames = list(x.data[chr.map[table],"ID"], c("context", "chr", "index")))
+						dimnames = list(x.data[chr.map[table],probe.id.column.name], c("context", "chr", "index")))
 			})
 	
 #	p.infos<-matrix(c(as.integer(x.data[site.ids, "Context"]), match(x.data[site.ids,"Chromosome"], names(chrs)), unlist(p.indices)),
