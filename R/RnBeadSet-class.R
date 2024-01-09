@@ -320,8 +320,14 @@ rnb.show.rnbeadset <- function(object) {
 	cat(sprintf("%8d probes\n", nrow(object@sites)))
 	probe.types <- rownames(object@sites)
 	if (!is.null(probe.types)) {
-		probe.types <- sapply(c("^cg", "^ch", "^rs"), function(type) { sum(grepl(type, probe.types)) })
-		cat(sprintf("\tof which: %g CpG, %g CpH, and %g rs\n", probe.types[1], probe.types[2], probe.types[3])) ## TODO: EPICv2 nv probe compatibility
+		probe.types.identifiers <- c("^cg", "^ch", "^rs")
+		if (object@target == "probesEPICv2") {
+			probe.types.identifiers <- c(probe.types.identifiers, "^nv")
+		}
+		probe.types <- sapply(probe.types.identifiers, function(type) { sum(grepl(type, probe.types)) })
+		cat(sprintf("\tof which: %g CpG, %g CpH, %g rs and %g nv\n", 
+					probe.types[1], probe.types[2], probe.types[3], ifelse(object@target == "probesEPICv2", probe.types[4], 0)
+					))
 	}
 	if (!is.null(object@regions)) {
 		cat("Region types:\n")
@@ -754,7 +760,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	probe.identifiers.pattern <- "^cg|^ch|^rs"
 	## EPIC v2 has a new probe type "nv"
 	if (target == "probesEPICv2") {
-		probe.identifiers.pattern <- paste(probe.identifiers.pattern, "|^nv", sep="") ## TODO: EPIC v2: Add "nv" functionality
+		probe.identifiers.pattern <- paste(probe.identifiers.pattern, "|^nv", sep="")
 	}
 	
 	if(!all(grepl(probe.identifiers.pattern, probes))){
