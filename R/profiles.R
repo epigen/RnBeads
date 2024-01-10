@@ -345,7 +345,7 @@ rnb.step.betadistribution.internal <- function(rnb.set, report, sample.inds, pin
 	attr(pinfos, "legend") <- pinfos.legend
 	rm(is.category, pinfos.legend)
 
-	X <- meth.matrices(rnb.set)
+	X <- meth.matrices(rnb.set, include.nv.probes = TRUE)
 	sample.inds.ext <- c(list("all samples" = list("all" = 1:ncol(X[[1]]))), sample.inds)
 
 	txt.site <- rnb.get.row.token(rnb.set)
@@ -370,7 +370,7 @@ rnb.step.betadistribution.internal <- function(rnb.set, report, sample.inds, pin
 #		print(rnb.plot.betadistribution.sampleGroups(X[[j]], sample.inds.ext[[i]], names(sample.inds.ext)[i]))
 #		off(rplot)
 		pp <- rnb.plot.betadistribution.sampleGroups(X[[j]], sample.inds.ext[[i]], names(sample.inds.ext)[i],
-				log.str=names(X)[j],points.per.group=points.per.group)
+				log.str=names(X)[j],points.per.group=points.per.group) ## TODO: For nv-probes this works. However nv-probes do not indicate methylation values. Descriptions shall be provided.
 		rplot <- do.ggplot(pp,pname)
 		rnb.cleanMem()
 		return(rplot)

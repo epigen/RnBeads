@@ -2059,30 +2059,47 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		sectionText <- paste(sectionText,"</ul>",sep="")
 		rnb.add.paragraph(report, sectionText)
 
-		nv_dmt <- dmt ## New nv dmt df
-		colnames(nv_dmt)[colnames(nv_dmt) == "cgid"] <- "nv_probe_id" ## New probe id column name
-		
-		sectionText <- "The tables for the individual comparisons of <em>only nv-probes</em> can be found here:\n<ul>\n"
+		# nv_diff <- dmt ## New nv dmt df
+		# saveRDS(nv_diff, "/Users/baris.kalem/Code/RnBeads_Project/nv_probes_EPICv2/debug/nv_diff.RDS")
+
+		logger.info("Enriching nv-probes comparison table with HGNC symbols. see: GeneSymbol column in the finished table.")
+		rnb.require("biomaRt")
+		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")
+
+		sectionText <- c("For Methylation EPICv2 platform, nv-probes are available. These probes are designed to detect somatic mutations in common cancers.
+						  These probes measure DNA sequence variations rather than DNA cytosine methylation.
+						  Tables contain additional columns <code>ReferenceBase</code> and <code>AlternateBase</code> to indicate the point mutation that each nv-probe is investigating.
+						  <code>GeneSymbol</code> column indicates the associated gene for this site.\n
+						  The tables for the individual comparisons of <em>only nv-probes</em> can be found here:\n<ul>\n")
 		for (i in 1:length(comps)){
 			cc <- comps[i]
-			
+
 			annot.vec <- get.diffmeth.tab.annot.cols("sites", includeCovg, hasVariability)
 			colname.vec <- get.diffmeth.tab.annot.colnames.pretty("sites", grp.names[i,1], grp.names[i,2], includeCovg, hasVariability, covgThres=get.covg.thres(diffmeth), skipSites=FALSE)
-			nv_dmt <- get.table(diffmeth,cc,"sites",return.data.frame=TRUE)[,annot.vec]		
-			colnames(nv_dmt) <- colname.vec
-			nv_dmt <- cbind(rownames(nv_dmt),sites.info,nv_dmt)
-			nv_dmt <- nv_dmt[grepl("^nv", nv_dmt$nv_probe_id), ] ## Filter to only have nv-probes in the table
-
-			## Create a new column for Reference and Alternate bases
-			probe_id_split <- strsplit(as.character(nv_dmt$nv_probe_id), "-|_") ## e.g. nv-GRCh38-chr7-6387219-6387219-G-A_TC21
-			nv_dmt$ReferenceBase <- sapply(probe_id_split, "[[", 6)
-			nv_dmt$AlternateBase <- sapply(probe_id_split, "[[", 7)
+			nv_diff <- get.table(diffmeth,cc,"sites",return.data.frame=TRUE)[,annot.vec]
+			colnames(nv_diff) <- colname.vec
+			nv_diff <- cbind(rownames(nv_diff),sites.info,nv_diff)
+			colnames(nv_diff)[colnames(nv_diff) == "cgid"] <- "nv_probe_id" ## New probe id column name
+			colnames(nv_diff)[colnames(nv_diff) == "diffmeth.p.val"] <- "diff.p.val" ## change diffmeth to diff, since nv-probes don't indicate methylation
+			colnames(nv_diff)[colnames(nv_diff) == "diffmeth.p.adj.fdr"] <- "diff.p.adj.fdr"	
 			
-			colnames(nv_dmt)[1] <- "id"
-			rownames(nv_dmt) <- NULL
+			nv_diff <- nv_diff[grepl("^nv", nv_diff$nv_probe_id), ] ## Filter to only have nv-probes in the table
+			## Create a new column for Reference and Alternate bases
+			probe_id_split <- strsplit(as.character(nv_diff$nv_probe_id), "-|_") ## e.g. nv-GRCh38-chr7-6387219-6387219-G-A_TC21
+			nv_diff$ReferenceBase <- sapply(probe_id_split, "[[", 6)
+			nv_diff$AlternateBase <- sapply(probe_id_split, "[[", 7)
+			colnames(nv_diff)[1] <- "id"
+			rownames(nv_diff) <- NULL
+			## Add gene symbol of every nv-probe
+			for (j in 1:nrow(nv_diff)) {
+				nv_diff[j, "GeneSymbol"] <- paste(getBM(attributes = "hgnc_symbol",
+                                                    filter = c("chromosome_name", "start", "end"),
+                                                    values = list(gsub("chr","",nv_diff[j, "Chromosome"]), nv_diff[j, "Start"], nv_diff[j, "Start"]), 
+                                                    mart = mart)$hgnc_symbol, collapse = ";")
+			}
 			ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
-			fname <- paste("diffMethTable_nv_site_",ccn,".csv",sep="")
-			fname <- rnb.write.table(nv_dmt,fname,fpath=rnb.get.directory(report, "data", absolute = TRUE),format="csv",gz=gzTable,row.names = FALSE,quote=FALSE)
+			fname <- paste("diffTable_nv_site_",ccn,".csv",sep="")
+			fname <- rnb.write.table(nv_diff,fname,fpath=rnb.get.directory(report, "data", absolute = TRUE),format="csv",gz=gzTable,row.names = FALSE,quote=FALSE)
 			txt <- paste(c("<a href=\"", rnb.get.directory(report, "data"), "/", fname,"\">",cc,"</a>"),collapse="")
 			sectionText <- paste(sectionText,"<li>",txt,"</li>\n",sep="")
 		}
