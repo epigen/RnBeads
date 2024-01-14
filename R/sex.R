@@ -54,13 +54,13 @@ rnb.get.XY.shifts <- function(rnb.set, signal.type = "raw") {
 	if (genome.build == "hg38") {
 		#' There is no 'cross-active' annotation available for probes in the hg38 annotation
 		if(target == 'probesEPIC'){
-	  		probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
+	  		probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
 		} else if(target == 'probesEPICv2'){
-			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs MAF"] != 0)) })
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
 		} else if (target == 'probes450'){
 			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
 		}
-	} else { 
+	} else { ## hg19
 		if(target == 'probesEPIC'){
 	  		#' There is no 'cross-active' annotation available for probes in the EPIC annotation
 			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })

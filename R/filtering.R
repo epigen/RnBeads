@@ -485,7 +485,7 @@ rnb.execute.snp.removal.internal <- function(sites2ignore, snp, is.infinium, ann
 			## Infinium datasets
 			snp.overlap.column <- paste("SNPs", ifelse(snp %in% c("3", "5"), snp, "Full"))
 
-			if ("SNPs 3 Alternative" %in% colnames(anno.table)) { ## To detect EPICv2: only EPICv2 anno has this column
+			if ("SNPs 3 Alternative" %in% colnames(anno.table)) { ## To detect EPICv2: only EPICv2 and EPIC anno has this column
 				snp.overlap.column <- paste(snp.overlap.column, "Alternative")
 			}
 
