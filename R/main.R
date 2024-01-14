@@ -1494,8 +1494,12 @@ rnb.run.exploratory <- function(rnb.set, dir.reports,
 			"because the dataset does not contain nv probes.")
 		report <- rnb.add.section(report, section.title, txt)
 	} else if (rnb.set@target == "probesEPICv2" & (rnb.getOption("nv.heatmap") | rnb.getOption("nv.beta.distribution"))) {
+		refText <- c("Kaur, D., Lee, S. M., Goldberg, D., Spix, N. J., Hinoue, T., Li, H.-T., Dwaraka, V. B., Smith, R., ",
+					 "Shen, H., Liang, G., Renke, N., Laird, P. W., & Zhou, W. (2023). Comprehensive evaluation of the Infinium human ",
+					 "MethylationEPIC v2 BeadChip. <i>Epigenetics Communications</i>, <b>3</b>(1), 6.")
+		report <- rnb.add.reference(report, refText)
 		txt <- paste0("Analysis of the beta values of the nv probes.\n", "EPICv2 introduced nv probes which target common somatic mutations that occur in human cancers. ",
-				 	  "These probes measure DNA sequence variations rather than DNA cytosine methylation.")
+				 	  "These probes measure DNA sequence variations rather than DNA cytosine methylation. ", rnb.get.reference(report, refText))
 		report <- rnb.add.section(report, section.title, txt)
 
 		## EPICv2 nv probes Heatmap
