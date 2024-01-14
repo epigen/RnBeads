@@ -2089,15 +2089,9 @@ setMethod("destroy", signature(object="RnBSet"),
 ##         the list is the one based on sites or probes. Other matrices store region-based methylation for (some of) the
 ##         regions addressed in the option \code{"region.types"}.
 ## @author Yassen Assenov
-meth.matrices <- function(object, include.sites = rnb.getOption("analyze.sites"), include.nv.probes = FALSE) {
+meth.matrices <- function(object, include.sites = rnb.getOption("analyze.sites")) {
 	result <- list()
 	if (include.sites) result[["sites"]] <- meth(object)
-	## Include nv-probes beta values if platform is EPICv2
-	if (include.sites & include.nv.probes & object@target == "probesEPICv2") {
-		nv_meth <- meth(object, row.names = TRUE)
-		nv_meth <- nv_meth[grepl("^nv", row.names(nv_meth)), ]
-		result[["nvProbes"]] <- nv_meth
-	}
 	for (rtype in rnb.region.types.for.analysis(object)) {
 		X <- tryCatch(meth(object, rtype), error = function(e) { NULL })
 		if (!is.null(X)) {

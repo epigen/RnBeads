@@ -337,64 +337,14 @@ rnb.step.betadistribution.internal <- function(rnb.set, report, sample.inds, pin
 		res <- off(res,handle.errors=TRUE)
 		return(res)
 	}
-	## Keep only site annotations that define categories
-	is.category <- sapply(attr(pinfos, "legend"), is.character)
-	pinfos.legend <- attr(pinfos, "legend")[is.category]
-	pinfos <- as.data.frame(pinfos[, is.category])
-	colnames(pinfos) <- names(pinfos.legend)
-	attr(pinfos, "legend") <- pinfos.legend
-	rm(is.category, pinfos.legend)
 
-	X <- meth.matrices(rnb.set, include.nv.probes = TRUE)
-	sample.inds.ext <- c(list("all samples" = list("all" = 1:ncol(X[[1]]))), sample.inds)
-
-	txt.site <- rnb.get.row.token(rnb.set)
-	txt.covered <- paste(txt.site, ifelse(length(X) != 1, " and region", ""), sep = "")
-	txt <- c("Methylation value distributions were assessed based on selected sample groups. This was done on ",
-			txt.covered, " levels. This section contains the generated density plots.")
-	report <- rnb.add.section(report, "Methylation Value Distributions", txt)
-
-	## Beta value distributions for different sample groups
-	logger.start("Methylation Value Distributions - Sample Groups")
-	param.combinations <- mapply(c, rep(1:length(sample.inds.ext), each = length(X)),
-		rep(1:length(X), length(sample.inds.ext)), SIMPLIFY = FALSE)
-	create.plot <- function(params) {
-		i <- params[1]
-		j <- params[2]
-		pname <- paste("beta_density_samples", i, sep = "_")
-		if (length(X) != 1) {
-			pname <- paste(pname, j, sep = "_")
-		}
-		logger.info(c("processing",pname))
-#		rplot <- init.plot(pname)
-#		print(rnb.plot.betadistribution.sampleGroups(X[[j]], sample.inds.ext[[i]], names(sample.inds.ext)[i]))
-#		off(rplot)
-		pp <- rnb.plot.betadistribution.sampleGroups(X[[j]], sample.inds.ext[[i]], names(sample.inds.ext)[i],
-				log.str=names(X)[j],points.per.group=points.per.group) ## TODO: For nv-probes this works. However nv-probes do not indicate methylation values. Descriptions shall be provided.
-		rplot <- do.ggplot(pp,pname)
-		rnb.cleanMem()
-		return(rplot)
-	}
-	if (parallel.isEnabled()) {
-		figure.plots <- foreach(params = param.combinations,
-			.export = c("logger.info", "rnb.plot.betadistribution.sampleGroups", "rnb.cleanMem")) %dopar% create.plot(params)
-	} else {
-		figure.plots <- lapply(param.combinations, create.plot)
-	}
-	txt <- c("The plots below compare the distributions of methylation values in different sample groups, as defined by the ",
-		"traits listed above.")
-	report <- rnb.add.section(report, "Methylation Value Densities of Sample Groups", txt, level = 2)
-	groupings <- names(sample.inds.ext)
-	names(groupings) <- 1:length(groupings)
-	setting.names <- list("Sample trait" = groupings)
-	if (length(X) != 1) {
-		i <- length(setting.names) + 1
-		setting.names[["Methylation of"]] <- c(rnb.get.row.token(rnb.set, plural = TRUE), names(X)[-1])
-		names(setting.names[[i]]) <- 1:length(setting.names[[i]])
-	}
-	description <- "Beta value density estimation according to sample grouping."
-	report <- rnb.add.figure(report, description, figure.plots, setting.names)
-	logger.completed()
+	## Add subsection for beta value densities of different sample groupings
+	beta.value.output <- rnb.section.beta.value.density.plot(report, rnb.set, sample.inds, pinfos, points.per.group)
+	
+	report <- beta.value.output$report
+	pinfos <- beta.value.output$pinfos
+	X <- beta.value.output$meth.matrices
+	txt.site <- beta.value.output$txt.site
 
 	## Beta value distributions for different site types
 	logger.start(c("Methylation Value Distributions -", capitalize(txt.site), "Categories"))
@@ -410,6 +360,7 @@ rnb.step.betadistribution.internal <- function(rnb.set, report, sample.inds, pin
 	if (skip){
 		logger.info(c("Site categories are non-categorical. --> skipped"))
 	} else {
+		X <- meth.matrices(rnb.set)
 		if (length(sample.inds) != 0) {
 			sample.inds.ext <- unlist(sample.inds, recursive = FALSE, use.names = FALSE)
 			names(sample.inds.ext) <- paste(unlist(lapply(sample.inds, names), use.names = FALSE),
@@ -464,6 +415,286 @@ rnb.step.betadistribution.internal <- function(rnb.set, report, sample.inds, pin
 
 	logger.completed()
 	return(report)
+}
+
+########################################################################################################################
+
+rnb.section.beta.value.density.plot <- function(report, object, sample.inds, pinfos, points.per.group, for.nv.probes = FALSE) {
+	## Beta value density plot ##
+	do.ggplot <- function(pp,fname) {
+		res <- createReportGgPlot(pp, fname, report, width = 7.8, height = 5.6, high.png = 200L)
+		res <- off(res,handle.errors=TRUE)
+		return(res)
+	}
+	## Keep only site annotations that define categories
+	is.category <- sapply(attr(pinfos, "legend"), is.character)
+	pinfos.legend <- attr(pinfos, "legend")[is.category]
+	pinfos <- as.data.frame(pinfos[, is.category])
+	colnames(pinfos) <- names(pinfos.legend)
+	attr(pinfos, "legend") <- pinfos.legend
+	rm(is.category, pinfos.legend)
+	
+	txt.site <- rnb.get.row.token(object)
+
+	if (for.nv.probes) {
+		X <- list("nvProbes" = rnb.get.nv.probes.matrix(object))
+	} else {
+		X <- meth.matrices(object)
+		txt.covered <- paste(txt.site, ifelse(length(X) != 1, " and region", ""), sep = "")
+		txt <- c("Methylation value distributions were assessed based on selected sample groups. This was done on ",
+				txt.covered, " levels. This section contains the generated density plots.")
+		report <- rnb.add.section(report, paste("Methylation Value Distributions"), txt, level = 2)
+	}
+
+	sample.inds.ext <- c(list("all samples" = list("all" = 1:ncol(X[[1]]))), sample.inds)
+
+	## Beta value distributions for different sample groups
+	logger.start(paste(ifelse(for.nv.probes, "Beta", "Methylation"), "Value Distributions - Sample Groups"))
+	param.combinations <- mapply(c, rep(1:length(sample.inds.ext), each = length(X)),
+		rep(1:length(X), length(sample.inds.ext)), SIMPLIFY = FALSE)
+	create.plot <- function(params) {
+		i <- params[1]
+		j <- params[2]
+		if (for.nv.probes) {
+			pname <- paste("beta_density_samples_nv_probes", i, sep = "_")
+		} else {
+			pname <- paste("beta_density_samples", i, sep = "_")
+		}
+		
+		if (length(X) != 1) {
+			pname <- paste(pname, j, sep = "_")
+		}
+		logger.info(c("processing",pname))
+#		rplot <- init.plot(pname)
+#		print(rnb.plot.betadistribution.sampleGroups(X[[j]], sample.inds.ext[[i]], names(sample.inds.ext)[i]))
+#		off(rplot)
+		pp <- rnb.plot.betadistribution.sampleGroups(X[[j]], sample.inds.ext[[i]], names(sample.inds.ext)[i],
+				log.str=names(X)[j],points.per.group=points.per.group)
+		rplot <- do.ggplot(pp,pname)
+		rnb.cleanMem()
+		return(rplot)
+	}
+	if (parallel.isEnabled()) {
+		figure.plots <- foreach(params = param.combinations,
+			.export = c("logger.info", "rnb.plot.betadistribution.sampleGroups", "rnb.cleanMem")) %dopar% create.plot(params)
+	} else {
+		figure.plots <- lapply(param.combinations, create.plot)
+	}
+	if (for.nv.probes) {
+		txt <- "The plots below compare the distributions of Beta values of nv probes in different sample groups."
+	} else {
+		txt <- "The plots below compare the distributions of Methylation values in different sample groups, as defined by the traits listed above."
+	}
+	report <- rnb.add.section(report, paste(ifelse(for.nv.probes, "Beta", "Methylation"), "Value Densities of Sample Groups"), txt, 
+							  level = 2)
+	groupings <- names(sample.inds.ext)
+	names(groupings) <- 1:length(groupings)
+	setting.names <- list("Sample trait" = groupings)
+	if (length(X) != 1) {
+		i <- length(setting.names) + 1
+		setting.names[[paste(ifelse(for.nv.probes, "Beta values", "Methylation"),"of")]] <- c(rnb.get.row.token(object, plural = TRUE), names(X)[-1])
+		names(setting.names[[i]]) <- 1:length(setting.names[[i]])
+	}
+	description <- paste(ifelse(for.nv.probes, "Beta", "Methylation"), "value density estimation according to sample grouping.")
+	report <- rnb.add.figure(report, description, figure.plots, setting.names)
+	logger.completed()
+	return(list("report" = report, "pinfos" = pinfos, "meth.matrices" = X, "txt.site" = txt.site))
+}
+
+#######################################################################################################################
+
+#' rnb.section.nv.probes.heatmap
+#'
+#' Adds a section on the nv probes to the given report.
+#'
+#' @param report Report to contain the new section. This must be an object of type \code{\linkS4class{Report}}.
+#' @param object Methylation dataset as an object of type \code{\linkS4class{RnBeadSet}}.
+#' @return The (possibly modified) report.
+#'
+#' @author Pavlo Lutsik, Baris Kalem
+#' @noRd
+rnb.section.nv.probes.heatmap <- function(report, object, sample.inds, pinfos) {
+	nv.probes <- rnb.get.nv.probes.matrix(object)
+	add.info <- function(stitle, ffunction, txt) {
+		result <- rnb.add.section(report, stitle, txt, level = 2)
+		result <- ffunction(result, nv.probes)
+		rnb.status(c("Added", stitle))
+		result
+	}
+
+	if (length(samples(object)) < 3) {
+		txt <- "Note that the nv-probe heatmap is generated only when the dataset contains at least 3 samples."
+		report <- rnb.add.section(report, "nv probes Heatmap", txt, level = 2)
+	} else {
+		txt <- "Heatmap of the beta values from the nv probes."
+		report <- add.info("nv probes Heatmap", rnb.add.nv.heatmap, txt)
+	}
+	return(report)
+}
+
+rnb.section.nv.probes.beta.distribution <- function(report, object, sample.inds, pinfos) {
+	points.per.group=rnb.getOption("distribution.subsample")
+	report <- rnb.section.beta.value.density.plot(report, object, sample.inds,
+												  pinfos, points.per.group, for.nv.probes = TRUE)$report
+}
+
+#######################################################################################################################
+
+#' rnb.step.nv.probes.heatmap
+#'
+#' Computes statistics on the nv probes in the given dataset and creates a corresponding section in the report.
+#'
+#' @param object a \code{\linkS4class{RnBeadSet}} object
+#' @param report Report to contain the new section. This must be an object of
+#'               type \code{\linkS4class{Report}}.
+#' @return the modified report object
+#'
+#' @author Pavlo Lutsik, Baris Kalem
+#' @noRd
+rnb.step.nv.probes.heatmap<-function(object, report, sample.inds, pinfos){
+	if(!inherits(object,"RnBSet")){
+		stop("Supplied object is not of the class inheriting from RnBSet")
+	}
+	if (!inherits(report, "Report")) {
+		stop("invalid value for report")
+	}
+
+	logger.start("nv Probe Heatmap Section")
+	report <- rnb.section.nv.probes.heatmap(report,object, sample.inds, pinfos)
+	logger.completed()
+
+	return(report)
+}
+
+#######################################################################################################################
+
+#' rnb.step.nv.probes.beta.distribution
+#'
+#' Plots beta distribution graph of the nv probes in the given dataset and creates a corresponding section in the report.
+#'
+#' @param object a \code{\linkS4class{RnBeadSet}} object
+#' @param report Report to contain the new section. This must be an object of
+#'               type \code{\linkS4class{Report}}.
+#' @return the modified report object
+#'
+#' @author Pavlo Lutsik, Baris Kalem
+#' @noRd
+
+rnb.step.nv.probes.beta.distribution <- function(object, report, sample.inds, pinfos) {
+	if(!inherits(object,"RnBSet")){
+		stop("Supplied object is not of the class inheriting from RnBSet")
+	}
+	if (!inherits(report, "Report")) {
+		stop("invalid value for report")
+	}
+
+	logger.start("Plotting beta distribution of nv probes")
+	report <- rnb.section.nv.probes.beta.distribution(report,object, sample.inds, pinfos)
+	logger.completed()
+
+	return(report)
+}
+
+#######################################################################################################################
+
+rnb.add.nv.heatmap <- function(report, object){
+	txt <- paste0("Heatmap of the nv probes. Euclidean distance and complete linkage are used for constructing the ",
+		"dendrograms.")
+	rplot <- rnb.plot.nv.heatmap(object, writeToFile=TRUE, report=report, width=8, height=9, low.png=100, high.png=300)
+	rnb.add.figure(report, txt, rplot)
+}
+
+#######################################################################################################################
+
+#' rnb.plot.nv.heatmap
+#'
+#' Heatmap of beta values from nv probes.
+#'
+#' @param dataset     Dataset as an object of type inheriting \code{\linkS4class{RnBeadSet}}, or a matrix of
+#'                    methylation beta values.
+#' @param writeToFile Flag specifying whether the output should be saved as \code{\linkS4class{ReportPlot}}.
+#' @param ...         Additional named arguments passed to \code{\link{createReportPlot}}. These are used only if
+#'                    \code{writeToFile} is \code{TRUE}.
+#' @return If \code{writeToFile} is \code{TRUE}, plot as an object of type \code{\linkS4class{ReportPlot}}. Otherwise,
+#'         there is no value returned (invisible \code{NULL}).
+#'
+#' @export
+#' @author Pavlo Lutsik, Baris Kalem
+
+rnb.plot.nv.heatmap <- function(dataset, writeToFile = FALSE, ...) {
+	if (inherits(dataset, "RnBeadSet")) {
+		dataset <- rnb.get.nv.probes.matrix(dataset)
+	}
+	if (!(is.matrix(dataset) && is.numeric(dataset) && length(dataset) != 0)) {
+		stop("invalid value for dataset")
+	}
+	if (!parameter.is.flag(writeToFile)) {
+		stop("invalid value for writeToFile; expected TRUE or FALSE")
+	}
+
+	if (writeToFile) {
+		plot.file <- createReportPlot('nvHeatmap', ...)
+	}
+	if (nrow(dataset) < 2 || ncol(dataset) < 2) {
+		rnb.message.plot("Heatmap is not available due to insufficient data.")
+	} else {
+		sample.ids <- abbreviate.names(colnames(dataset))
+		meth.colors <- get.methylation.color.panel()
+		meth.breaks <- seq(0, 1, length.out = length(meth.colors) + 1L)
+		suppressWarnings(heatmap.2(dataset, scale = "none", na.rm = FALSE,
+				breaks = meth.breaks, col = meth.colors, trace = "none",
+				margins = c(14, 10), labCol = sample.ids,
+				cexRow = 0.45, ## nv probes have long ids. Reduce font size
+				density.info = "density", key.title = NA, key.xlab = expression(beta), key.ylab = "Density"))
+	}
+	if (writeToFile) {
+		off(plot.file)
+		return(plot.file)
+	}
+	return(invisible(NULL))
+}
+
+#######################################################################################################################
+
+#' rnb.get.nv.probes.matrix
+#' 
+#' Gets the matrix with "beta" values of nv probes in the given dataset.
+#' 
+#' @param dataset       Microarray-based methylation dataset as an object of type inheriting \code{RnBeadSet}.
+#' @param threshold.nas Threshold for removing probes (rows) and samples (columns). If more than this fraction of
+#'                      \code{NA}s are present in the nv probe matrix, the corresponding row or column is removed.
+#' @return Two-dimensional \code{matrix} with the values at the nv probes.
+#' 
+#' @author Yassen Asenov, Baris Kalem
+#' @noRd
+rnb.get.nv.probes.matrix <- function(dataset, threshold.nas = 1) {
+	if (dataset@target == "probesEPICv2") {
+		result <- meth(dataset, row.names=TRUE)
+		result <- result[grep("^nv", rownames(result)), , drop = FALSE]
+	} else {
+		stop("invalid value for dataset")
+	}
+	if (length(result) == 0) {
+		stop("invalid value for dataset; no SNP probes found")
+	}
+	
+	i <- which(apply(is.na(result), 1, mean) > threshold.nas)
+	if (length(i) != 0) {
+		if (length(i) == nrow(result)) {
+			rnb.error("Not enough nv probe data available (too many missing values per probe)")
+		}
+		result <- result[-i, , drop = FALSE]
+		rnb.warning(paste(length(i), "probes ignored because their they contain too many NAs"))
+	}
+	i <- which(apply(is.na(result), 2, mean) > threshold.nas)
+	if (length(i) != 0) {
+		if (length(i) == ncol(result)) {
+			rnb.error("Not enough nv probe data available (too many missing values per sample)")
+		}
+		result <- result[, -i, drop = FALSE]
+		rnb.warning(paste(length(i), "samples ignored because their nv probes contain too many NAs"))
+	}
+	return(result)
 }
 
 ########################################################################################################################

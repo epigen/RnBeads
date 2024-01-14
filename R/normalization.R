@@ -265,7 +265,7 @@ rnb.execute.normalization<-function(
 		if(inherits(object,"MethyLumiSet") && (is.null(methylated(object))||is.null(unmethylated(object)))) {
 			rnb.error("Invalid value for object; missing intensity information")
 		}
-		## TODO: No support for EPIC v2?
+
 		rga <- c("IlluminaHumanMethylationEPIC", "ilm10b2.hg19", "IlluminaHumanMethylation450k", "ilmn12.hg19")
 		rga <- matrix(rga, 2, 2, TRUE, list(c("EPIC", "450"), c("array", "annotation")))
 		if(inherits(object,"MethyLumiSet")){
@@ -276,7 +276,7 @@ rnb.execute.normalization<-function(
 			intensities.by.channel<-intensities.by.color(object)
 			rga <- rga[gsub("^probes", "", object@target), ]
 		}
-		if (grepl("EPIC", rga[1])) { ## FIXME: No EPICv2 manifest from minfi! This condition passes for EPICv2
+		if (grepl("EPIC", rga[1])) {
 			rnb.require("IlluminaHumanMethylationEPICmanifest")
 		} else {
 			rnb.require("IlluminaHumanMethylation450kmanifest")

@@ -98,7 +98,7 @@ EPIC.CONTROL.TARGETS <- c(
 	"staining" = "STAINING",
 	"target removal" = "TARGET REMOVAL")
 
-EPICv2.CONTROL.TARGETS <- c( ## TODO: Not tested for EPIC v2 (I assume it's compatible)
+EPICv2.CONTROL.TARGETS <- c( ## TODO: Not validated for EPIC v2 (Most likely it's compatible)
 	"bisulfite conversion I" = "BISULFITE CONVERSION I",
 	"bisulfite conversion II" = "BISULFITE CONVERSION II",
 	"extension" = "EXTENSION",

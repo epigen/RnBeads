@@ -1286,7 +1286,8 @@ rnb.run.inference <- function(rnb.set, dir.reports,
 		rm(meth.levels)
 	}
 
-	if (inherits(rnb.set,"RnBSet") && rnb.getOption("inference.age.prediction")){
+	if (inherits(rnb.set,"RnBSet") && rnb.getOption("inference.age.prediction") 
+		&& !(rnb.set@target == "probesEPIC" | rnb.set@target == "probesEPICv2")){ ## There is no age prediction for EPICv1 & EPICv2
 		ph <- pheno(rnb.set)
 		ages <- ph$predicted_ages
 		if(is.null(ages)){
@@ -1483,6 +1484,31 @@ rnb.run.exploratory <- function(rnb.set, dir.reports,
 	rinfos <- get.site.and.region.types(rnb.set)
 	if (rnb.getOption("exploratory.beta.distribution") && rnb.getOption("analyze.sites")) {
 		report <- rnb.step.betadistribution.internal(rnb.set, report, sample.inds, rinfos[[1]])
+	}
+
+	## EPICv2 nv probes visualization section
+	section.title <- "Visualization of nv Probe Data"
+	nv.probes <- tryCatch(rnb.get.nv.probes.matrix(rnb.set), error = function(err) { NULL })
+	if (is.null(nv.probes)) {
+		txt <- c("Overview of nv probes and sample comparison based on them cannot be performed ",
+			"because the dataset does not contain nv probes.")
+		report <- rnb.add.section(report, section.title, txt)
+	} else if (rnb.set@target == "probesEPICv2" & (rnb.getOption("nv.heatmap") | rnb.getOption("nv.beta.distribution"))) {
+		txt <- paste0("Analysis of the beta values of the nv probes.\n", "EPICv2 introduced nv probes which target common somatic mutations that occur in human cancers. ",
+				 	  "These probes measure DNA sequence variations rather than DNA cytosine methylation.")
+		report <- rnb.add.section(report, section.title, txt)
+
+		## EPICv2 nv probes Heatmap
+		if (rnb.getOption("nv.heatmap")) {
+			report <- rnb.step.nv.probes.heatmap(rnb.set, report, sample.inds, rinfos[[1]])
+		}
+
+		## EPICv2 nv probes beta distribution
+		if (rnb.getOption("nv.beta.distribution")) {
+			report <- rnb.step.nv.probes.beta.distribution(rnb.set, report, sample.inds, rinfos[[1]])
+		}
+
+		## TODO: Export a csv file containing nv probes and their beta values 
 	}
 
 	## Inter-sample variability

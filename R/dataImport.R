@@ -20,7 +20,7 @@ INTENSITY.SUMMARIZATION.INFO<-list(
                 "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
                 "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
                 "typeII"=list(Design="II", Color="Both", Msource="Grn", Usource="Red", Maddress="AddressA", Uaddress="AddressA")),
-		probesEPICv2=list( ## TODO: Not tested for EPIC v2 (I assume it's compatible)
+		probesEPICv2=list(
                 "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
                 "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
                 "typeII"=list(Design="II", Color="Both", Msource="Grn", Usource="Red", Maddress="AddressA", Uaddress="AddressA")),

@@ -139,7 +139,7 @@ rnb.geo.parse.ids <- function(txt) {
 #' @author Yassen Assenov
 #' @noRd
 rnb.geo.init.matrix <- function(txt, N.expected, assay.type) {
-	## TODO: Implement for EPICv2
+	## TODO: Does it need implementation for EPICv2?
 	sample.ids <- rnb.geo.parse.ids(txt)
 	if (length(sample.ids) != N.expected) {
 		stop("Inconsistent sample characteristics and series matrix table")

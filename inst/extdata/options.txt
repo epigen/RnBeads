@@ -96,6 +96,8 @@ exploratory.clustering.heatmaps.pdf	logical	no	no		FALSE
 exploratory.region.profiles	character.vector	no	yes		()
 exploratory.gene.symbols	character.vector	no	yes		NULL
 exploratory.custom.loci.bed	character	no	yes		NULL
+nv.heatmap	logical	no	no		TRUE
+nv.beta.distribution	logical	no	no		TRUE
 differential	logical	no	no		TRUE
 differential.site.test.method	character	no	no	(limma,ttest,refFreeEWAS)	limma
 differential.variability	logical	no	no		FALSE

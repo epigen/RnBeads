@@ -72,7 +72,7 @@ rnb.plot.control.boxplot <- function(
 	if(rnb.set@target=="probesEPIC"){
 		types<-rnb.infinium.control.targets(rnb.set@target)[c(14,4,3,15,1:2,12:13,6,11)]
 	}else if(rnb.set@target=="probesEPICv2"){ 
-		types<-rnb.infinium.control.targets(rnb.set@target)[c(14,4,3,15,1:2,12:13,6,11)] ## TODO: Not tested for EPICv2
+		types<-rnb.infinium.control.targets(rnb.set@target)[c(14,4,3,15,1:2,12:13,6,11)]
 	}else if(rnb.set@target=="probes450"){
 		types<-rnb.infinium.control.targets(rnb.set@target)[c(13,4,3,14,1:2,11:12,6)]
 	}else if(rnb.set@target=="probes27"){
@@ -90,7 +90,7 @@ rnb.plot.control.boxplot <- function(
 		### TODO: Remove the following passage
 		### for testing purposes only!
 		if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2"){ 
-			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not tested for EPICv2
+			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not validated for EPICv2
 		}
 		meta <- meta[type == meta[["Target"]], ]
 		ids<-as.character(meta[["ID"]])
@@ -227,7 +227,7 @@ rnb.plot.negative.boxplot<- function(
 		### TODO: Remove the following passage
 		### for testing purposes only!
 		if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2"){
-			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not tested for EPICv2 (duplicate)
+			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not validated for EPICv2 (duplicate)
 		}
 		meta <- meta["NEGATIVE" == meta[["Target"]], ]
 		ids<-as.character(meta[["ID"]])
