@@ -1499,7 +1499,7 @@ rnb.run.exploratory <- function(rnb.set, dir.reports,
 					 "MethylationEPIC v2 BeadChip. <i>Epigenetics Communications</i>, <b>3</b>(1), 6.")
 		report <- rnb.add.reference(report, refText)
 		txt <- paste0("Analysis of the beta values of the nv probes.\n", "EPICv2 introduced nv probes which target common somatic mutations that occur in human cancers. ",
-				 	  "These probes measure DNA sequence variations rather than DNA cytosine methylation. ", rnb.get.reference(report, refText))
+				 	  "These probes measure DNA sequence variations rather than DNA cytosine methylation ", rnb.get.reference(report, refText), ".")
 		report <- rnb.add.section(report, section.title, txt)
 
 		## EPICv2 nv probes Heatmap
