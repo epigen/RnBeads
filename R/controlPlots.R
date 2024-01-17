@@ -531,7 +531,7 @@ rnb.plot.control.barplot<-function(
 #' @author Yassen Assenov
 #' @noRd
 rnb.get.snp.matrix <- function(dataset, threshold.nas = 1) {
-	if (dataset@target %in% c("probes450", "probesEPIC", "probedsMMBC", "probesEPICv2")) {
+	if (dataset@target %in% c("probes450", "probesEPIC", "probesMMBC", "probesEPICv2")) {
 		result <- meth(dataset, row.names=TRUE)
 		result <- result[grep("^rs", rownames(result)), , drop = FALSE]
 	} else if (dataset@target == "probes27") {
