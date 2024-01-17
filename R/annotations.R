@@ -98,7 +98,7 @@ EPIC.CONTROL.TARGETS <- c(
 	"staining" = "STAINING",
 	"target removal" = "TARGET REMOVAL")
 
-EPICv2.CONTROL.TARGETS <- c( ## TODO: Not tested for EPIC v2 (I assume it's compatible)
+EPICv2.CONTROL.TARGETS <- c( ## TODO: Not validated for EPIC v2 (Most likely it's compatible)
 	"bisulfite conversion I" = "BISULFITE CONVERSION I",
 	"bisulfite conversion II" = "BISULFITE CONVERSION II",
 	"extension" = "EXTENSION",
@@ -766,6 +766,10 @@ rnb.get.assemblies <- function() {
 #' rnb.get.annotation("promoters")
 #' }
 rnb.get.annotation <- function(type = "CpG", assembly = "hg19") {
+	if (type == "probesEPICv2" || type == "controlsEPICv2") {
+		assembly = "hg38"
+	}
+
 	if (!(is.character(type) && length(type) == 1 && (!is.na(type)))) {
 		stop("invalid value for type")
 	}

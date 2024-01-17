@@ -48,16 +48,25 @@ rnb.contains.sex <- function(rnb.set) {
 rnb.get.XY.shifts <- function(rnb.set, signal.type = "raw") {
 
   target <- rnb.set@target
+  genome.build <- rnb.set@assembly
 	probes.bad <- rnb.get.annotation(target, rnb.set@assembly)
 	probes.max <- sapply(probes.bad, length)
-	if(target == 'probesEPIC'){
-	  #' There is no 'cross-active' annotation available for probes in the EPIC annotation
-	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
-	} else if(target == 'probesEPICv2'){
-	  #' There is no 'cross-active' annotation available for probes in the EPICv2 annotation
-	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) }) ## TODO: EPIC v2 SNPs need to be more strict.
-	} else{
-	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0) | (mcols(x)[, "Cross-reactive"] != 0)) })
+	if (genome.build == "hg38") {
+		#' There is no 'cross-active' annotation available for probes in the hg38 annotation
+		if(target == 'probesEPIC'){
+	  		probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
+		} else if(target == 'probesEPICv2'){
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
+		} else if (target == 'probes450'){
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
+		}
+	} else { ## hg19
+		if(target == 'probesEPIC'){
+	  		#' There is no 'cross-active' annotation available for probes in the EPIC annotation
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
+		} else {
+	  		probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0) | (mcols(x)[, "Cross-reactive"] != 0)) })
+		}
 	}
 	probes.max <- probes.max - sapply(probes.bad, length)
 

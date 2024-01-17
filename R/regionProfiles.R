@@ -338,6 +338,7 @@ locus.profile.get.base.tracks <- function(chrom,start,end,assembly="hg19"){
 	}
 	
 	rnb.require("biomaRt")
+	rnb.require("Gviz")	
 	mart <- NULL
 	featMap <- Gviz:::.getBMFeatureMap()
 	if (assembly == "hg19"){
@@ -349,7 +350,7 @@ locus.profile.get.base.tracks <- function(chrom,start,end,assembly="hg19"){
 		# 	}
 		# )
 		mart <- tryCatch(
-			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="feb2014.archive.ensembl.org"),
+			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2014.archive.ensembl.org"), ## Ensembl 75
 			error = function(ee) {
 				logger.warning(c("could not retrieve Ensembl genes from biomart: ",ee$message))
 				NULL
@@ -358,7 +359,7 @@ locus.profile.get.base.tracks <- function(chrom,start,end,assembly="hg19"){
 		featMap["symbol"] <- "external_gene_id"
 	} else if (assembly == "hg38"){
 		mart <- tryCatch(
-			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="may2015.archive.ensembl.org"),
+			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org"), ## Ensembl 109
 			error = function(ee) {
 				logger.warning(c("could not retrieve Ensembl genes from biomart: ",ee$message))
 				NULL

@@ -173,7 +173,7 @@ RnBeadRawSet<-function(
 		beta.offset=100,
 		summarize.bead.counts=TRUE,
 		summarize.regions=TRUE,
-		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", "hg19"))),
+		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", rnb.getOption("assembly")))), ## TODO: Implement assembly selection
 		useff=rnb.getOption("disk.dump.big.matrices"),
 		ffcleanup=FALSE){
 		
@@ -245,15 +245,16 @@ RnBeadRawSet<-function(
 			stop("invalid value for useff: should be a logical of length one")
 		}
 		
+		genome.assembly <- rnb.getOption("assembly")
 		if (platform =="EPIC") {
 			target <- "probesEPIC"
-			assembly <- "hg19" ## TODO: EPICv1 will be hg38 compatible
+			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
 		}else if (platform =="EPICv2") {
 			target <- "probesEPICv2"
 			assembly <- "hg38"
 		}else if (platform =="450k") {
 			target <- "probes450"
-			assembly <- "hg19"
+			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
 		} else if(platform == "27k"){
 			target <- "probes27"
 			assembly <- "hg19"
@@ -504,7 +505,7 @@ setAs("RnBeadRawSet","MethyLumiSet",
 					index<-rnb.update.controlsEPIC.enrich(rnb.get.annotation("controlsEPIC"))[,"Index"]
 					probeIDs<-paste(probeIDs, index, sep=".")
 				}else if(from@target == "probesEPICv2"){
-					probeIDs<-rnb.get.annotation("controlsEPICv2")[,"Target"]
+					probeIDs<-rnb.get.annotation("controlsEPICv2", assembly = "hg38")[,"Target"]
 					probeIDs<-paste(probeIDs, unlist(sapply(table(probeIDs)[unique(probeIDs)], seq, from=1 )), sep=".")
 				}else if(from@target == "probes450"){
 					probeIDs<-rnb.get.annotation("controls450")[,"Target"]
@@ -568,7 +569,7 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 		}
 	
 		## Use RnBeads' mapping from probe IDs to addresses
-		probes.all <- rnb.get.annotation(assay.name, ifelse(assay.name=="probesEPICv2", "hg38", "hg19"))
+		probes.all <- rnb.get.annotation(assay.name, ifelse(assay.name=="probesEPICv2", "hg38", rnb.getOption("assembly"))) ## TODO: Impove genome build selection
 		probes.all <- lapply(probes.all, function(x) {
 				result <- as.data.frame(mcols(x)[, c("Design", "Color", "AddressA", "AddressB")])
 				rownames(result) <- names(x)
@@ -576,7 +577,7 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 			}
 		)
 		probes.all <- do.call(rbind, unname(probes.all))
-		controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", "hg19"))
+		controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", rnb.getOption("assembly"))) ## TODO: Impove genome build selection
 		controls.all <- controls.all[, "ID"]
 
 		## Extract data on signals
@@ -672,7 +673,8 @@ setAs("RnBeadRawSet", "RGChannelSet", function(from, to){
 #	)
 #	probes.all <- do.call(rbind, unname(probes.all))
 	probes.all <- annotation(from)[,c("Design", "Color", "AddressA", "AddressB")]
-	controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", "hg19"))
+	genome.assembly<-rnb.getOption("assembly")
+	controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", genome.assembly))
 	controls.all <- controls.all[, "ID"]
 
 	# Obtain methylated and unmethylated intensities
@@ -1171,11 +1173,11 @@ intensities.by.color<-function(raw.set,
                                    add.controls = !is.null(qc(raw.set)),
                                    add.missing = TRUE,
                                    re.separate = FALSE) {
-  if (raw.set@target == "probesEPIC") { ## FIXME: No minfi support for EPIC v2!
+  if (raw.set@target == "probesEPIC") { 
     rnb.require("IlluminaHumanMethylationEPICmanifest")
     manifest.object <- IlluminaHumanMethylationEPICmanifest
 
-#   } else if (raw.set@target == "probesEPICv2") {
+#   } else if (raw.set@target == "probesEPICv2") { ## FIXME: No minfi support for EPIC v2!
 #     rnb.require("IlluminaHumanMethylationEPICv2manifest") ## TODO: Doesn't exist for EPIC v2!
 #     manifest.object <- IlluminaHumanMethylationEPICv2manifest
 
@@ -1301,7 +1303,11 @@ intensities.by.color<-function(raw.set,
   }
   
   if (add.controls) {
-    ncd <- rnb.get.annotation(ifelse(raw.set@target == "probesEPIC", "controlsEPIC", ifelse(raw.set@target == "probesEPICv2", "controlsEPICv2", "controls450")))
+	if (raw.set@target == "probesEPICv2") {
+		ncd <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
+	} else {
+		ncd <- rnb.get.annotation(ifelse(raw.set@target == "probesEPIC", "controlsEPIC", "controls450"))
+	}
     #ncd <- ncd[ncd[["Target"]] == "NEGATIVE", ]
     ncd$Target <- tolower(ncd$Target)
     controls.by.channel <- qc(raw.set)

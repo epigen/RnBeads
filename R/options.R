@@ -555,7 +555,7 @@ rnb.is.option <- function(txt) {
 #'   \item{\bold{\code{qc.negative.boxplot}}\code{ = TRUE}}{
 #'        [Microarrays] Add boxplot of negative control probe intensities for all samples.}
 #'   \item{\bold{\code{qc.snp.heatmap}}\code{ = TRUE}}{
-#'        [Microarrays] Flag indicating if a heatmap of the beta values for all SNP probes is to be geneerated.}
+#'        [Microarrays] Flag indicating if a heatmap of the beta values for all SNP probes is to be generated.}
 #'   \item{\bold{\code{qc.snp.barplot}}\code{ = FALSE}}{
 #'        [Microarrays] Add bar plots of the beta-values observed for each SNP-calling probe.}
 #'   \item{\bold{\code{qc.snp.boxplot}}\code{ = FALSE}}{
@@ -778,6 +778,10 @@ rnb.is.option <- function(txt) {
 #'   \item{\bold{\code{exploratory.custom.loci.bed}}\code{ = NULL}}{
 #'        Path to a bed file containing custom genomic regions. Locus views will be generated for these regions.
 #'        }
+#'   \item{\bold{\code{nv.heatmap}}\code{ = TRUE}}{
+#'        [Microarrays] Flag indicating if a heatmap of the beta values for all nv probes is to be generated.}
+#'   \item{\bold{\code{nv.beta.distribution}}\code{ = TRUE}}{
+#'        [Microarrays] Flag indicating if a density plot of the beta values for all nv probes is to be generated.}
 #'   \item{\bold{\code{differential}}\code{ = TRUE}}{
 #'        Flag indicating if the differential methylation module is to be executed.}
 #'   \item{\bold{\code{differential.site.test.method}}\code{ = "limma"}}{
