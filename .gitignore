@@ -20,3 +20,4 @@ RnBeads.Rproj
 .gitignore
 /vignettes/figure
 .vscode/
+*.nfs
