@@ -26,6 +26,7 @@ RnBeads uses sets of annotation tables and mappings (from regions to sites) for 
 structures for one assembly are stored in a separate dedicated annotation package. The following annotation packages
 are available in Bioconductor:
 \describe{
+	 \item{\pkg{RnBeads.hg38}}{for \code{"hg38"}}
   \item{\pkg{RnBeads.hg19}}{for \code{"hg19"}}
   \item{\pkg{RnBeads.mm10}}{for \code{"mm10"}}
   \item{\pkg{RnBeads.mm9}}{for \code{"mm9"}}

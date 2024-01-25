@@ -598,11 +598,14 @@ rnb.is.option <- function(txt) {
 #'        \code{"wm.danes"}, \code{"wm.danet"}, \code{"wm.danen"}, \code{"wm.daten1"}, \code{"wm.daten2"},
 #'        \code{"wm.tost"}, \code{"wm.fuks"} and \code{"wm.swan"} - all normalization methods implemented in the
 #'        \href{http://www.bioconductor.org/packages/release/bioc/html/wateRmelon.html}{wateRmelon} package. When
-#'        setting this option to a specific algorithm, make sure its dedicated package is installed.}
+#'        setting this option to a specific algorithm, make sure its dedicated package is installed.
+#'        \code{"scaling.internal"}, \code{"scalings"} - different scaling methods as implemented in the
+#'        \href{https://www.bioconductor.org/packages/release/bioc/html/sesame.html}{sesame} R package.
+#'        }
 #'   \item{\bold{\code{normalization.background.method}}\code{ = "none"}}{
 #'        A character singleton specifying which background subtraction is to be performed during normalization.
 #'        The following values are accepted: \code{"none"} (default), \code{"methylumi.noob"}, \code{"methylumi.goob"},
-#'        \code{"methylumi.lumi"} and \code{"enmix.oob"}.}
+#'        \code{"methylumi.lumi"}, \code{"enmix.oob"},  \code{"sesame.noob"} and \code{"sesame.noobsb"}.}
 #'   \item{\bold{\code{normalization.plot.shifts}}\code{ = TRUE}}{
 #'        Flag indicating if the report on normalization should include plots of shifts (degrees of beta value
 #'        correction).}

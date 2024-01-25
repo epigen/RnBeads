@@ -8,8 +8,8 @@ rnb.infinium.control.targets(target = "probes450")
 }
 \arguments{
 \item{target}{A singleton of type \code{character}, specifying the microarray platform.
-\code{"probesEPIC"},\code{"probes450"} and \code{"probes27"} correspond to MethylationEPIC, 
-HumanMethylation450, and HumanMethylation27 microarrays respectively.}
+\code{"probesEPICv2"},\code{"probesEPIC"},\code{"probes450"} and \code{"probes27"} correspond to MethylationEPICv2, 
+Methylation EPIC, HumanMethylation450, and HumanMethylation27 microarrays respectively.}
 }
 \value{
 \code{character} vector of control targets.

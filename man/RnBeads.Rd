@@ -2,6 +2,7 @@
 % Please edit documentation in R/RnBeads-package.R
 \docType{package}
 \name{RnBeads}
+\alias{RnBeads-package}
 \alias{RnBeads}
 \title{Analysis of genome-scale DNA methylation data with RnBeads}
 \description{
@@ -14,4 +15,16 @@ The complete analysis can be performed by calling the function \code{\link{rnb.r
 }
 \references{
 Yassen Assenov*, Fabian Mueller*, Pavlo Lutsik*, Joern Walter, Thomas Lengauer and Christoph Bock (2014) Compehensive Analysis of DNA Methylation Data with RnBeads, Nature Methods, 11(11):1138-1140.
+}
+\author{
+\strong{Maintainer}: Fabian Mueller \email{team@rnbeads.org}
+
+Authors:
+\itemize{
+  \item Yassen Assenov \email{assenov@gmail.com}
+  \item Christoph Bock \email{cbock@cemm.at}
+  \item Pavlo Lutsik \email{p.lutsik@dkfz.de}
+  \item Michael Scherer \email{mscherer@mpi-inf.mpg.de}
+}
+
 }
