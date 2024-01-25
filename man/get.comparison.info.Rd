@@ -8,8 +8,7 @@ get.comparison.info(
   x,
   pheno.cols = rnb.getOption("differential.comparison.columns"),
   region.types = rnb.region.types.for.analysis(x),
- 
-    pheno.cols.all.pairwise = rnb.getOption("differential.comparison.columns.all.pairwise"),
+  pheno.cols.all.pairwise = rnb.getOption("differential.comparison.columns.all.pairwise"),
   columns.pairs = rnb.getOption("columns.pairing"),
   columns.adj = rnb.getOption("covariate.adjustment.columns"),
   adjust.sva = rnb.getOption("differential.adjustment.sva"),

@@ -23,7 +23,7 @@ RnBeadRawSet(
   summarize.bead.counts = TRUE,
   summarize.regions = TRUE,
   region.types = rnb.region.types.for.analysis(ifelse(platform == "MMBC", "mm10",
-    "hg19")),
+    ifelse(target == "probesEPICv2", "hg38", rnb.getOption("assembly")))),
   useff = rnb.getOption("disk.dump.big.matrices"),
   ffcleanup = FALSE
 )

@@ -29,7 +29,7 @@ In case a non-synonymous merge is performed, the class conversion will follow th
 \code{\linkS4class{RnBeadSet}} < \code{\linkS4class{RnBeadRawSet}} < \code{\linkS4class{RnBiseqSet}}.
 In case \code{x} and \code{y} are both array data containers (\code{RnBeadSet} or \code{RnBeadRawSet}), 
 the resulting object will have an annotation that corresponds to the newer array version 
-(\code{27k} < \code{450k} < \code{EPIC}).
+(\code{27k} < \code{450k} < \code{EPIC} < \code{EPICv2}).
 The sample sets of \code{x} and \code{y} should be unique. Sample annotation information is merged only for columns 
 which have identical names in both objects. CpG sites of the new object are a union of those present in both objects.
 }

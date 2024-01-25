@@ -2,12 +2,12 @@
 # Cluster Architecture Descriptions
 ################################################################################
 ################################################################################
-# Concrete implementations for the SLURM environment
+# Concrete implementations for the LSF environment
 ################################################################################
 
-#' ClusterArchitectureSLURM Class
+#' ClusterArchitectureLSF Class
 #'
-#' A child class of \code{\linkS4class{ClusterArchitecture}} implementing specifications of Simple Linux Utility for Resource Management (SLURM) architectures.
+#' A child class of \code{\linkS4class{ClusterArchitecture}} implementing specifications of IBM LSF architectures.
 #'
 #' @details
 #' Follow this template if you want to create your own ClusterArchitecture class.
@@ -17,33 +17,33 @@
 #'
 #' @section Methods:
 #' \describe{
-#'   \item{\code{\link{getSubCmdTokens,ClusterArchitectureSGE-method}}}{Returns a vector of command line tokens corresponding to submitting
+#'   \item{\code{\link{getSubCmdTokens,ClusterArchitectureLSF-method}}}{Returns a vector of command line tokens corresponding to submitting
 #'   a job with the given command to the cluster}
 #' }
 #'
-#' @name ClusterArchitectureSLURM-class
-#' @rdname ClusterArchitectureSLURM-class
+#' @name ClusterArchitectureLSF-class
+#' @rdname ClusterArchitectureLSF-class
 #' @author Michael Scherer
 #' @exportClass ClusterArchitecture
-setClass("ClusterArchitectureSLURM",
+setClass("ClusterArchitectureLSF",
 	contains = "ClusterArchitecture"
 )
 
-#' initialize.ClusterArchitectureSLURM
+#' initialize.ClusterArchitectureLSF
 #'
-#' Initialize an ClusterArchitecture object for a SLURM
+#' Initialize an ClusterArchitecture object for a LSF
 #' 
-#' @param .Object New instance of \code{ClusterArchitectureSLURM}.
+#' @param .Object New instance of \code{ClusterArchitectureLSF}.
 #' @param name A name or identifier
 #' @param ... arguments passed on to the constructor of \code{\linkS4class{ClusterArchitecture}} (the parent class)
 #'
 #' @export
 #' @author Michael Scherer
 #' @docType methods
-setMethod("initialize","ClusterArchitectureSLURM",
+setMethod("initialize","ClusterArchitectureLSF",
 	function(
 		.Object,
-		name="ClusterArchitectureSLURM",
+		name="ClusterArchitectureLSF",
 		...
 	) {
 		.Object <- callNextMethod(.Object=.Object, name=name, ...)
@@ -60,33 +60,32 @@ setMethod("initialize","ClusterArchitectureSLURM",
 #' Returns a string for the of command line corresponding to submitting
 #' a job with the given command to the cluster.
 #' @details
-#' For a concrete child class implementation for a SLURM architecture specification see \code{\linkS4class{ClusterArchitectureSLURM}}
+#' For a concrete child class implementation for a LSF architecture specification see \code{\linkS4class{ClusterArchitectureLSF}}
 #'
-#' @param object \code{\linkS4class{ClusterArchitectureSLURM}} object
+#' @param object \code{\linkS4class{ClusterArchitectureLSF}} object
 #' @param cmd.tokens a character vector specifying the executable command that should be wrapped in the cluster submission command
 #' @param log file name and path of the log file that the submitted job writes to
 #' @param job.name name of the submitted job
 #' @param res.req named vector of requested resources. Two options are available: \code{"clock.limit"} and \code{"memory.size"}
-#' @param sub.binary flag indicating if the command is to be submitted using the \code{"wrap"} option of SLURM
 #' @param depend.jobs character vector containg names or ids of jobs the submitted job will depend on.
-#' @param quote.cmd Flag indicating whether the submitted cammed should also be wrapped in quotes
+#' @param queue.name Name of the Queue the job should be submitted to
 #' @return A character vector containing the submission command tokens
 #'
-#' @rdname getSubCmdTokens-ClusterArchitectureSLURM-methods
+#' @rdname getSubCmdTokens-ClusterArchitectureLSF-methods
 #' @docType methods
-#' @aliases getSubCmdTokens,ClusterArchitectureSLURM-method
+#' @aliases getSubCmdTokens,ClusterArchitectureLSF-method
 #' @author Michael Scherer
 #' @export
 #' @examples
 #' \donttest{
-#' arch <- new("ClusterArchitectureSLURM",
-#' 	name="my_slurm_architecture"
+#' arch <- new("ClusterArchitectureLSF",
+#' 	name="my_lsf_architecture"
 #' )
 #' getSubCmdTokens(arch,c("Rscript","my_great_script.R"),"my_logfile.log")
 #' }
 setMethod("getSubCmdTokens",
 	signature(
-		object="ClusterArchitectureSLURM"
+		object="ClusterArchitectureLSF"
 	),
 	function(
 	  object,
@@ -99,57 +98,41 @@ setMethod("getSubCmdTokens",
 	  quote.cmd = TRUE
 	) {
 	  res.req.token <- NULL
+	  queue <- "short"
 		if(length(res.req)>0){
 		  if("clock.limit" %in% names(res.req)){
-		    res.req.token <- paste(res.req.token,"-t",res.req["clock.limit"]," ",collapse = "")
+		    res.req.token <- paste(res.req.token,"-W ",res.req["clock.limit"]," ",collapse = "")
 		  }
 		  if("mem.size" %in% names(res.req)){
-		    res.req.token <- paste0(res.req.token,"--mem=",res.req["mem.size"],collapse="")
-		    
+		    res.req.token <- paste0(res.req.token,'-R "rusage[mem=', res.req["mem.size"], ']"', collapse="")
+		  }
+		  if("queue" %in% names(res.req)){
+		    queue <-  res.req["queue"]
 		  }
 		}
 		log.token <- NULL
 		if (nchar(log)>0) {
-			log.token <- c("-o",log)
+			log.token <- c("-e", log, "-o", log)
 		}
 		job.name.token <- NULL
 		if (nchar(job.name)>0) {
-			job.name.token <- paste0(job.name.token,"--job-name=",job.name,collapse = "")
+			job.name.token <- paste0(job.name.token,"-J ",job.name,collapse = "")
 		}
 		dependency.token <- NULL
 		if (length(depend.jobs)>0){
-		  get.job.id <- function(x){
-		    cmd <- paste0("echo $(squeue --noheader --format %i --name ",x,")")
-		    system(cmd,intern = T)
-		  }
-		  depend.jobs <- sapply(depend.jobs,get.job.id)
-			dependency.token <- paste0(dependency.token, "--depend=", paste0(paste(depend.jobs,collapse=",")),collapse = "")
-		}
-		wrap.token <- NULL
-		if(sub.binary){
-		  if (quote.cmd){
-		    cmd.tokens <- paste0("--wrap=",paste0("'",paste(cmd.tokens,collapse=" "),"'"),collapse="")
-		  }else{
-		    cmd.tokens <- paste0("--wrap=",paste(cmd.tokens,collapse=" "),collapse="")
-		  }
-		}else{
-		  if (quote.cmd){
-		    cmd.tokens <- paste0("'",paste(cmd.tokens,collapse=" "),"'")
-		  }else{
-		    cmd.tokens <- paste(cmd.tokens,collapse=" ")
-		  }
+			dependency.token <- paste0(dependency.token, "-w ", paste0('"', paste(paste0('done(', depend.jobs, ')'),collapse="&&"), '"'),collapse = "")
 		}
 
 		res <- c(
-			"sbatch",
-			"--export=ALL",
+			"bsub",
+			paste("-q", queue),
 			res.req.token,
 			log.token,
 			job.name.token,
 			dependency.token,
-			wrap.token,
 			cmd.tokens
 		)
+		print(paste(res, collapse=" "))
 		return(res)
 	}
 )
