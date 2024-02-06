@@ -1350,6 +1350,13 @@ get.matrix.from.ff<-function(x){
 	nm
 }
 
+get.genesymbol.of.coordinate <- function(start, end, chromosome, ensembl) {
+	paste(getBM(attributes = "hgnc_symbol",
+				filter = c("chromosome_name", "start", "end"),
+				values = list(gsub("chr","",chromosome), start, end), 
+				mart = ensembl)$hgnc_symbol, collapse = ";")
+}
+
 ########################################################################################################################
 
 ## prepare.idat.dir

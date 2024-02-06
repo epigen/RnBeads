@@ -539,7 +539,7 @@ rnb.is.option <- function(txt) {
 #'		  Skip the check of the loaded RnBSet object after loading. Helps with keeping the memory profile down}
 #'   \item{\bold{\code{import.idat.platform}}\code{ = NULL}}{
 #'		  Character specifying the Infinium platform that is uses. Has to be one of \code{'probes27'},
-#'		  \code{'probes450'} or \code{'probesEPIC'}. If \code{'auto'}, the platform is automatically detected
+#'		  \code{'probes450'}, \code{'probesEPIC'} or \code{'probesEPICv2'}. If \code{'auto'}, the platform is automatically detected
 #'		  from the IDAT file names.}
 #'   \item{\bold{\code{import.sex.prediction}}\code{ = TRUE}}{
 #'        Flag indicating if sex prediction is to be performed. Sex prediction is supported for Infinium 450k, EPIC, EPICv2

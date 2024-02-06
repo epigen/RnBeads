@@ -598,6 +598,12 @@ rnb.step.nv.probes.beta.distribution <- function(object, report, sample.inds, pi
 #######################################################################################################################
 
 rnb.add.nv.heatmap <- function(report, object){
+	if (inherits(object, "RnBeadSet")) {
+		object <- rnb.get.nv.probes.matrix(dataset)
+	}
+	if (!(is.matrix(object) && is.numeric(object) && length(object) != 0)) {
+		stop("invalid value for object")
+	}
 	txt <- paste0("Heatmap of the nv probes. Euclidean distance and complete linkage are used for constructing the ",
 		"dendrograms.")
 	rplot <- rnb.plot.nv.heatmap(object, writeToFile=TRUE, report=report, width=8, height=9, low.png=100, high.png=300)
@@ -625,9 +631,6 @@ rnb.plot.nv.heatmap <- function(dataset, writeToFile = FALSE, ...) {
 	if (inherits(dataset, "RnBeadSet")) {
 		dataset <- rnb.get.nv.probes.matrix(dataset)
 	}
-	if (!(is.matrix(dataset) && is.numeric(dataset) && length(dataset) != 0)) {
-		stop("invalid value for dataset")
-	}
 	if (!parameter.is.flag(writeToFile)) {
 		stop("invalid value for writeToFile; expected TRUE or FALSE")
 	}
@@ -641,9 +644,22 @@ rnb.plot.nv.heatmap <- function(dataset, writeToFile = FALSE, ...) {
 		sample.ids <- abbreviate.names(colnames(dataset))
 		meth.colors <- get.methylation.color.panel()
 		meth.breaks <- seq(0, 1, length.out = length(meth.colors) + 1L)
+
+		## Trim rownames of nv probes -> assumes this format: nv-GRCh38-chr19-52213081-52213081-C-G_BC11
+		nv.probe.ids <- strsplit(rownames(dataset), split = "-")
+		rnb.require("biomaRt")
+		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")
+		for (i in 1:length(nv.probe.ids)) {
+			chr <- nv.probe.ids[[i]][3]
+			start <- nv.probe.ids[[i]][4]
+			end <- nv.probe.ids[[i]][5]
+			gene.symbol <- get.genesymbol.of.coordinate(start, end, chr, mart) ## Get gene symbol of this nv probe
+			rownames(dataset)[i] <- paste(c(chr, start, end, gene.symbol), collapse = "-")
+		}
+
 		suppressWarnings(heatmap.2(dataset, scale = "none", na.rm = FALSE,
 				breaks = meth.breaks, col = meth.colors, trace = "none",
-				margins = c(14, 10), labCol = sample.ids,
+				margins = c(13, 7), labCol = sample.ids, labRow = FALSE,
 				cexRow = 0.45, ## nv probes have long ids. Reduce font size
 				density.info = "density", key.title = NA, key.xlab = expression(beta), key.ylab = "Density"))
 	}
