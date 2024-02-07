@@ -1486,35 +1486,6 @@ rnb.run.exploratory <- function(rnb.set, dir.reports,
 		report <- rnb.step.betadistribution.internal(rnb.set, report, sample.inds, rinfos[[1]])
 	}
 
-	## EPICv2 nv probes visualization section
-	section.title <- "Visualization of nv Probe Data"
-	nv.probes <- tryCatch(rnb.get.nv.probes.matrix(rnb.set), error = function(err) { NULL })
-	if (is.null(nv.probes)) {
-		txt <- c("Overview of nv probes and sample comparison based on them cannot be performed ",
-			"because the dataset does not contain nv probes.")
-		report <- rnb.add.section(report, section.title, txt)
-	} else if (rnb.set@target == "probesEPICv2" & (rnb.getOption("nv.heatmap") | rnb.getOption("nv.beta.distribution"))) {
-		refText <- c("Kaur, D., Lee, S. M., Goldberg, D., Spix, N. J., Hinoue, T., Li, H.-T., Dwaraka, V. B., Smith, R., ",
-					 "Shen, H., Liang, G., Renke, N., Laird, P. W., & Zhou, W. (2023). Comprehensive evaluation of the Infinium human ",
-					 "MethylationEPIC v2 BeadChip. <i>Epigenetics Communications</i>, <b>3</b>(1), 6.")
-		report <- rnb.add.reference(report, refText)
-		txt <- paste0("Analysis of the beta values of the nv probes.\n", "EPICv2 introduced nv probes which target common somatic mutations that occur in human cancers. ",
-				 	  "These probes measure DNA sequence variations rather than DNA cytosine methylation ", rnb.get.reference(report, refText), ".")
-		report <- rnb.add.section(report, section.title, txt)
-
-		## EPICv2 nv probes Heatmap
-		if (rnb.getOption("nv.heatmap")) {
-			report <- rnb.step.nv.probes.heatmap(rnb.set, report, sample.inds, rinfos[[1]])
-		}
-
-		## EPICv2 nv probes beta distribution
-		if (rnb.getOption("nv.beta.distribution")) {
-			report <- rnb.step.nv.probes.beta.distribution(rnb.set, report, sample.inds, rinfos[[1]])
-		}
-
-		## TODO: Export a csv file containing nv probes and their beta values 
-	}
-
 	## Inter-sample variability
 	do.intersample <- rnb.getOption("exploratory.intersample")
 	if(is.null(do.intersample)){
@@ -1547,6 +1518,51 @@ rnb.run.exploratory <- function(rnb.set, dir.reports,
 	if (length(custom.genes) > 0 || length(custom.loci.bed) > 0) {
 		if (is.null(custom.loci.bed)) custom.loci.bed <- ""
 		report <- rnb.step.locus.profiles(rnb.set, report, locus.bed=custom.loci.bed, gene.list=custom.genes)
+	}
+
+	## EPICv2 nv probes visualization section
+	section.title <- "Visualization of nv Probe Data"
+	nv.probes <- tryCatch(rnb.get.nv.probes.matrix(rnb.set), error = function(err) { NULL })
+	if (is.null(nv.probes)) {
+		txt <- c("Overview of nv probes and sample comparison based on them cannot be performed ",
+			"because the dataset does not contain nv probes.")
+		report <- rnb.add.section(report, section.title, txt)
+	} else if (rnb.set@target == "probesEPICv2" & (rnb.getOption("nv.heatmap") | rnb.getOption("nv.beta.distribution"))) {
+		refText <- c("Kaur, D., Lee, S. M., Goldberg, D., Spix, N. J., Hinoue, T., Li, H.-T., Dwaraka, V. B., Smith, R., ",
+					 "Shen, H., Liang, G., Renke, N., Laird, P. W., & Zhou, W. (2023). Comprehensive evaluation of the Infinium human ",
+					 "MethylationEPIC v2 BeadChip. <i>Epigenetics Communications</i>, <b>3</b>(1), 6.")
+		report <- rnb.add.reference(report, refText)
+		txt <- paste0("Analysis of the beta values of the nv probes.\n", "EPICv2 introduced nv probes which target common somatic mutations that occur in human cancers. ",
+				 	  "These probes measure DNA sequence variations rather than DNA cytosine methylation ", rnb.get.reference(report, refText), ".")
+
+		## Attach a table of beta values and gene symbol of nv probes
+		data.dir.abs <- rnb.get.directory(report, "data", TRUE)
+		data.dir.rel <- rnb.get.directory(report, "data")
+		nv.probe.ids <- strsplit(rownames(nv.probes), split = "-")
+		rnb.require("biomaRt")
+		ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")
+		chromosomes <- sapply(nv.probe.ids, function(x) x[[3]])
+		start <- sapply(nv.probe.ids, function(x) x[[4]])
+		end <- sapply(nv.probe.ids, function(x) x[[5]])
+		gene.symbols <- sapply(nv.probe.ids, function(x) get.genesymbol.of.coordinate(x[[4]], x[[5]], x[[3]], ensembl))
+		tbl <- cbind("ProbeID" = rownames(nv.probes), "Chromosome" = chromosomes, "Start" = start, "End" = end, "GeneSymbol" = gene.symbols, nv.probes)
+		fname <- "nv_probes_beta_values_and_genes.csv"
+		utils::write.csv(tbl, file = file.path(data.dir.abs, fname), na = "", row.names = FALSE)
+
+		txt <- c(txt, " The table of beta values of each sample and gene symbols of each nv probe is available as a <a href=\"",
+				data.dir.rel, "/", fname, "\">comma-separated file</a> accompanying this report.")
+
+		report <- rnb.add.section(report, section.title, txt)
+
+		## EPICv2 nv probes Heatmap
+		if (rnb.getOption("nv.heatmap")) {
+			report <- rnb.step.nv.probes.heatmap(rnb.set, report, sample.inds, rinfos[[1]])
+		}
+
+		## EPICv2 nv probes beta distribution
+		if (rnb.getOption("nv.beta.distribution")) {
+			report <- rnb.step.nv.probes.beta.distribution(rnb.set, report, sample.inds, rinfos[[1]])
+		}
 	}
 
 	module.complete(report, close.report, show.report)

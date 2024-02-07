@@ -2066,11 +2066,15 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		rnb.require("biomaRt")
 		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")
 
-		sectionText <- c("For Methylation EPICv2 platform, nv-probes are available. These probes are designed to detect somatic mutations in common cancers.
-						  These probes measure DNA sequence variations rather than DNA cytosine methylation.
+		refText <- c("Kaur, D., Lee, S. M., Goldberg, D., Spix, N. J., Hinoue, T., Li, H.-T., Dwaraka, V. B., Smith, R., ",
+					 "Shen, H., Liang, G., Renke, N., Laird, P. W., & Zhou, W. (2023). Comprehensive evaluation of the Infinium human ",
+					 "MethylationEPIC v2 BeadChip. <i>Epigenetics Communications</i>, <b>3</b>(1), 6.")
+		report <- rnb.add.reference(report, refText)
+		sectionText <- c(paste0("For Methylation EPICv2 platform, nv-probes are available. These probes are designed to detect somatic mutations in common cancers.
+						  These probes measure DNA sequence variations rather than DNA cytosine methylation ", rnb.get.reference(report, refText), " .
 						  Tables contain additional columns <code>ReferenceBase</code> and <code>AlternateBase</code> to indicate the point mutation that each nv-probe is investigating.
 						  <code>GeneSymbol</code> column indicates the associated gene for this site.\n
-						  The tables for the individual comparisons of <em>only nv-probes</em> can be found here:\n<ul>\n")
+						  The tables for the individual comparisons of <em>only nv-probes</em> can be found here:\n<ul>\n"))
 		for (i in 1:length(comps)){
 			cc <- comps[i]
 
@@ -2092,10 +2096,7 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 			rownames(nv_diff) <- NULL
 			## Add gene symbol of every nv-probe
 			for (j in 1:nrow(nv_diff)) {
-				nv_diff[j, "GeneSymbol"] <- paste(getBM(attributes = "hgnc_symbol",
-                                                    filter = c("chromosome_name", "start", "end"),
-                                                    values = list(gsub("chr","",nv_diff[j, "Chromosome"]), nv_diff[j, "Start"], nv_diff[j, "Start"]), 
-                                                    mart = mart)$hgnc_symbol, collapse = ";")
+				nv_diff[j, "GeneSymbol"] <- get.genesymbol.of.coordinate(nv_diff[j, "Start"], nv_diff[j, "Start"], nv_diff[j, "Chromosome"], mart)
 			}
 			ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
 			fname <- paste("diffTable_nv_site_",ccn,".csv",sep="")

@@ -151,6 +151,10 @@ rnb.execute.context.removal <- function(rnb.set, contexts = rnb.getOption("filte
 }
 
 rnb.execute.context.removal.internal <- function(sites2ignore, contexts, anno.table) {
+	if (any(grepl("^nv", anno.table[, "ID"]))) {
+		logger.info("Detected nv probes in the dataset. Will not remove any nv probes based on context")
+		return(setdiff(which(anno.table[, "Context"] %in% contexts & !grepl("^nv",anno.table[, "ID"])), sites2ignore))
+	}
 	setdiff(which(anno.table[, "Context"] %in% contexts), sites2ignore)
 }
 
