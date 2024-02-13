@@ -2059,9 +2059,6 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		sectionText <- paste(sectionText,"</ul>",sep="")
 		rnb.add.paragraph(report, sectionText)
 
-		# nv_diff <- dmt ## New nv dmt df
-		# saveRDS(nv_diff, "/Users/baris.kalem/Code/RnBeads_Project/nv_probes_EPICv2/debug/nv_diff.RDS")
-
 		logger.info("Enriching nv-probes comparison table with HGNC symbols. see: GeneSymbol column in the finished table.")
 		rnb.require("biomaRt")
 		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")

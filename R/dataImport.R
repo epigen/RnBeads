@@ -909,7 +909,6 @@ read.idat.files <- function(base.dir,
 		sample.sheet<-data.frame(barcodes=barcode)
 	}
 
-	#  saveRDS(M, "/Users/baris.kalem/Code/RnBeads_Project/Kaur_CompareEPICv1_EPICv2/duplicated_probes_bug/M_good.RDS")
     
     ### solve the problem of duplicated probes
     ### in each pair select those that have a lower detection p-value
