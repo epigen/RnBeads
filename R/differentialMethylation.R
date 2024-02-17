@@ -180,7 +180,7 @@ rowOneSampleTP <- function(X,mu=0,alternative="two.sided"){
 
 #' limmaP
 #'
-#' applies hierarchical modeling anlalogous to differential expression employed in the \code{limma} package and returns
+#' applies hierarchical modeling analogous to differential expression employed in the \code{limma} package and returns
 #' p-values for differential methylation
 #' @author Fabian Mueller
 #' @param X Matrix on which the test is performed for every row
@@ -1582,7 +1582,7 @@ rnb.section.diffMeth.introduction <- function(diffmeth,report){
 	#include information on the p-value method
 	site.test.method <- get.site.test.method(diffmeth)
 	txt <- c(
-		"In the following anlyses, p-values on the site level were computed using the <code>",site.test.method,"</code> method. "
+		"In the following analyses, p-values on the site level were computed using the <code>",site.test.method,"</code> method. "
 	)
 	if (site.test.method == "limma"){
 		txt <- c(txt,
