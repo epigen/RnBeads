@@ -11,10 +11,7 @@
   log,
   job.name = "",
   res.req = character(0),
-  depend.jobs = character(0),
-  sub.binary = TRUE,
-  quote.cmd = TRUE,
-  queue.name = "short"
+  depend.jobs = character(0)
 )
 }
 \arguments{
@@ -29,8 +26,6 @@
 \item{res.req}{named vector of requested resources. Two options are available: \code{"clock.limit"} and \code{"memory.size"}}
 
 \item{depend.jobs}{character vector containg names or ids of jobs the submitted job will depend on.}
-
-\item{queue.name}{Name of the Queue the job should be submitted to}
 }
 \value{
 A character vector containing the submission command tokens

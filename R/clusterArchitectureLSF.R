@@ -50,7 +50,6 @@ setMethod("initialize","ClusterArchitectureLSF",
 		.Object <- setExecutable(.Object,"R","R")
 		.Object <- setExecutable(.Object,"Rscript","Rscript")
 		.Object <- setExecutable(.Object,"python","python")
-		.Object@getSubCmdTokens.optional.args <- c("sub.binary","quote.cmd")
 		.Object
 	}
 )
@@ -68,7 +67,6 @@ setMethod("initialize","ClusterArchitectureLSF",
 #' @param job.name name of the submitted job
 #' @param res.req named vector of requested resources. Two options are available: \code{"clock.limit"} and \code{"memory.size"}
 #' @param depend.jobs character vector containg names or ids of jobs the submitted job will depend on.
-#' @param queue.name Name of the Queue the job should be submitted to
 #' @return A character vector containing the submission command tokens
 #'
 #' @rdname getSubCmdTokens-ClusterArchitectureLSF-methods
@@ -93,9 +91,7 @@ setMethod("getSubCmdTokens",
 	  log,
 	  job.name = "",
 	  res.req = character(0),
-	  depend.jobs = character(0),
-	  sub.binary = TRUE,
-	  quote.cmd = TRUE
+	  depend.jobs = character(0)
 	) {
 	  res.req.token <- NULL
 	  queue <- "short"
