@@ -1229,7 +1229,7 @@ rnb.section.na.removal.internal <- function(report, dataset.class, numSamples, n
 				binwidth <- max((binwidth[2] - binwidth[1]) / 40, 1)
 				rplot <- createReportPlot(x$fname, report, width = 5, height = 5)
 				pp <- ggplot(dframe, aes_string(x = "x")) + labs(x = "Number of missing values", y = "Frequency") +
-					geom_histogram(aes_string(y = "..count.."), binwidth = binwidth)
+					geom_histogram(aes(y = after_stat(count)), binwidth = binwidth)
 				if (0 < threshold && threshold < 1) {
 					pp <- pp + geom_vline(xintercept = threshold * numSamples, linetype = "dotted")
 				}

@@ -503,7 +503,7 @@ add.quantile.plot <- function(report, object, actualAges, predictedAges){
 	density.frame <- data.frame(Difference=density$x,Density=density$y)
 	median <- median(diff)
 
-	plot <- ggplot(data,aes(x=Difference,y=0.0))+geom_density(aes(y=..density..))+geom_point(aes(label=Sample))+geom_text(aes(label=Sample),hjust=.5,vjust=1.5,size=3,colour='#BE1E2D')+geom_area(data=subset(density.frame,Difference>=q1 & Difference<=q99),aes(x=Difference,y=Density),fill='#75BC1C')+geom_area(data=subset(density.frame,Difference<=q1),aes(x=Difference,y=Density),fill='#BE1E2D')+geom_area(data=subset(density.frame,Difference>=q99),aes(x=Difference,y=Density),fill='#BE1E2D')+geom_vline(xintercept=median)+ylab("Density")
+	plot <- ggplot(data,aes(x=Difference,y=0.0))+geom_density(aes(y=after_stat(density)))+geom_point(aes(label=Sample))+geom_text(aes(label=Sample),hjust=.5,vjust=1.5,size=3,colour='#BE1E2D')+geom_area(data=subset(density.frame,Difference>=q1 & Difference<=q99),aes(x=Difference,y=Density),fill='#75BC1C')+geom_area(data=subset(density.frame,Difference<=q1),aes(x=Difference,y=Density),fill='#BE1E2D')+geom_area(data=subset(density.frame,Difference>=q99),aes(x=Difference,y=Density),fill='#BE1E2D')+geom_vline(xintercept=median)+ylab("Density")
 	report.plot <- createReportPlot("age_prediction_quantile", report)
 	print(plot)
 	report.plot <- off(report.plot)
@@ -612,7 +612,7 @@ add.age.histogram <- function(report,ages){
 	data <- data.frame(Age=ages)
 	colors <- rnb.getOption("colors.category")
 	gradient <- rnb.getOption("colors.gradient")
-	plot <- ggplot(data,aes(x=Age))+geom_histogram(aes(fill=..count..,y=..density..),binwidth=5) +geom_density(color=colors[2])+scale_fill_gradient(low=gradient[1],high=gradient[2],name="Count")+ylab("Density")
+	plot <- ggplot(data,aes(x=Age))+geom_histogram(aes(fill=after_stat(count),y=after_stat(density)),binwidth=5) +geom_density(color=colors[2])+scale_fill_gradient(low=gradient[1],high=gradient[2],name="Count")+ylab("Density")
 	report.plot <- createReportPlot("predicted_ages_histogram",report)
 	print(plot)
 	report.plot <- off(report.plot)

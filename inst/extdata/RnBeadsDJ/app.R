@@ -42,13 +42,13 @@ RNB.MODULES.LOG.MSG <- c(
 	"exploratory_analysis"="Exploratory Analysis",
 	"differential_methylation"="Differential Methylation"
 )
-RNB.PLATFORMS <- c("Bisulfite Sequencing"="biseq", "Illumina EPIC"="illEpic", "Illumina EPIC v2"="illEpicv2", "Illumina 450k"="ill450k", "Illumina27k"="ill27k")
+RNB.PLATFORMS <- c("Bisulfite Sequencing"="biseq", "Illumina EPIC"="illEpic", "Illumina EPIC v2"="illEpicv2", "Illumina 450k"="ill450k", "Illumina27k"="ill27k", 'Illumina MMBC'='illMMBC')
 RNB.ASSEMBLIES <- rnb.get.assemblies()
 RNB.TABLE.SEPS <- c("comma" = ",", "tab"="\t")
 RNB.BED.STYLES <- c("BisSNP"="BisSNP", "ENCODE"="Encode", "EPP"="EPP", "Bismark cytosine"="bismarkCytosine", "Bismark coverage"="bismarkCov")
 RNB.FILTERING.SNP <- c("No filtering"="no", "3 SNPs"="3", "5 SNPs"="5", "Any SNPs"="any") ## TODO: Include SNPs MAF from the new hg38 annotation
-RNB.NORMALIZATION.METHODS=c("none", "bmiq", "illumina", "swan", "minfi.funnorm", "wm.dasen", "wm.nasen", "wm.betaqn", "wm.naten", "wm.nanet", "wm.nanes", "wm.danes", "wm.danet", "wm.danen", "wm.daten1", "wm.daten2", "wm.tost", "wm.fuks", "wm.swan")
-RNB.NORMALIZATION.BG.METHODS <- c("none", "methylumi.noob", "methylumi.goob", "enmix.oob")
+RNB.NORMALIZATION.METHODS=c("none", "bmiq", "illumina", "swan", "minfi.funnorm", "wm.dasen", "wm.nasen", "wm.betaqn", "wm.naten", "wm.nanet", "wm.nanes", "wm.danes", "wm.danet", "wm.danen", "wm.daten1", "wm.daten2", "wm.tost", "wm.fuks", "wm.swan", "scaling.internal")
+RNB.NORMALIZATION.BG.METHODS <- c("none", "methylumi.noob", "methylumi.goob", "enmix.oob", "sesame.noobsb")
 RNB.IMPUTATION.METHODS <- c("none", "mean.cpgs", "mean.samples", "random", "knn")
 RNB.TRACKHUB.FORMATS <- c("bigBed", "bigWig")
 RNB.SVA.NUM.METHODS <- c("leek", "be")
@@ -834,7 +834,7 @@ ui <- tagList(useShinyjs(), navbarPage(
 								tags$div(title=RNB.OPTION.DESC["normalization.method"], tags$code("normalization.method"))
 							),
 							tags$td(
-								selectInput("rnbOptsI.normalization.method", NULL, RNB.NORMALIZATION.METHODS, selected="wm.dasen")
+								selectInput("rnbOptsI.normalization.method", NULL, RNB.NORMALIZATION.METHODS, selected="scaling.internal")
 							),
 							tags$td(
 								verbatimTextOutput("rnbOptsO.normalization.method")
@@ -845,7 +845,7 @@ ui <- tagList(useShinyjs(), navbarPage(
 								tags$div(title=RNB.OPTION.DESC["normalization.background.method"], tags$code("normalization.background.method"))
 							),
 							tags$td(
-								selectInput("rnbOptsI.normalization.background.method", NULL, RNB.NORMALIZATION.BG.METHODS, selected="none")
+								selectInput("rnbOptsI.normalization.background.method", NULL, RNB.NORMALIZATION.BG.METHODS, selected="sesame.noobsb")
 							),
 							tags$td(
 								verbatimTextOutput("rnbOptsO.normalization.background.method")
@@ -1479,7 +1479,7 @@ server <- function(input, output, session) {
 			shinyjs::disable("rnbOptsI.normalization.background.method")
 			shinyjs::disable("rnbOptsI.exploratory.correlation.qc")
 		} else {
-			shinyjs::disable("rnbOptsI.assembly")
+			#shinyjs::disable("rnbOptsI.assembly")
 			shinyjs::disable("rnbOptsI.import.bed.style")
 			shinyjs::disable("rnbOptsI.filtering.coverage.threshold")
 			shinyjs::disable("rnbOptsI.filtering.low.coverage.masking")
@@ -1587,7 +1587,7 @@ server <- function(input, output, session) {
 	assemblySel <- reactive({
 		interfaceSetting <- input$rnbOptsI.assembly
 		res <- "hg19"
-		if (isBiseq() && !is.null(interfaceSetting)){
+		if (!is.null(interfaceSetting)){
 			res <- interfaceSetting
 		}
 		rnb.options(assembly=res)
