@@ -203,7 +203,7 @@ rnb.plot.region.profile.density <- function(rnb.set, sample, region.type="", reg
 	stable.h <- c(stable.bandwidth.fun(df2p$relative.coord),stable.bandwidth.fun(df2p$meth))
 
 	pp <- ggplot(df2p) + aes(x=relative.coord,y=meth) + 
-		  stat_density2d(geom="tile",fill="#1F78B4", aes(alpha=..density..^0.25), contour = FALSE, h=stable.h) +
+		  stat_density2d(geom="tile",fill="#1F78B4", aes(alpha=after_stat(density)^0.25), contour = FALSE, h=stable.h) +
 		  ylim(0, 1) + ylab("methylation") + xlab("relative position") + theme(legend.position="none") +
 		  geom_vline(xintercept = c(0,1), linetype = "solid",size=1.5)
 	return(pp)
@@ -338,6 +338,7 @@ locus.profile.get.base.tracks <- function(chrom,start,end,assembly="hg19"){
 	}
 	
 	rnb.require("biomaRt")
+	rnb.require("Gviz")	
 	mart <- NULL
 	featMap <- Gviz:::.getBMFeatureMap()
 	if (assembly == "hg19"){
@@ -349,7 +350,7 @@ locus.profile.get.base.tracks <- function(chrom,start,end,assembly="hg19"){
 		# 	}
 		# )
 		mart <- tryCatch(
-			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="feb2014.archive.ensembl.org"),
+			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2014.archive.ensembl.org"), ## Ensembl 75
 			error = function(ee) {
 				logger.warning(c("could not retrieve Ensembl genes from biomart: ",ee$message))
 				NULL
@@ -358,7 +359,7 @@ locus.profile.get.base.tracks <- function(chrom,start,end,assembly="hg19"){
 		featMap["symbol"] <- "external_gene_id"
 	} else if (assembly == "hg38"){
 		mart <- tryCatch(
-			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="may2015.archive.ensembl.org"),
+			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org"), ## Ensembl 109
 			error = function(ee) {
 				logger.warning(c("could not retrieve Ensembl genes from biomart: ",ee$message))
 				NULL

@@ -135,13 +135,15 @@ setMethod("initialize", "RnBeadSet",
 			
 			.Object@qc<-qc
 			
+			genome.assembly<-rnb.getOption("assembly")
+
 			callNextMethod(.Object,
 					pheno=pheno,
 					sites=sites,
 					meth.sites=meth.sites,
 					covg.sites=covg.sites,
 					status=status,
-					assembly=ifelse(target=="probesMMBC", "mm10", "hg19"),
+					assembly=ifelse(target=="probesMMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", genome.assembly)),
 					target=target
 			)
 			
@@ -178,7 +180,7 @@ RnBeadSet<-function(
 		qc = NULL,
 		platform = "450k",
 		summarize.regions = TRUE,
-		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", "hg19")),
+		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", rnb.getOption("assembly"))),
 		useff=rnb.getOption("disk.dump.big.matrices")
 		){
 		
@@ -237,16 +239,23 @@ RnBeadSet<-function(
 			stop("invalid value for useff: should be a logical of length one")
 		}
 		
+		genome.assembly <- rnb.getOption("assembly")
 		if (platform == "EPIC") {
 			target <- "probesEPIC"
-			assembly <- "hg19"
-		}else if (platform == "450k") {
+			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
+		} else if (platform == "EPICv2") {
+			target <- "probesEPICv2"
+			assembly <- "hg38"
+		} else if (platform == "450k") {
 			target <- "probes450"
-			assembly <- "hg19"
+			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
 		} else if(platform == "27k"){ 
 			target <- "probes27"
 			assembly <- "hg19"
-		}else{
+		} else if(platform == "MMBC"){
+            target <- "probesMMBC"
+            assembly <- "mm10"
+		} else{
 			stop("Invalid value for platform")
 		}
 		mr<-match.probes2annotation(probes, target, assembly)
@@ -311,8 +320,14 @@ rnb.show.rnbeadset <- function(object) {
 	cat(sprintf("%8d probes\n", nrow(object@sites)))
 	probe.types <- rownames(object@sites)
 	if (!is.null(probe.types)) {
-		probe.types <- sapply(c("^cg", "^ch", "^rs"), function(type) { sum(grepl(type, probe.types)) })
-		cat(sprintf("\tof which: %g CpG, %g CpH, and %g rs\n", probe.types[1], probe.types[2], probe.types[3]))
+		probe.types.identifiers <- c("^cg", "^ch", "^rs")
+		if (object@target == "probesEPICv2") {
+			probe.types.identifiers <- c(probe.types.identifiers, "^nv")
+		}
+		probe.types <- sapply(probe.types.identifiers, function(type) { sum(grepl(type, probe.types)) })
+		cat(sprintf("\tof which: %g CpG, %g CpH, %g rs and %g nv\n", 
+					probe.types[1], probe.types[2], probe.types[3], ifelse(object@target == "probesEPICv2", probe.types[4], 0)
+					))
 	}
 	if (!is.null(object@regions)) {
 		cat("Region types:\n")
@@ -741,8 +756,14 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	if(!is.character(probes)){
 		stop("wrong value for probes")
 	}
+
+	probe.identifiers.pattern <- "^cg|^ch|^rs"
+	## EPIC v2 has a new probe type "nv"
+	if (target == "probesEPICv2") {
+		probe.identifiers.pattern <- paste(probe.identifiers.pattern, "|^nv", sep="")
+	}
 	
-	if(!all(grepl("^cg|^ch|^rs", probes))){
+	if(!all(grepl(probe.identifiers.pattern, probes))){
 		stop("probes contains invalid IDs")
 	}
 	
@@ -765,7 +786,16 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	
 	chrs<-rnb.get.chromosomes(assembly)
 	
+	probe.id.column.name = "ID"
+	is.combining.epicv2.arrays = FALSE
 	annotated.probes<-do.call("c", lapply(probe.annotation, names))
+	if (!grepl("_", probes[1]) & grepl("_", annotated.probes[1])){
+		## FIXME: Bit of a hack - This part resolves the issue when combining
+		## EPICv2 with previous arrays; since the IlmnID's do not match. i.e. cg123_BT12 vs cg123
+		annotated.probes<-do.call("c", lapply(probe.annotation, function(x) mcols(x)[["Name"]]))
+		probe.id.column.name = "Name" ## For EPICv2 annotation
+		is.combining.epicv2.arrays = TRUE
+	}
 	if(length(which(probes %in% annotated.probes))<2){
 		err<-"Annotations could be found for less than two rows from the supplied beta value table"
 		rnb.error(err)		
@@ -777,7 +807,9 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	}
 	
 	x.data<-rnb.annotation2data.frame(probe.annotation)
-	rownames(x.data)<-annotated.probes
+	if (!is.combining.epicv2.arrays) {
+		rownames(x.data)<-annotated.probes
+	}
 	rm(annotated.probes)
 	
 	#site.ids<-character()
@@ -785,7 +817,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 	p.infos <- lapply(unique(x.data[["Chromosome"]]), 
 			function(chr) {
 				chr.map<-which(x.data[["Chromosome"]]==chr)
-				chr.ids<-x.data[chr.map, "ID"]
+				chr.ids<-x.data[chr.map, probe.id.column.name]
 				table<-match(probes, chr.ids)
 				present<-!is.na(table)
 				po<-order(table[present])
@@ -796,7 +828,7 @@ match.probes2annotation<-function(probes, target="probes450", assembly="hg19"){
 						match(x.data[chr.map[table],"Chromosome"], names(chrs)), 
 						table),
 						ncol = 3, 
-						dimnames = list(x.data[chr.map[table],"ID"], c("context", "chr", "index")))
+						dimnames = list(x.data[chr.map[table],probe.id.column.name], c("context", "chr", "index")))
 			})
 	
 #	p.infos<-matrix(c(as.integer(x.data[site.ids, "Context"]), match(x.data[site.ids,"Chromosome"], names(chrs)), unlist(p.indices)),

@@ -3,7 +3,7 @@
 ## created: 2014-02-28
 ## creator: Yassen Assenov
 ## ---------------------------------------------------------------------------------------------------------------------
-## Functions to infer sex from Infinium 450k, EPIC and bisulfite sequencing data, and to visualize the results.
+## Functions to infer sex from Infinium 450k, EPIC, EPICv2 and bisulfite sequencing data, and to visualize the results.
 ########################################################################################################################
 
 ## G L O B A L S #######################################################################################################
@@ -48,13 +48,25 @@ rnb.contains.sex <- function(rnb.set) {
 rnb.get.XY.shifts <- function(rnb.set, signal.type = "raw") {
 
   target <- rnb.set@target
+  genome.build <- rnb.set@assembly
 	probes.bad <- rnb.get.annotation(target, rnb.set@assembly)
 	probes.max <- sapply(probes.bad, length)
-	if(target == 'probesEPIC'){
-	  #' There is no 'cross-active' annotation available for probes in the EPIC annotation
-	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
-	}else{
-	  probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0) | (mcols(x)[, "Cross-reactive"] != 0)) })
+	if (genome.build == "hg38") {
+		#' There is no 'cross-active' annotation available for probes in the hg38 annotation
+		if(target == 'probesEPIC'){
+	  		probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
+		} else if(target == 'probesEPICv2'){
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
+		} else if (target == 'probes450'){
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
+		}
+	} else { ## hg19
+		if(target == 'probesEPIC'){
+	  		#' There is no 'cross-active' annotation available for probes in the EPIC annotation
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
+		} else {
+	  		probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0) | (mcols(x)[, "Cross-reactive"] != 0)) })
+		}
 	}
 	probes.max <- probes.max - sapply(probes.bad, length)
 
@@ -225,7 +237,7 @@ rnb.execute.sex.prediction <- function(rnb.set) {
     stop("invalid value for rnb.set")
   }
 	if (inherits(rnb.set, "RnBeadRawSet")) {
-	  if (rnb.set@target != "probes450" && rnb.set@target != "probesEPIC") {
+	  if (rnb.set@target != "probes450" && rnb.set@target != "probesEPIC" && rnb.set@target != "probesEPICv2") {
 		  stop("unsupported platform")
 	  }
 	  shifts <- rnb.get.XY.shifts(rnb.set)
@@ -302,7 +314,7 @@ rnb.section.sex.prediction <- function(rnb.set, shifts, report) {
 		}
 	} else {
 		txt <- c("Sex prediction is skipped because this operation is not supported for the dataset. Currently, ",
-			"sex prediction can be performed only on raw Infinium 450k and EPIC datasets, as well as sequencing data sets.", 
+			"sex prediction can be performed only on raw Infinium 450k, EPIC and EPICv2 datasets, as well as sequencing data sets.", 
       "These are, for example, datasets loaded from IDAT or BED-like files.")
 		return(report)
 	}

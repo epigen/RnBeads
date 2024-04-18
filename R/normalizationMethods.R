@@ -506,7 +506,13 @@ get.platform.tokens<-function(platform){
         dict$bg_token<-"NEGATIVE"
         dict$id_col<-"ID"
         dict$trg_col<-"Target"
-    }else if(platform=="probesMMBC"){
+    } else if(platform=="probesEPICv2"){
+        dict$norm_token["Cy3"] <- 'NORM_(C|G)'
+        dict$norm_token["Cy5"] <- 'NORM_(A|T)'
+        dict$bg_token<-"NEGATIVE"
+        dict$id_col<-"ID"
+        dict$trg_col<-"Target"
+    } else if(platform=="probesMMBC"){
         dict$norm_token["Cy3"] <- 'NORM_(C|G)'
         dict$norm_token["Cy5"] <- 'NORM_(A|T)'
         dict$bg_token<-"NEGATIVE"

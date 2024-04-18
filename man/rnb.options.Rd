@@ -128,10 +128,10 @@ is available (see below). Attempting to get or set the value of a non-existing o
 	  Skip the check of the loaded RnBSet object after loading. Helps with keeping the memory profile down}
   \item{\bold{\code{import.idat.platform}}\code{ = NULL}}{
 	  Character specifying the Infinium platform that is uses. Has to be one of \code{'probes27'},
-	  \code{'probes450'} or \code{'probesEPIC'}. If \code{'auto'}, the platform is automatically detected
+	  \code{'probes450'}, \code{'probesEPIC'} or \code{'probesEPICv2'}. If \code{'auto'}, the platform is automatically detected
 	  from the IDAT file names.}
   \item{\bold{\code{import.sex.prediction}}\code{ = TRUE}}{
-       Flag indicating if sex prediction is to be performed. Sex prediction is supported for Infinium 450k, EPIC
+       Flag indicating if sex prediction is to be performed. Sex prediction is supported for Infinium 450k, EPIC, EPICv2
        and bisulfite sequencing datasets with signal intensity or coverage information.
        The value of this option is ignored for 27k datasets.}
   \item{\bold{\code{qc}}\code{ = TRUE}}{
@@ -144,7 +144,7 @@ is available (see below). Attempting to get or set the value of a non-existing o
   \item{\bold{\code{qc.negative.boxplot}}\code{ = TRUE}}{
        [Microarrays] Add boxplot of negative control probe intensities for all samples.}
   \item{\bold{\code{qc.snp.heatmap}}\code{ = TRUE}}{
-       [Microarrays] Flag indicating if a heatmap of the beta values for all SNP probes is to be geneerated.}
+       [Microarrays] Flag indicating if a heatmap of the beta values for all SNP probes is to be generated.}
   \item{\bold{\code{qc.snp.barplot}}\code{ = FALSE}}{
        [Microarrays] Add bar plots of the beta-values observed for each SNP-calling probe.}
   \item{\bold{\code{qc.snp.boxplot}}\code{ = FALSE}}{
@@ -187,11 +187,14 @@ is available (see below). Attempting to get or set the value of a non-existing o
        \code{"wm.danes"}, \code{"wm.danet"}, \code{"wm.danen"}, \code{"wm.daten1"}, \code{"wm.daten2"},
        \code{"wm.tost"}, \code{"wm.fuks"} and \code{"wm.swan"} - all normalization methods implemented in the
        \href{http://www.bioconductor.org/packages/release/bioc/html/wateRmelon.html}{wateRmelon} package. When
-       setting this option to a specific algorithm, make sure its dedicated package is installed.}
+       setting this option to a specific algorithm, make sure its dedicated package is installed.
+       \code{"scaling.internal"}, \code{"scalings"} - different scaling methods as implemented in the
+       \href{https://www.bioconductor.org/packages/release/bioc/html/sesame.html}{sesame} R package.
+       }
   \item{\bold{\code{normalization.background.method}}\code{ = "none"}}{
        A character singleton specifying which background subtraction is to be performed during normalization.
        The following values are accepted: \code{"none"} (default), \code{"methylumi.noob"}, \code{"methylumi.goob"},
-       \code{"methylumi.lumi"} and \code{"enmix.oob"}.}
+       \code{"methylumi.lumi"}, \code{"enmix.oob"},  \code{"sesame.noob"} and \code{"sesame.noobsb"}.}
   \item{\bold{\code{normalization.plot.shifts}}\code{ = TRUE}}{
        Flag indicating if the report on normalization should include plots of shifts (degrees of beta value
        correction).}
@@ -367,6 +370,10 @@ is available (see below). Attempting to get or set the value of a non-existing o
   \item{\bold{\code{exploratory.custom.loci.bed}}\code{ = NULL}}{
        Path to a bed file containing custom genomic regions. Locus views will be generated for these regions.
        }
+  \item{\bold{\code{nv.heatmap}}\code{ = TRUE}}{
+       [Microarrays] Flag indicating if a heatmap of the beta values for all nv probes is to be generated.}
+  \item{\bold{\code{nv.beta.distribution}}\code{ = TRUE}}{
+       [Microarrays] Flag indicating if a density plot of the beta values for all nv probes is to be generated.}
   \item{\bold{\code{differential}}\code{ = TRUE}}{
        Flag indicating if the differential methylation module is to be executed.}
   \item{\bold{\code{differential.site.test.method}}\code{ = "limma"}}{

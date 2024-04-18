@@ -334,7 +334,7 @@ rnb.plot.beta.comparison <- function(beta.values, fprefix, report = NULL, qq.len
 	rplot <- createReportPlot(fnames[2], report, width = 6.8, height = 5.2)
 	pp <- ggplot(dframe, aes_string(x = "value")) + coord_cartesian(xlim = c(0, 1)) +
 		labs(x = expression(beta), y = "Density") +
-		geom_histogram(aes_string(y = "..density.."), binwidth = 0.02) +
+		geom_histogram(aes(y = after_stat(density)), binwidth = 0.02) +
 		facet_grid(vtype ~ .) + theme(plot.margin = pmargins)
 	print(pp)
 	off(rplot)
@@ -1467,7 +1467,7 @@ create.densityScatter <- function(df2p,is.special=NULL,dens.subsample=FALSE,dens
   		pp <- rnb.message.plot("Could not assess density")
   	} else {		
   		pp <- ggplot(df2p.sub) + aes_string(x=colnames(df2p)[1],y=colnames(df2p)[2]) + 
-		  stat_density2d(geom="tile", fill=DENS.COLORS.LOW[1], aes(,alpha=..density..^0.25), contour=FALSE, n=dens.n, h=stable.h) +
+		  stat_density2d(geom="tile", fill=DENS.COLORS.LOW[1], aes(alpha=after_stat(density)^0.25), contour=FALSE, n=dens.n, h=stable.h) +
 		  scale_alpha(range = c(0.0, 1))
 		if (sparse.points > 0){
 			if (sparse.points <= 1){

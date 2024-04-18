@@ -3,7 +3,7 @@
 ## created: 2016-10-02
 ## creator: Yassen Assenov
 ## ---------------------------------------------------------------------------------------------------------------------
-## Functions for performing exponential-normal (EN) background subtraction on 450k and EPIC datasets.
+## Functions for performing exponential-normal (EN) background subtraction on 450k, EPIC and EPICv2 datasets.
 ########################################################################################################################
 
 ## F U N C T I O N S ###################################################################################################
@@ -12,7 +12,7 @@
 #'
 #' Gets the indices of the probes of specific type in the given dataset.
 #'
-#' @param dataset     Infinium 450k or EPIC dataset as an instance of \code{\linkS4class{RnBeadRawSet}}.
+#' @param dataset     Infinium 450k, EPIC or EPICv2 dataset as an instance of \code{\linkS4class{RnBeadRawSet}}.
 #' @param include.snp Flag indicating if the SNP probes, if present in the dataset, are to be considered.
 #' @return Probe indices, split by types as a \code{list} with three elements: \code{"IGrn"}, \code{"IRed"},
 #'         \code{"II"}.
@@ -55,7 +55,7 @@ rnb.probe.types <- function(dataset, include.snp = TRUE) {
 #' Runs the Exponential-truncated-normal (ENmix) background subtraction using out-of-band (OOB) intensities to estimate
 #' the background (noise) distribution parameters.
 #' 
-#' @param dataset      Infinium 450k or EPIC dataset as an instance of \code{\linkS4class{RnBeadRawSet}}.
+#' @param dataset      Infinium 450k, EPIC or EPICv2 dataset as an instance of \code{\linkS4class{RnBeadRawSet}}.
 #' @param update.betas Flag indicating if the beta value matrix is to be updated after correcting the M and U intensity
 #'                     values.
 #' @return The modified dataset.
@@ -96,7 +96,7 @@ rnb.enmix.oob <- function(dataset, update.betas = TRUE) {
 #'
 #' Processes a single sample from the given dataset using ENmix.
 #'
-#' @param dataset  Infinium 450k or EPIC dataset as an instance of \code{\linkS4class{RnBeadRawSet}}.
+#' @param dataset  Infinium 450k, EPIC or EPICv2 dataset as an instance of \code{\linkS4class{RnBeadRawSet}}.
 #' @param i.sample Index of the sample to be processed.
 #' @param ptypes   Probe indices, split by types, as returned by \code{\link{rnb.probe.types}}.
 #' @return Corrected intensity values for the i-th sample as a \code{list} of two \code{vectors}: one of the M, and

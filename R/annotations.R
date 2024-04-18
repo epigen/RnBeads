@@ -12,6 +12,7 @@
 #' structures for one assembly are stored in a separate dedicated annotation package. The following annotation packages
 #' are available in Bioconductor:
 #' \describe{
+#' 	 \item{\pkg{RnBeads.hg38}}{for \code{"hg38"}}
 #'   \item{\pkg{RnBeads.hg19}}{for \code{"hg19"}}
 #'   \item{\pkg{RnBeads.mm10}}{for \code{"mm10"}}
 #'   \item{\pkg{RnBeads.mm9}}{for \code{"mm9"}}
@@ -81,6 +82,23 @@ NULL
 
 ## Control probe types
 EPIC.CONTROL.TARGETS <- c(
+	"bisulfite conversion I" = "BISULFITE CONVERSION I",
+	"bisulfite conversion II" = "BISULFITE CONVERSION II",
+	"extension" = "EXTENSION",
+	"hybridization" = "HYBRIDIZATION",
+	"negative control" = "NEGATIVE",
+	"non-polymorphic" = "NON-POLYMORPHIC",
+	"norm A" = "NORM_A",
+	"norm C" = "NORM_C",
+	"norm G" = "NORM_G",
+	"norm T" = "NORM_T",
+	"restoration" = "RESTORATION",
+	"specificity I" = "SPECIFICITY I",
+	"specificity II" = "SPECIFICITY II",
+	"staining" = "STAINING",
+	"target removal" = "TARGET REMOVAL")
+
+EPICv2.CONTROL.TARGETS <- c( ## TODO: Not validated for EPIC v2 (Most likely it's compatible)
 	"bisulfite conversion I" = "BISULFITE CONVERSION I",
 	"bisulfite conversion II" = "BISULFITE CONVERSION II",
 	"extension" = "EXTENSION",
@@ -748,6 +766,10 @@ rnb.get.assemblies <- function() {
 #' rnb.get.annotation("promoters")
 #' }
 rnb.get.annotation <- function(type = "CpG", assembly = "hg19") {
+	if (type == "probesEPICv2" || type == "controlsEPICv2") {
+		assembly = "hg38"
+	}
+
 	if (!(is.character(type) && length(type) == 1 && (!is.na(type)))) {
 		stop("invalid value for type")
 	}
@@ -1342,8 +1364,8 @@ rnb.get.chromosomes <- function(assembly = "hg19") {
 #' Extracts all control probe types in the HumanMethylation450 assay.
 #'
 #' @param target  A singleton of type \code{character}, specifying the microarray platform.
-#' 				 \code{"probesEPIC"},\code{"probes450"} and \code{"probes27"} correspond to MethylationEPIC, 
-#' 				 HumanMethylation450, and HumanMethylation27 microarrays respectively.
+#' 				 \code{"probesEPICv2"},\code{"probesEPIC"},\code{"probes450"} and \code{"probes27"} correspond to MethylationEPICv2, 
+#' 				 Methylation EPIC, HumanMethylation450, and HumanMethylation27 microarrays respectively.
 #'
 #' @return \code{character} vector of control targets.
 #'
@@ -1356,6 +1378,8 @@ rnb.get.chromosomes <- function(assembly = "hg19") {
 rnb.infinium.control.targets <- function(target="probes450") {
 	if(target=="probesEPIC"){
 		return(EPIC.CONTROL.TARGETS)
+	}else if(target=="probesEPICv2"){
+		return(EPICv2.CONTROL.TARGETS)
 	}else if(target=="probes450"){
 		return(HM450.CONTROL.TARGETS)
 	}else if(target=="probes27"){

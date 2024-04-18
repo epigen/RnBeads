@@ -2053,6 +2053,59 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		txt <- paste(c("<a href=\"", rnb.get.directory(report, "data"), "/", fname,"\">",cc,"</a>"),collapse="")
 		sectionText <- paste(sectionText,"<li>",txt,"</li>\n",sep="")
 	}
+	## Save table of only the nv-probes in EPICv2
+	if (rnbSet@target == "probesEPICv2" & any(grepl("^nv", dmt$cgid))) {
+		logger.info("Saving table(s) containing only nv-probes")
+		sectionText <- paste(sectionText,"</ul>",sep="")
+		rnb.add.paragraph(report, sectionText)
+
+		# nv_diff <- dmt ## New nv dmt df
+		# saveRDS(nv_diff, "/Users/baris.kalem/Code/RnBeads_Project/nv_probes_EPICv2/debug/nv_diff.RDS")
+
+		logger.info("Enriching nv-probes comparison table with HGNC symbols. see: GeneSymbol column in the finished table.")
+		rnb.require("biomaRt")
+		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")
+
+		refText <- c("Kaur, D., Lee, S. M., Goldberg, D., Spix, N. J., Hinoue, T., Li, H.-T., Dwaraka, V. B., Smith, R., ",
+					 "Shen, H., Liang, G., Renke, N., Laird, P. W., & Zhou, W. (2023). Comprehensive evaluation of the Infinium human ",
+					 "MethylationEPIC v2 BeadChip. <i>Epigenetics Communications</i>, <b>3</b>(1), 6.")
+		report <- rnb.add.reference(report, refText)
+		sectionText <- c(paste0("For Methylation EPICv2 platform, nv-probes are available. These probes are designed to detect somatic mutations in common cancers.
+						  These probes measure DNA sequence variations rather than DNA cytosine methylation ", rnb.get.reference(report, refText), " .
+						  Tables contain additional columns <code>ReferenceBase</code> and <code>AlternateBase</code> to indicate the point mutation that each nv-probe is investigating.
+						  <code>GeneSymbol</code> column indicates the associated gene for this site.\n
+						  The tables for the individual comparisons of <em>only nv-probes</em> can be found here:\n<ul>\n"))
+		for (i in 1:length(comps)){
+			cc <- comps[i]
+
+			annot.vec <- get.diffmeth.tab.annot.cols("sites", includeCovg, hasVariability)
+			colname.vec <- get.diffmeth.tab.annot.colnames.pretty("sites", grp.names[i,1], grp.names[i,2], includeCovg, hasVariability, covgThres=get.covg.thres(diffmeth), skipSites=FALSE)
+			nv_diff <- get.table(diffmeth,cc,"sites",return.data.frame=TRUE)[,annot.vec]
+			colnames(nv_diff) <- colname.vec
+			nv_diff <- cbind(rownames(nv_diff),sites.info,nv_diff)
+			colnames(nv_diff)[colnames(nv_diff) == "cgid"] <- "nv_probe_id" ## New probe id column name
+			colnames(nv_diff)[colnames(nv_diff) == "diffmeth.p.val"] <- "diff.p.val" ## change diffmeth to diff, since nv-probes don't indicate methylation
+			colnames(nv_diff)[colnames(nv_diff) == "diffmeth.p.adj.fdr"] <- "diff.p.adj.fdr"	
+			
+			nv_diff <- nv_diff[grepl("^nv", nv_diff$nv_probe_id), ] ## Filter to only have nv-probes in the table
+			## Create a new column for Reference and Alternate bases
+			probe_id_split <- strsplit(as.character(nv_diff$nv_probe_id), "-|_") ## e.g. nv-GRCh38-chr7-6387219-6387219-G-A_TC21
+			nv_diff$ReferenceBase <- sapply(probe_id_split, "[[", 6)
+			nv_diff$AlternateBase <- sapply(probe_id_split, "[[", 7)
+			colnames(nv_diff)[1] <- "id"
+			rownames(nv_diff) <- NULL
+			## Add gene symbol of every nv-probe
+			for (j in 1:nrow(nv_diff)) {
+				nv_diff[j, "GeneSymbol"] <- get.genesymbol.of.coordinate(nv_diff[j, "Start"], nv_diff[j, "Start"], nv_diff[j, "Chromosome"], mart)
+			}
+			ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
+			fname <- paste("diffTable_nv_site_",ccn,".csv",sep="")
+			fname <- rnb.write.table(nv_diff,fname,fpath=rnb.get.directory(report, "data", absolute = TRUE),format="csv",gz=gzTable,row.names = FALSE,quote=FALSE)
+			txt <- paste(c("<a href=\"", rnb.get.directory(report, "data"), "/", fname,"\">",cc,"</a>"),collapse="")
+			sectionText <- paste(sectionText,"<li>",txt,"</li>\n",sep="")
+		}
+	}
+
 	sectionText <- paste(sectionText,"</ul>",sep="")
 	rnb.add.paragraph(report, sectionText)
 	
@@ -2820,7 +2873,7 @@ get.comparison.info <- function(x, pheno.cols=rnb.getOption("differential.compar
 
 		pheno.cols.all.pairwise <- intersect(pheno.cols.all.pairwise,names(group.info.all.pairwise))
 		if (length(pheno.cols.all.pairwise)<1) {
-			logger.warning("No pariwise comparison specifier could be matched to the comparisons conducted")
+			logger.warning("No pairwise comparison specifier could be matched to the comparisons conducted")
 		} else {
 			logger.info(c("Conducting all pairwise comparisons for columns:",paste(pheno.cols.all.pairwise,collapse=",")))
 			logger.info("All pairwise comparisons are performed on a subset of sample groupings. Caution: this could increase the runtime significantly

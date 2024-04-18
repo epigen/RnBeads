@@ -52,7 +52,7 @@ rnb.get.cnv.annotations<-function(platform="probes450"){
 #' @return GLAD profiles as produced by \code{\link{daglad}}, with names corresponding
 #'          to the samples of \code{rnb.set}
 #' @noRd
-#' @author Pavlo Lutsik, with modifications by Michael Scherer         
+#' @author Pavlo Lutsik, with modifications by Michael Scherer and Baris Kalem         
 getGLADProfiles<-function(rnb.set,refbased=TRUE){
 	
 	if(!inherits(rnb.set,"RnBeadRawSet")){
@@ -61,7 +61,7 @@ getGLADProfiles<-function(rnb.set,refbased=TRUE){
 	
   annot <- annotation(rnb.set)
   target <- rnb.set@target
-  if(target %in% c("probes27","probes450","probesEPIC")){
+  if(target %in% c("probes27","probes450","probesEPIC", "probesEPICv2")){
     target <- "probes450"
   }
   cnv.reference.data<-rnb.get.cnv.annotations(target)

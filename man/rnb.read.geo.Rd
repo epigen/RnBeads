@@ -27,9 +27,9 @@ directory. Keep in mind that GEO series can be demanding in terms of storage spa
 \code{\linkS4class{RnBeadSet}} object with phenotypic and beta value information.
 }
 \description{
-Imports Infinium 450K or MethylationEPIC data series from the Gene Expression Omnibus. This function uses the
+Imports Infinium 450K, MethylationEPIC or MethylationEPIC2 data series from the Gene Expression Omnibus. This function uses the
 series matrix file.
 }
 \author{
-Yassen Assenov
+Yassen Assenov, modified by Baris Kalem
 }

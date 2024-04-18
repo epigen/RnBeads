@@ -48,6 +48,8 @@ rnb.execute.pOOBAH <- function(raw.set, anno.table = NULL, pval.thresh = 0.05, v
       platform = "HM450"
     }else if(raw.set@target == "probesEPIC"){
       platform = "EPIC"
+    }else if(raw.set@target == "probesEPICv2"){
+      platform = "EPICv2"
     }else{
       stop("Invalid value for platform")
     }

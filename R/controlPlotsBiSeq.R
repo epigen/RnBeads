@@ -170,7 +170,7 @@ rnb.plot.biseq.coverage.hist<-function(
 	dframe<-data.frame(Coverage=covg.rnbs)
 	#TODO: cut after 95 percentile of coverage
 	pp <- ggplot(dframe, aes_string(x = "Coverage")) + coord_cartesian(xlim=c(0,max.covg))+ 
-		labs(x = "Coverage", y = "# CpGs") + geom_histogram(aes_string(y = "..count.."), binwidth = 10)
+		labs(x = "Coverage", y = "# CpGs") + geom_histogram(aes(y = after_stat(count)), binwidth = 10)
 	
 	if(writeToFile) {
 		print(pp)

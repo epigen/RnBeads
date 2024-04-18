@@ -404,6 +404,10 @@ rnb.section.import<-function(report, object, data.source, data.type=rnb.getOptio
 	if(data.type %in% c("rnb.set", "rnb.set.dir")) dtype="RnBead Set object"
 	descr<-c(
 		   "Data type",
+		   if (dtype == ".idat files"){
+			"Infinium platform"
+		   },
+		   "Annotation package",
 	       "Data source",
 		   if(class(object)=="RnBiseqSet") "Genome assembly used" else NULL,
            "Number of samples",
@@ -413,6 +417,16 @@ rnb.section.import<-function(report, object, data.source, data.type=rnb.getOptio
            if(inherits(object, "RnBeadSet")) "Quality control information" else NULL)
 
 	vals<-c(dtype,
+			if (dtype == ".idat files"){
+				platform <- rnb.detect.infinium.platform(list.files(path = data.source[[1]], full.names = TRUE))
+				txt <- c("probes27"="HumanMethylation27",
+				"probes450"="HumanMethylation450",
+				"probesEPIC"="MethylationEPIC",
+				"probesEPICv2"="MethylationEPICv2",
+				"probesMMBC"="MouseMethylationBeadChip")
+				txt[platform]
+		   },
+		   paste0("RnBeads.", rnb.getOption("assembly")),
 		if(is.list(data.source)){ 
 					if(is.null(data.source[[1]])){
 						NA_character_
@@ -570,7 +584,7 @@ rnb.step.import <- function(data.source, data.type = rnb.getOption("import.defau
 	logger.status(c("Loaded data from", d.source))
 
 	## Perform sex prediction
-	if (rnb.getOption("import.sex.prediction") && inherits(object, c("RnBeadRawSet","RnBiseqSet")) && object@target %in% c("probes450","probesEPIC","CpG")) {
+	if (rnb.getOption("import.sex.prediction") && inherits(object, c("RnBeadRawSet","RnBiseqSet")) && object@target %in% c("probes450","probesEPIC","probesEPICv2","CpG")) {
 		object <- rnb.execute.sex.prediction(object)
 		if (is.null(object@inferred.covariates$sex)) {
 			object@inferred.covariates$sex <- FALSE

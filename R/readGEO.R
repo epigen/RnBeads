@@ -12,7 +12,8 @@ GEO.PLATFORMS <- c(
 	"GPL8490" = "probes27",
 	"GPL13534" = "probes450",
 	"GPL16304" = "probes450",
-	"GPL21145" = "probesEPIC")
+	"GPL21145" = "probesEPIC",
+	"GPL33022" = "probesEPICv2") ## https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GPL33022
 
 ## F U N C T I O N S ###################################################################################################
 
@@ -138,11 +139,13 @@ rnb.geo.parse.ids <- function(txt) {
 #' @author Yassen Assenov
 #' @noRd
 rnb.geo.init.matrix <- function(txt, N.expected, assay.type) {
+	## TODO: Does it need implementation for EPICv2?
 	sample.ids <- rnb.geo.parse.ids(txt)
 	if (length(sample.ids) != N.expected) {
 		stop("Inconsistent sample characteristics and series matrix table")
 	}
-	probe.ids <- rnb.get.annotation(assay.type, assembly = "hg19")
+	genome.assembly <- rnb.getOption("assembly")
+	probe.ids <- rnb.get.annotation(assay.type, assembly = genome.assembly) ## TODO: Improve genome build selection
 	probe.ids <- unlist(lapply(probe.ids, names), use.names = FALSE)
 
 	## TODO: Consider rnb.getOption("disk.dump.big.matrices") and initialize different things
@@ -306,7 +309,7 @@ rnb.geo.parse.series.matrix <- function(fname, verbose) {
 
 #' Import methylation data from GEO
 #'
-#' Imports Infinium 450K or MethylationEPIC data series from the Gene Expression Omnibus. This function uses the
+#' Imports Infinium 450K, MethylationEPIC or MethylationEPIC2 data series from the Gene Expression Omnibus. This function uses the
 #' series matrix file.
 #'
 #' @param accession  Character string, starting with \code{"GSE"}, representing the GEO series for download and parsing.
@@ -320,10 +323,10 @@ rnb.geo.parse.series.matrix <- function(fname, verbose) {
 #'                   directory. Keep in mind that GEO series can be demanding in terms of storage space.
 #' @return \code{\linkS4class{RnBeadSet}} object with phenotypic and beta value information.
 #'
-#' @author Yassen Assenov
+#' @author Yassen Assenov, modified by Baris Kalem
 #' @export
 rnb.read.geo <- function(accession = NULL, verbose = logger.isinitialized(), destdir = tempdir()) {
-
+	## TODO: Make it compatible with EPIC v2
 	if (verbose) {
 		rnb.logger.start("Loading GEO Data Series")
 	}
@@ -360,6 +363,6 @@ rnb.read.geo <- function(accession = NULL, verbose = logger.isinitialized(), des
 
 	## Parse the series matrix file
 	result <- rnb.geo.parse.series.matrix(fname, verbose)
-	x <- c("probes27" = "27k", "probes450" = "450k", "probesEPIC" = "EPIC")[result[[3]]]
+	x <- c("probes27" = "27k", "probes450" = "450k", "probesEPIC" = "EPIC", "probesEPICv2" = "EPICv2")[result[[3]]]
 	RnBeadSet(pheno = result[[1]], betas = result[[2]], platform = x)
 }
