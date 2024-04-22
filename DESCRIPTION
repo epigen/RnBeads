@@ -23,6 +23,7 @@ Suggests:
     RPMM,
     RnBeads.hg19,
     RnBeads.mm9,
+    RnBeads.hg38,
     XML,
     annotate,
     biomaRt,
