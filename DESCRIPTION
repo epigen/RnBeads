@@ -13,8 +13,8 @@ Authors@R: c(
     role = c("aut")),
     person("Fabian", "Mueller", email = "team@rnbeads.org",
     role = c("aut", "cre")))
-Date: 2023-08-01
-Version: 2.19.0
+Date: 2024-04-22
+Version: 2.23.0
 Suggests:
     Category,
     GOstats,
@@ -23,6 +23,7 @@ Suggests:
     RPMM,
     RnBeads.hg19,
     RnBeads.mm9,
+    RnBeads.hg38,
     XML,
     annotate,
     biomaRt,
@@ -102,6 +103,7 @@ Collate:
     'bmiq.R'
     'cellTypeAdjustment.R'
     'clusterArchitecture.R'
+    'clusterArchitectureLSF.R'
     'clusterArchitectureSGE.R'
     'clusterArchitectureSLURM.R'
     'clustering.R'
@@ -142,4 +144,4 @@ Collate:
     'sva.R'
     'utilities.R'
     'wbcInference.R'
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.1

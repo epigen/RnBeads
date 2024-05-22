@@ -418,7 +418,7 @@ rnb.section.import<-function(report, object, data.source, data.type=rnb.getOptio
 
 	vals<-c(dtype,
 			if (dtype == ".idat files"){
-				platform <- rnb.detect.infinium.platform(list.files(path = data.source$data.dir, full.names = TRUE))
+				platform <- rnb.detect.infinium.platform(list.files(path = data.source[[1]], full.names = TRUE))
 				txt <- c("probes27"="HumanMethylation27",
 				"probes450"="HumanMethylation450",
 				"probesEPIC"="MethylationEPIC",

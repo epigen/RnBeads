@@ -720,7 +720,7 @@ create.diffMeth.diffVar.subsample <- function(df2p,dens.subsample,is.special=NUL
     pp <- rnb.message.plot("Could not assess density")
   } else {
     pp <- ggplot(df2p.sub) + aes_string(x=colnames(df2p)[1],y=colnames(df2p)[2]) + 
-      stat_density2d(geom="tile", fill=DENS.COLORS.LOW[1], aes(,alpha=..density..^0.25), contour=FALSE, n=dens.n, h=stable.h) +
+      stat_density2d(geom="tile", fill=DENS.COLORS.LOW[1], aes(alpha=after_stat(density)^0.25), contour=FALSE, n=dens.n, h=stable.h) +
       scale_alpha(range = c(0.0, 1),guide=FALSE) +
       geom_vline(xintercept = rank.cut.diffMeth,linetype='dotted') + geom_hline(yintercept = rank.cut.diffVar,linetype='dotted')+
       scale_color_manual(values=c(rnb.getOption("colors.category")[c(1,2,4)],DENS.COLORS.LOW[1]))
@@ -739,7 +739,6 @@ create.diffMeth.diffVar.subsample <- function(df2p,dens.subsample,is.special=NUL
         ss <- as.numeric(dens.subsample)
         if(nrow(df2p.special)>ss){
           pp <- pp + geom_point(data=df2p.special,aes_string(x=colnames(df2p)[1],y=colnames(df2p)[2],colour=colnames(df2p)[3]),size=0.4) + guides(fill=FALSE)
-          #pp <- pp + stat_density2d(data = df2p.special, geom="tile", aes(fill=colnames(df2p)[3],alpha=..density..^0.25), contour=FALSE, n =dens.n, h=stable.h)+scale_fill_manual(values=c(rnb.getOption("colors.category")[c(1,2,4)],DENS.COLORS.LOW[1]))
         }else{
           pp <- pp + geom_point(data=df2p.special,aes_string(x=colnames(df2p)[1],y=colnames(df2p)[2],colour=colnames(df2p)[3]),size=1) + guides(fill=FALSE)
         }

@@ -58,11 +58,11 @@ rnb.plot.control.boxplot <- function(
 
 	## Extract intensities of the control probes
 	if(rnb.set@target=="probesEPIC"){
-		meta <- rnb.get.annotation("controlsEPIC", assembly = rnb.getOption("assembly"))
+		meta <- rnb.get.annotation("controlsEPIC", assembly = "hg19")
 	}else if(rnb.set@target=="probesEPICv2"){
 		meta <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
 	}else if(rnb.set@target=="probes450"){
-		meta <- rnb.get.annotation("controls450", assembly = rnb.getOption("assembly"))
+		meta <- rnb.get.annotation("controls450", assembly = "hg19")
 	}else if(rnb.set@target=="probes27"){
 		meta <- rnb.get.annotation("controls27")
 	}else if(rnb.set@target=="probesMMBC"){

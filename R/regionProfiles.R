@@ -203,7 +203,7 @@ rnb.plot.region.profile.density <- function(rnb.set, sample, region.type="", reg
 	stable.h <- c(stable.bandwidth.fun(df2p$relative.coord),stable.bandwidth.fun(df2p$meth))
 
 	pp <- ggplot(df2p) + aes(x=relative.coord,y=meth) + 
-		  stat_density2d(geom="tile",fill="#1F78B4", aes(alpha=..density..^0.25), contour = FALSE, h=stable.h) +
+		  stat_density2d(geom="tile",fill="#1F78B4", aes(alpha=after_stat(density)^0.25), contour = FALSE, h=stable.h) +
 		  ylim(0, 1) + ylab("methylation") + xlab("relative position") + theme(legend.position="none") +
 		  geom_vline(xintercept = c(0,1), linetype = "solid",size=1.5)
 	return(pp)
