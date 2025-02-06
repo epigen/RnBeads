@@ -413,10 +413,11 @@ add.qc.barplots<-function(report, object, sample.batch.size=50){
 
   plot.names<-NULL
 
-  if(nsamp %% sample.batch.size==1){
-	  sample.batch.size<-sample.batch.size-5
+  if(nsamp %% sample.batch.size == 0){
+	  portion.starts<-0:(nsamp %/% sample.batch.size - 1)*sample.batch.size+1
+  }else if (nsamp %% sample.batch.size != 0){
+	  portion.starts<-0:(nsamp %/% sample.batch.size)*sample.batch.size+1
   }
-  portion.starts<-0:(nsamp %/% sample.batch.size)*sample.batch.size+1
   portion.ends<-portion.starts+sample.batch.size-1
   portion.ends[length(portion.ends)]<-nsamp
   portions<-paste(portion.starts, portion.ends, sep="-")
@@ -483,10 +484,11 @@ add.negative.control.boxplot<-function(report, object, sample.batch.size=50){
 #   sn<-list(tolower(ctypes))
 #   names(sn[[1]])<-gsub(" ", ".", ctypes)
 	nsamp<-length(samples(object))
-	if(nsamp %% sample.batch.size==1){
-		sample.batch.size<-sample.batch.size-5
+	if(nsamp %% sample.batch.size == 0){
+ 	 portion.starts<-0:(nsamp %/% sample.batch.size - 1)*sample.batch.size+1
+	}else if (nsamp %% sample.batch.size != 0){
+  	portion.starts<-0:(nsamp %/% sample.batch.size)*sample.batch.size+1
 	}
-	portion.starts<-0:(nsamp %/% sample.batch.size)*sample.batch.size+1
 	portion.ends<-portion.starts+sample.batch.size-1
 	portion.ends[length(portion.ends)]<-nsamp
 	portions<-paste(portion.starts, portion.ends, sep="-")
