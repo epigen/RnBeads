@@ -507,7 +507,7 @@ rnb.execute.dreduction <- function(rnb.set, target = "sites") {
 			stop("too many missing values")
 		}
 		## Remove sites that contain NAs only
-		X <- X[, -i] ### PROBLEM HERE
+		X <- X[, -i]
 		site.nas <- site.nas[-i]
 	}
 	dframe.selected <- data.frame( # table with statistics on used sites
