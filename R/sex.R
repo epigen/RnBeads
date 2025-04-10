@@ -57,6 +57,8 @@ rnb.get.XY.shifts <- function(rnb.set, signal.type = "raw") {
 	  		probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
 		} else if(target == 'probesEPICv2'){
 			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
+		} else if(target == 'probesMSA'){
+			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3 Alternative"] != 0)) })
 		} else if (target == 'probes450'){
 			probes.bad <- lapply(probes.bad, function(x) { which((mcols(x)[, "SNPs 3"] != 0)) })
 		}
@@ -237,7 +239,7 @@ rnb.execute.sex.prediction <- function(rnb.set) {
     stop("invalid value for rnb.set")
   }
 	if (inherits(rnb.set, "RnBeadRawSet")) {
-	  if (rnb.set@target != "probes450" && rnb.set@target != "probesEPIC" && rnb.set@target != "probesEPICv2") {
+	  if (rnb.set@target != "probes450" && rnb.set@target != "probesEPIC" && rnb.set@target != "probesEPICv2" && rnb.set@target != "probesMSA") {
 		  stop("unsupported platform")
 	  }
 	  shifts <- rnb.get.XY.shifts(rnb.set)

@@ -59,6 +59,11 @@ rnb.execute.batch.qc <- function(rnb.set, pcoordinates, permutations = NULL) {
 		id.col<-"ID"
 		type.col<-"Target"
 		ctrls<-"controlsEPICv2"
+	} else if(rnb.set@target=="probesMSA"){
+		CONTROL.TYPES <- rnb.infinium.control.targets("probesMSA")[c(1:4, 6, 11:14)]
+		id.col<-"ID"
+		type.col<-"Target"
+		ctrls<-"controlsMSA"
 	} else if(rnb.set@target=="probes450"){
 		CONTROL.TYPES <- rnb.infinium.control.targets("probes450")[c(1:4, 6, 11:14)]
 		id.col<-"ID"

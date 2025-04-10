@@ -12,6 +12,7 @@ GEO.PLATFORMS <- c(
 	"GPL8490" = "probes27",
 	"GPL13534" = "probes450",
 	"GPL16304" = "probes450",
+	"GPL34394" = "probesMSA",
 	"GPL21145" = "probesEPIC",
 	"GPL33022" = "probesEPICv2") ## https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GPL33022
 
@@ -326,7 +327,6 @@ rnb.geo.parse.series.matrix <- function(fname, verbose) {
 #' @author Yassen Assenov, modified by Baris Kalem
 #' @export
 rnb.read.geo <- function(accession = NULL, verbose = logger.isinitialized(), destdir = tempdir()) {
-	## TODO: Make it compatible with EPIC v2
 	if (verbose) {
 		rnb.logger.start("Loading GEO Data Series")
 	}
@@ -363,6 +363,6 @@ rnb.read.geo <- function(accession = NULL, verbose = logger.isinitialized(), des
 
 	## Parse the series matrix file
 	result <- rnb.geo.parse.series.matrix(fname, verbose)
-	x <- c("probes27" = "27k", "probes450" = "450k", "probesEPIC" = "EPIC", "probesEPICv2" = "EPICv2")[result[[3]]]
+	x <- c("probes27" = "27k", "probes450" = "450k", "probesEPIC" = "EPIC", "probesEPICv2" = "EPICv2", "probesMSA" = "MSA")[result[[3]]]
 	RnBeadSet(pheno = result[[1]], betas = result[[2]], platform = x)
 }

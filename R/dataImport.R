@@ -24,6 +24,10 @@ INTENSITY.SUMMARIZATION.INFO<-list(
                 "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
                 "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
                 "typeII"=list(Design="II", Color="Both", Msource="Grn", Usource="Red", Maddress="AddressA", Uaddress="AddressA")),
+		probesMSA=list(
+                "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
+                "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
+                "typeII"=list(Design="II", Color="Both", Msource="Grn", Usource="Red", Maddress="AddressA", Uaddress="AddressA")),
         probes450=list(
                 "typeIred"=list(Design="I", Color="Red", Msource="Red", Usource="Red", Maddress="AddressB", Uaddress="AddressA"),
                 "typeIgrn"=list(Design="I", Color="Grn", Msource="Grn", Usource="Grn", Maddress="AddressB", Uaddress="AddressA"),
@@ -283,7 +287,7 @@ read.data.dir<-function(dir,
 							ifelse(nrow(beta.table)<30000L,"27k","450k"))
 			}else{
 				platform.dict <- list("probesEPIC" = "EPIC", "probesEPICv2" = "EPICv2",
-									  "probes27" = "27k", "probes450" = "450k")
+									  "probesMSA" = "MSA", "probes27" = "27k", "probes450" = "450k")
 				platform <- platform.dict$platform
 				rm(platform.dict)
 			}				
@@ -696,10 +700,11 @@ read.idat.files <- function(base.dir,
 			"probes450"="HumanMethylation450",
 			"probesEPIC"="MethylationEPIC",
 			"probesEPICv2"="MethylationEPICv2",
+			"probesMSA"="MethylationScreeningArray",
 			"probesMMBC"="MouseMethylationBeadChip")
 		rnb.info(paste("Detected platform:", txt[platform]))
-		if (platform == "probesEPICv2" && genome.assembly != "hg38") {
-			rnb.info(paste0("MethylationEPICv2 is not supported for this session's genome assembly: ", genome.assembly, ". Changing genome assembly to: hg38"))
+		if ( (platform == "probesEPICv2" | platform == "probesMSA") && genome.assembly != "hg38") {
+			rnb.info(paste0(txt[platform], " is not supported for this session's genome assembly: ", genome.assembly, ". Changing genome assembly to: hg38"))
 			rnb.options(assembly = "hg38") ## EPICv2 is only annotated in the RnBeads.hg38 package
 			genome.assembly<-rnb.getOption("assembly")
 		}
@@ -712,6 +717,7 @@ read.idat.files <- function(base.dir,
             "probes450"=ifelse(genome.assembly == "hg19", "hg19", "hg38"),
             "probesEPIC"=ifelse(genome.assembly == "hg19", "hg19", "hg38"),
 			"probesEPICv2"="hg38",
+			"probesMSA"="hg38",
             "probesMMBC"="mm10")
     
     annot_gr<-rnb.get.annotation(platform, genome[platform])
@@ -730,6 +736,11 @@ read.idat.files <- function(base.dir,
 		ctrls.target.col<-"Target"
 		neg.ctrl.indexes<-which(annot.ctrls[["Target"]]=="NEGATIVE")
 	}else if(platform=="probesEPICv2"){
+        id.col<-"ID"
+		ctrls.address.col<-"ID"
+		ctrls.target.col<-"Target"
+		neg.ctrl.indexes<-which(annot.ctrls[["Target"]]=="NEGATIVE")
+	}else if(platform=="probesMSA"){
         id.col<-"ID"
 		ctrls.address.col<-"ID"
 		ctrls.target.col<-"Target"
@@ -900,6 +911,9 @@ read.idat.files <- function(base.dir,
 	}else if(platform %in% "probesEPICv2"){
 		rnb.platform<-"EPICv2"
         assembly<-"hg38"
+	}else if(platform %in% "probesMSA"){
+		rnb.platform<-"MSA"
+        assembly<-"hg38"
 	}else{
         rnb.platform<-"MMBC"
         assembly<-"mm10"
@@ -909,11 +923,10 @@ read.idat.files <- function(base.dir,
 		sample.sheet<-data.frame(barcodes=barcode)
 	}
 
-	#  saveRDS(M, "/Users/baris.kalem/Code/RnBeads_Project/Kaur_CompareEPICv1_EPICv2/duplicated_probes_bug/M_good.RDS")
     
     ### solve the problem of duplicated probes
     ### in each pair select those that have a lower detection p-value
-    if(rnb.platform=="MMBC" || rnb.platform=="EPICv2"){
+    if(rnb.platform=="MMBC" || rnb.platform=="EPICv2" || rnb.platform=="MSA"){
        
        probe_names<-annot[["Name"]]
        dup_probe_names<-unique(probe_names[duplicated(probe_names)])
@@ -1798,8 +1811,11 @@ rnb.detect.infinium.platform <- function(idat.fnames){
   		if (all(file.sizes>10000000)) {
   			return("probesEPIC")
   		}
+		if (all(file.sizes>5000000)) {
+  			return("probesMSA") ## idat file size is ~ 5MB
+  		}
         if (all(file.sizes<5000000)) {
-            return("probesMMBC")
+            return("probesMMBC") ## idat file size is ~ 4.7MB
         }
   		if (all(file.sizes<10000000)) {
   			return("probes450")

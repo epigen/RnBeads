@@ -1287,7 +1287,7 @@ rnb.run.inference <- function(rnb.set, dir.reports,
 	}
 
 	if (inherits(rnb.set,"RnBSet") && rnb.getOption("inference.age.prediction") 
-		&& !(rnb.set@target == "probesEPIC" | rnb.set@target == "probesEPICv2")){ ## There is no age prediction for EPICv1 & EPICv2
+		&& !(rnb.set@target == "probesEPIC" | rnb.set@target == "probesEPICv2" | rnb.set@target == "probesMSA")){ ## There is no age prediction for EPICv1, EPICv2 & MSA
 		ph <- pheno(rnb.set)
 		ages <- ph$predicted_ages
 		if(is.null(ages)){
