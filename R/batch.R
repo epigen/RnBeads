@@ -507,7 +507,7 @@ rnb.execute.dreduction <- function(rnb.set, target = "sites") {
 			stop("too many missing values")
 		}
 		## Remove sites that contain NAs only
-		X <- X[, -i]
+		X <- X[, -i] ### PROBLEM HERE
 		site.nas <- site.nas[-i]
 	}
 	dframe.selected <- data.frame( # table with statistics on used sites
@@ -707,7 +707,6 @@ rnb.section.dreduction.internal <- function(report, pcoordinates, sample.phenoty
 	} else {
 		report <- rnb.add.section(report, "Low-dimensional Representation", stext)
 	}
-
 	## Mention that only some sites and/or regions are selected
 	if (!is.null(attr(pcoordinates, "selected"))) {
 		selected <- attr(pcoordinates, "selected")

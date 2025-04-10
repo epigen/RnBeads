@@ -98,7 +98,24 @@ EPIC.CONTROL.TARGETS <- c(
 	"staining" = "STAINING",
 	"target removal" = "TARGET REMOVAL")
 
-EPICv2.CONTROL.TARGETS <- c( ## TODO: Not validated for EPIC v2 (Most likely it's compatible)
+EPICv2.CONTROL.TARGETS <- c(
+	"bisulfite conversion I" = "BISULFITE CONVERSION I",
+	"bisulfite conversion II" = "BISULFITE CONVERSION II",
+	"extension" = "EXTENSION",
+	"hybridization" = "HYBRIDIZATION",
+	"negative control" = "NEGATIVE",
+	"non-polymorphic" = "NON-POLYMORPHIC",
+	"norm A" = "NORM_A",
+	"norm C" = "NORM_C",
+	"norm G" = "NORM_G",
+	"norm T" = "NORM_T",
+	"restoration" = "RESTORATION",
+	"specificity I" = "SPECIFICITY I",
+	"specificity II" = "SPECIFICITY II",
+	"staining" = "STAINING",
+	"target removal" = "TARGET REMOVAL")
+
+MSA.CONTROL.TARGETS <- c( ## TODO: Not validated for MSA (Most likely it's compatible)
 	"bisulfite conversion I" = "BISULFITE CONVERSION I",
 	"bisulfite conversion II" = "BISULFITE CONVERSION II",
 	"extension" = "EXTENSION",
@@ -766,7 +783,7 @@ rnb.get.assemblies <- function() {
 #' rnb.get.annotation("promoters")
 #' }
 rnb.get.annotation <- function(type = "CpG", assembly = "hg19") {
-	if (type == "probesEPICv2" || type == "controlsEPICv2") {
+	if (type == "probesEPICv2" || type == "controlsEPICv2" || type == "probesMSA" || type == "controlsMSA") {
 		assembly = "hg38"
 	}
 
@@ -1364,7 +1381,7 @@ rnb.get.chromosomes <- function(assembly = "hg19") {
 #' Extracts all control probe types in the HumanMethylation450 assay.
 #'
 #' @param target  A singleton of type \code{character}, specifying the microarray platform.
-#' 				 \code{"probesEPICv2"},\code{"probesEPIC"},\code{"probes450"} and \code{"probes27"} correspond to MethylationEPICv2, 
+#' 				 \code{"probesEPICv2"},\code{"probesMSA"},\code{"probesEPIC"},\code{"probes450"} and \code{"probes27"} correspond to MethylationEPICv2, 
 #' 				 Methylation EPIC, HumanMethylation450, and HumanMethylation27 microarrays respectively.
 #'
 #' @return \code{character} vector of control targets.
@@ -1380,6 +1397,8 @@ rnb.infinium.control.targets <- function(target="probes450") {
 		return(EPIC.CONTROL.TARGETS)
 	}else if(target=="probesEPICv2"){
 		return(EPICv2.CONTROL.TARGETS)
+	}else if(target=="probesMSA"){
+		return(MSA.CONTROL.TARGETS)
 	}else if(target=="probes450"){
 		return(HM450.CONTROL.TARGETS)
 	}else if(target=="probes27"){

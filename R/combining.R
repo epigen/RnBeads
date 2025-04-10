@@ -122,6 +122,7 @@ rnb.combine.pheno <- function(dataset1, dataset2) {
 #' @author Yassen Assenov
 #' @export
 rnb.combine.arrays <- function(dataset1, dataset2, type="common") {
+    ## TODO: Update for MSA
 	if (!inherits(dataset1, "RnBeadSet")) {
 		stop("Invalid value for dataset1")
 	}
@@ -132,7 +133,7 @@ rnb.combine.arrays <- function(dataset1, dataset2, type="common") {
 		stop("Incompatible assemblies")
 	}
 	i <- c(dataset1@target, dataset2@target)
-	common.platform <- c("probesEPICv2" = "EPICv2", "probesEPIC" = "EPIC", "probes450" = "450k", "probes27" = "27k") ## TODO: Validate for EPICv2 (on EPICv1 ?)
+	common.platform <- c("probesEPICv2" = "EPICv2", "probesEPIC" = "EPIC", "probes450" = "450k", "probes27" = "27k")
 	if (!(i[1] %in% names(common.platform))) {
 		stop("Unsupported platform for dataset1")
 	}
