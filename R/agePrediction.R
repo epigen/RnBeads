@@ -1179,7 +1179,7 @@ run.cross.validation <- function(rnbSet,report,alpha=0.8){
 		medians <- result["Median",]
 		medians <- t(medians)
 		toPlot <- data.frame(Mean=means,Median=medians)
-		toPlot <- melt(toPlot,id=c())
+		toPlot <- reshape2::melt(toPlot,id=c())
 		colnames(toPlot) <- c("Measure","Error")
 		plot <- ggplot(toPlot,aes(x=Measure,y=Error,fill=Measure))+geom_boxplot()+scale_fill_manual(values=cvalues)+ylab("Error [years]")
 		report.plot <- createReportPlot("cv_error_boxplot",report)
@@ -1199,7 +1199,7 @@ run.cross.validation <- function(rnbSet,report,alpha=0.8){
 		medians <- result["Median",]
 		medians <- t(medians)
 		toPlot <- data.frame(Mean=means,Median=medians)
-		toPlot <- melt(toPlot,id=c())
+		toPlot <- reshape2::melt(toPlot,id=c())
 		colnames(toPlot) <- c("Measure","Error")
 		plot <- ggplot(toPlot,aes(x=Measure,y=Error,fill=Measure))+geom_boxplot()+scale_fill_manual(values=cvalues)+ylab("Error [years]")
 		report.plot <- createReportPlot("cv_error_boxplot",report)

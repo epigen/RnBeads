@@ -703,6 +703,16 @@ read.idat.files <- function(base.dir,
 			rnb.options(assembly = "hg38") ## EPICv2 is only annotated in the RnBeads.hg38 package
 			genome.assembly<-rnb.getOption("assembly")
 		}
+		if (platform == "probes450" && genome.assembly == "hg38") {
+		  rnb.info(paste0("Methylation450k is not supported for this session's genome assembly: ", genome.assembly, ". Changing genome assembly to: hg19"))
+		  rnb.options(assembly = "hg19") ## 450k only for hg19
+		  genome.assembly<-rnb.getOption("assembly")
+		}
+		if (platform == "probes27" && genome.assembly == "hg38") {
+		  rnb.info(paste0("Methylation27k is not supported for this session's genome assembly: ", genome.assembly, ". Changing genome assembly to: hg19"))
+		  rnb.options(assembly = "hg19") ## 450k only for hg19
+		  genome.assembly<-rnb.getOption("assembly")
+		}
 		rnb.info(paste("Annotation package genome assembly version:", genome.assembly))
 		rm(txt)
 	}

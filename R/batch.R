@@ -272,7 +272,7 @@ test.traits <- function(x, y, perm.matrix = NULL) {
 ##         object and plot's description, respectively.
 ## @author Yassen Assenov
 plot.heatmap.pc.correlations <- function(report, tbl, fname, width = NULL, height = NULL) {
-	tbl.melt <- melt(tbl, varnames = c("x", "y"))
+	tbl.melt <- reshape2::melt(tbl, varnames = c("x", "y"))
 	colnames(tbl.melt)[3] <- "correlation"
 	tbl.melt[[1]] <- factor(as.character(tbl.melt[[1]]), levels = rev(rownames(tbl)))
 	tbl.melt[[2]] <- factor(as.character(tbl.melt[[2]]), levels = colnames(tbl))
@@ -309,7 +309,7 @@ plot.heatmap.pc.correlations <- function(report, tbl, fname, width = NULL, heigh
 ########################################################################################################################
 
 plot.heatmap.pc.pvalues <- function(report, tbl, fname, width = NULL, height = NULL) {
-	tbl.melt <- melt(tbl, varnames = c("x", "y"))
+	tbl.melt <- reshape2::melt(tbl, varnames = c("x", "y"))
 	colnames(tbl.melt)[3] <- "pvalue"
 	tbl.melt[[1]] <- factor(as.character(tbl.melt[[1]]), levels = rev(rownames(tbl)))
 	tbl.melt[[2]] <- factor(as.character(tbl.melt[[2]]), levels = colnames(tbl))
@@ -383,7 +383,7 @@ plot.heatmap.symm <- function(report, tbl.symm, tbl.failures = NULL, fname) {
 	tbl <- tbl.symm
 	tbl[upper.tri(tbl)] <- NA
 	tbl <- tbl[-1, -ncol(tbl), drop = FALSE]
-	tbl.melt <- melt(tbl, varnames = c("x", "y"))
+	tbl.melt <- reshape2::melt(tbl, varnames = c("x", "y"))
 	colnames(tbl.melt)[3] <- "test"
 	if (do.tests) {
 		col.mapping <- COLORS.TEST
@@ -405,7 +405,7 @@ plot.heatmap.symm <- function(report, tbl.symm, tbl.failures = NULL, fname) {
 		tbl <- tbl.failures
 		tbl[upper.tri(tbl)] <- NA
 		tbl <- tbl[-1, -ncol(tbl), drop = FALSE]
-		tbl.f.melt <- melt(tbl, varnames = c("x", "y"))
+		tbl.f.melt <- reshape2::melt(tbl, varnames = c("x", "y"))
 		colnames(tbl.f.melt)[3] <- "failure"
 		tbl.f.melt[[1]] <- factor(as.character(tbl.f.melt[[1]]), levels = levels(tbl.melt[[1]]))
 		tbl.f.melt[[2]] <- factor(as.character(tbl.f.melt[[2]]), levels = levels(tbl.melt[[2]]))
