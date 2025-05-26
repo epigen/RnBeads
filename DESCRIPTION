@@ -14,7 +14,7 @@ Authors@R: c(
     person("Fabian", "Mueller", email = "team@rnbeads.org",
     role = c("aut", "cre")))
 Date: 2025-05-26
-Version: 2.25.0
+Version: 2.27.1
 Suggests:
     Category,
     GOstats,
