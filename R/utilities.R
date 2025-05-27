@@ -812,7 +812,7 @@ symmetric.melt <- function(tbl.symmetric, include.diagonal = TRUE) {
 				dimnames = list(rownames(tbl.symmetric)[2], colnames(tbl.symmetric)[1]))
 		}
 	}
-	tbl.melt <- melt(tbl, varnames = c("x", "y"))
+	tbl.melt <- reshape2::melt(tbl, varnames = c("x", "y"))
 	tbl.melt[[1]] <- factor(as.character(tbl.melt[[1]]), levels = rev(rownames(tbl)))
 	tbl.melt[[2]] <- factor(as.character(tbl.melt[[2]]), levels = colnames(tbl))
 	tbl.melt[!is.na(tbl.melt[[3]]), ]

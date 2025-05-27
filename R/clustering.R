@@ -179,7 +179,7 @@ get.silhouette <- function(x, dist) {
 ##
 ## @author Yassen Assenov
 plot.heatmap.rand <- function(tbl, fname = NA, report = NULL) {
-	tbl.melt <- melt(tbl, varnames = c("x", "y"))
+	tbl.melt <- reshape2::melt(tbl, varnames = c("x", "y"))
 	tbl.melt[[1]] <- factor(as.character(tbl.melt[[1]]), levels = rev(rownames(tbl)))
 	tbl.melt[[2]] <- factor(as.character(tbl.melt[[2]]), levels = colnames(tbl))
 	colnames(tbl.melt)[3] <- "rindex"

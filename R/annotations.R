@@ -929,7 +929,9 @@ rnb.set.annotation.and.cpg.stats <- function(type, regions, description = NULL, 
 	regs.gr <- BiocGenerics::unlist(regs.grl,use.names=FALSE)
 
 	regs.df <- GenomicRanges::as.data.frame(regs.gr)
-	colnames(regs.df)[colnames(regs.df)=="seqnames"] <- "chromosome"
+	colnames(regs.df)[colnames(regs.df)=="seqnames"] <- "Chromosome"
+	colnames(regs.df)[colnames(regs.df)=="start"] <- "Start"
+	colnames(regs.df)[colnames(regs.df)=="end"] <- "End"
 	regs.df$width <- NULL
 
 	rnb.set.annotation(type=type, regions=regs.df, description=description, assembly = assembly)

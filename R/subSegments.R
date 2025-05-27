@@ -212,7 +212,7 @@ rnb.section.region.subsegmentation <- function(report,rnb.set){
 	names(reg.types.base) <- reg.types.base.files
 
 	get.summary.df.from.list <- function(ll,value.name="value"){
-		res <- melt(ll)
+		res <- reshape2::melt(ll)
 		colnames(res) <- c(value.name,"region")
 		res$is.subsegmentation <- grepl("\\.subsegments$",res$region)
 		res$region <- sub("\\.subsegments$","",res$region)

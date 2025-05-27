@@ -1458,10 +1458,10 @@ rnb.section.imputation <- function(report,rnb.set,old.values){
     report <- rnb.add.paragraph(report,txt)
     return(report)
   }
-  old.values <- melt(old.values)
+  old.values <- reshape2::melt(old.values)
   old.values <- old.values$value
   old.values <- na.omit(old.values)
-  new.values <- melt(new.values)
+  new.values <- reshape2::melt(new.values)
   new.values <- new.values$value
   min.observations <- 501L
   beta.values <- list("NAs removed" = old.values, "After imputation" = new.values)
