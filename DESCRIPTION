@@ -76,7 +76,8 @@ Depends:
     methods,
     illuminaio,
     methylumi,
-    plyr
+    plyr,
+    reshape2
 Imports:
     IRanges
 License: GPL-3
@@ -144,4 +145,4 @@ Collate:
     'sva.R'
     'utilities.R'
     'wbcInference.R'
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
