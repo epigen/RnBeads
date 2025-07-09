@@ -601,7 +601,7 @@ rnb.section.snp.removal.internal <- function(report, dataset.class, filtered, an
 		txt <- paste(txt, "The", ifelse(N == 1, paste("removed", txt.site), paste("list of removed", txt.sites)),
 					 ' is available in a <a href="', fname, '">dedicated table</a> accompanying this report.')
 		if (is.epicv2) {
-			txt <- paste(txt, "For this step, dbSNP data from the MethylationEPICv2 manifest file is utilized.")
+			txt <- paste(txt, "For this step, dbSNP data from the Illumina manifest file is utilized.")
 		}
 	}
 	report <- rnb.add.section(report, txt.title, txt)
