@@ -1,3 +1,9 @@
+RnBeads 2.27.1
+=============
+
+ * Fixed issue with nv probes. Now they are filtered during the preprocessing.
+
+
 RnBeads 2.19.0
 =============
 

@@ -584,6 +584,43 @@ setMethod("covg", signature(object="RnBSet"),
 	}
 )
 
+if(!isGeneric("geno")) setGeneric("geno", function(object, ...) standardGeneric("geno"))
+#' geno-methods
+#'
+#' Extracts genotyping information from either the SNP (rs) or mutation (nv) probes
+#'
+#' @param object 	dataset of interest.
+#' @param type 		\code{character} singleton. Available options are \code{NULL} (all genotyping probes), \code{'nv'} for the
+#'      genotyping probes of the arrays, or \code{'rs'} for the SNP probes.
+#'
+#' @return \code{matrix} with genotyping information in the form of beta values. \code{0} stands for homozygous allele 1, \code{0.5}
+#'      for heterozygous and \code{1} for homozygous allele 2.
+#'
+#' @rdname geno
+#' @docType methods
+#' @aliases geno
+#' @aliases geno,RnBSet-method
+#' @export
+setMethod("geno", signature(object = "RnBSet"),
+  function(object, type=NULL) {
+    dat <- get.dataset.matrix(object, type='sites', row.names=TRUE, object@meth.sites, object@meth.regions, remove.nvs=FALSE)
+    if(!any(row.names(dat)%in%c('nv', 'rs'))){
+      rnb.error("No genotyping information for this dataset. During preprocessing, RnBeads removes these sites.")
+    }
+    if(!is.null(type)){
+      if(!type%in%c('nv', 'rs')){
+        rnb.error("Invalid value for type, has to be 'nv' or 'rs'")
+      }
+      dat <- dat[grepl(type, row.names(dat)),]
+    }else{
+      dat <- dat[grepl('nv', row.names(dat))|grepl('rs', row.names(dat)),]
+    }
+    return(dat)
+  }
+)
+
+
+
 if(!isGeneric("nsites")) setGeneric("nsites", function(object, ...) standardGeneric("nsites"))
 #' nsites-methods
 #'
