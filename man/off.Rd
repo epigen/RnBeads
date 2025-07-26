@@ -16,7 +16,9 @@
 \arguments{
 \item{object}{Object to be closed.}
 
-\item{...}{additional arguments such as \code{handle.errors}: Flag indicating if the method should attempt to catch and process errors (e.g. I/O errors)
+\item{...}{additional arguments}
+
+\item{handle.errors}{Flag indicating if the method should attempt to catch and process errors (e.g. I/O errors)
 internally. Setting this to \code{TRUE} does not guarantee that the method never stops with an
 error.}
 }

@@ -114,7 +114,7 @@ get.files <- function(report.plot) {
 
 ########################################################################################################################
 
-#' @rdname off-methods
+#' @rdname off
 #' @export
 setMethod("off", signature(object="ReportPlot"),
 	function(object) {
