@@ -134,7 +134,8 @@ setMethod("initialize", "RnBDiffMeth",
 )
 
 #remove the directory containing the dumped matrices
-if (!isGeneric("destroy")) setGeneric("destroy", function(object) standardGeneric("destroy"))
+#' @export
+setGeneric("destroy", function(object) standardGeneric("destroy"))
 #' destroy-methods
 #'
 #' remove tables stored to disk from the file system. Useful for cleaning up disk dumped objects.
@@ -174,7 +175,8 @@ setMethod("destroy", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("get.region.types")) setGeneric("get.region.types", function(object) standardGeneric("get.region.types"))
+#' @export
+setGeneric("get.region.types", function(object) standardGeneric("get.region.types"))
 #' get.region.types-methods
 #'
 #' Gets all region types represented in the object as character vector
@@ -202,7 +204,8 @@ setMethod("get.region.types", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("get.comparisons")) setGeneric("get.comparisons", function(object) standardGeneric("get.comparisons"))
+#' @export
+setGeneric("get.comparisons", function(object) standardGeneric("get.comparisons"))
 #' get.comparisons-methods
 #'
 #' Gets all comparisons represented in the object as character vector
@@ -230,7 +233,8 @@ setMethod("get.comparisons", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("get.comparison.grouplabels")) setGeneric("get.comparison.grouplabels", function(object) standardGeneric("get.comparison.grouplabels"))
+#' @export 
+setGeneric("get.comparison.grouplabels", function(object) standardGeneric("get.comparison.grouplabels"))
 #' get.comparison.grouplabels-methods
 #'
 #' Gets all comparison grouplabels represented in the object as character matrix of dimension n.comparisons x 2
@@ -258,7 +262,9 @@ setMethod("get.comparison.grouplabels", signature(object="RnBDiffMeth"),
 			return(object@comparison.grouplabels)
 		}
 )
-if (!isGeneric("get.comparison.groupsizes")) setGeneric("get.comparison.groupsizes", function(object) standardGeneric("get.comparison.groupsizes"))
+
+#' @export 
+setGeneric("get.comparison.groupsizes", function(object) standardGeneric("get.comparison.groupsizes"))
 #' get.comparison.groupsizes-methods
 #'
 #' Gets all comparison group sizes represented in the object as character matrix of dimension n.comparisons x 2
@@ -291,7 +297,8 @@ setMethod("get.comparison.groupsizes", signature(object="RnBDiffMeth"),
 		}
 )
 
-if (!isGeneric("get.site.test.method")) setGeneric("get.site.test.method", function(object) standardGeneric("get.site.test.method"))
+#' @export 
+setGeneric("get.site.test.method", function(object) standardGeneric("get.site.test.method"))
 #' get.site.test.method-methods
 #'
 #' Gets the site testing method used to obtain the p-values in the differential methylation tables
@@ -323,7 +330,8 @@ setMethod("get.site.test.method", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("get.variability.method")) setGeneric("get.variability.method", function(object) standardGeneric("get.variability.method"))
+#' @export 
+setGeneric("get.variability.method", function(object) standardGeneric("get.variability.method"))
 #' get.variability.method-methods
 #'
 #' Gets the variability testing method used to obtain the p-values in the differential varibiality tables
@@ -347,7 +355,8 @@ setMethod("get.variability.method", signature(object="RnBDiffMeth"),
           }
 )
 
-if (!isGeneric("get.covg.thres")) setGeneric("get.covg.thres", function(object) standardGeneric("get.covg.thres"))
+#' @export 
+setGeneric("get.covg.thres", function(object) standardGeneric("get.covg.thres"))
 #' get.covg.thres-methods
 #'
 #' Gets the coverage threshold employed for obtaining statistics in the differential methylation tables
@@ -375,7 +384,8 @@ setMethod("get.covg.thres", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("includes.sites")) setGeneric("includes.sites", function(object) standardGeneric("includes.sites"))
+#' @export 
+setGeneric("includes.sites", function(object) standardGeneric("includes.sites"))
 #' includes.sites-methods
 #'
 #' Returns \code{TRUE} if the differential methylation object contains site-level information
@@ -407,7 +417,8 @@ setMethod("includes.sites", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("get.table")) setGeneric("get.table", function(object,...) standardGeneric("get.table"))
+#' @export 
+setGeneric("get.table", function(object,...) standardGeneric("get.table"))
 #' get.table-methods
 #'
 #' Gets a differential methylation table
@@ -458,7 +469,8 @@ setMethod("get.table", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("addDiffMethTable")) setGeneric("addDiffMethTable", function(object,...) standardGeneric("addDiffMethTable"))
+#' @export 
+setGeneric("addDiffMethTable", function(object,...) standardGeneric("addDiffMethTable"))
 #' addDiffMethTable-methods
 #'
 #' Adds a differential methylation table
@@ -577,7 +589,8 @@ setMethod("addDiffMethTable", signature(object="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("save.tables")) setGeneric("save.tables", function(object,...) standardGeneric("save.tables"))
+#' @export 
+setGeneric("save.tables", function(object,...) standardGeneric("save.tables"))
 #' save.tables-methods
 #'
 #' save the disk dumped tables to an ff archive for later reloading
@@ -630,8 +643,9 @@ setMethod("save.tables", signature(object="RnBDiffMeth"),
 		}
 	}
 )
-			
-if (!isGeneric("reload")) setGeneric("reload", function(object,...) standardGeneric("reload"))
+
+#' @export 
+setGeneric("reload", function(object,...) standardGeneric("reload"))
 #' reload-methods
 #'
 #' reload disk dumped tables. Useful if the table files are manually copied or if the object is loaded again.
@@ -809,7 +823,8 @@ setMethod("addComparisonInfo", signature(object="RnBDiffMeth"),
 )
 
 
-if (!isGeneric("join.diffMeth")) setGeneric("join.diffMeth", function(obj1,obj2,...) standardGeneric("join.diffMeth"))
+#' @export 
+setGeneric("join.diffMeth", function(obj1,obj2,...) standardGeneric("join.diffMeth"))
 #' join.diffMeth-methods
 #'
 #' Merges two disjoint RnBDiffMeth objects into one. Disjoint here means, that no differential methylation table is specified in both
@@ -957,7 +972,8 @@ setMethod("join.diffMeth", signature(obj1="RnBDiffMeth",obj2="RnBDiffMeth"),
 	}
 )
 
-if (!isGeneric("is.valid")) setGeneric("is.valid", function(object,...) standardGeneric("is.valid"))
+#' @export 
+setGeneric("is.valid", function(object,...) standardGeneric("is.valid"))
 #' is.valid-methods
 #'
 #' Validate an RnBDiffMeth object, ie. verify that all differential methylation tables are specified

@@ -293,7 +293,7 @@ setMethod("initialize", "ReportGgPlot",
 		}
 )
 
-#' @rdname off-methods
+#' @rdname off
 #' @export
 setMethod("off", signature(object="ReportGgPlot"),
 	function(object,handle.errors=FALSE) {

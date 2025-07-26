@@ -1114,10 +1114,10 @@ rnb.get.reference <- function(report, txt) {
 	return(result)
 }
 
-########################################################################################################################
-	
-if(!isGeneric("off")) setGeneric("off",
-                                 function(object, ...) standardGeneric("off"))
+#' @import methods
+#' @export
+setGeneric("off",
+           function(object, ...) standardGeneric("off"))
 
 #' off-methods
 #'
@@ -1127,12 +1127,13 @@ if(!isGeneric("off")) setGeneric("off",
 #' @param handle.errors Flag indicating if the method should attempt to catch and process errors (e.g. I/O errors)
 #'                      internally. Setting this to \code{TRUE} does not guarantee that the method never stops with an
 #'                      error.
+#' @param ...         additional arguments
 #'
 #' @return The closed object, invisibly.
 #'
 #' @export
 #' @docType methods
-#' @rdname off-methods
+#' @rdname off
 setMethod("off", signature(object="Report"),
   function(object, ...) {
     return(invisible(complete.report(object)))
