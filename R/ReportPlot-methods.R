@@ -320,7 +320,7 @@ setMethod("off", signature(object="ReportGgPlot"),
 		}
 		if (handle.errors){
 			tryCatch(
-				do.it(.Object),
+				do.it(object),
 				error=function(ee){
 					logger.warning(c("ReportGgPlot error ('off' method):",ee$message))
 				  object@ggp <<- rnb.message.plot("plotting error")

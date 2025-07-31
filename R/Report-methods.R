@@ -1134,6 +1134,7 @@ setGeneric("off",
 #' @export
 #' @docType methods
 #' @rdname off
+#' @aliases off
 setMethod("off", signature(object="Report"),
   function(object, ...) {
     return(invisible(complete.report(object)))

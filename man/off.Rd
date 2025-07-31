@@ -3,6 +3,7 @@
 \docType{methods}
 \name{off,Report-method}
 \alias{off,Report-method}
+\alias{off}
 \alias{off,ReportPlot-method}
 \alias{off,ReportGgPlot-method}
 \title{off-methods}
