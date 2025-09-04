@@ -707,7 +707,6 @@ rnb.section.dreduction.internal <- function(report, pcoordinates, sample.phenoty
 	} else {
 		report <- rnb.add.section(report, "Low-dimensional Representation", stext)
 	}
-
 	## Mention that only some sites and/or regions are selected
 	if (!is.null(attr(pcoordinates, "selected"))) {
 		selected <- attr(pcoordinates, "selected")

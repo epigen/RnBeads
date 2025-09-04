@@ -1177,6 +1177,8 @@ setMethod("mergeSamples", signature(object = "RnBSet"),
 				platform<-"EPIC"
 			}else if (object@target=="probesEPICv2"){
 				platform<-"EPICv2"
+			}else if (object@target=="probesMSA"){
+				platform<-"MSA"
 			}else if (object@target=="probes450"){
 				platform<-"450k"
 			}else if(object@target=="probes27"){

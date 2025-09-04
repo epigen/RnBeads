@@ -136,6 +136,7 @@ setMethod("initialize", "RnBeadSet",
 			.Object@qc<-qc
 			
 			genome.assembly<-rnb.getOption("assembly")
+			is.EPICv2.or.MSA<-ifelse(target == "probesEPICv2" || target == "probesMSA", TRUE, FALSE)
 
 			callNextMethod(.Object,
 					pheno=pheno,
@@ -143,7 +144,7 @@ setMethod("initialize", "RnBeadSet",
 					meth.sites=meth.sites,
 					covg.sites=covg.sites,
 					status=status,
-					assembly=ifelse(target=="probesMMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", genome.assembly)),
+					assembly=ifelse(target=="probesMMBC", "mm10", ifelse(is.EPICv2.or.MSA, "hg38", genome.assembly)),
 					target=target
 			)
 			
@@ -245,6 +246,9 @@ RnBeadSet<-function(
 			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
 		} else if (platform == "EPICv2") {
 			target <- "probesEPICv2"
+			assembly <- "hg38"
+		} else if (platform == "MSA") {
+			target <- "probesMSA"
 			assembly <- "hg38"
 		} else if (platform == "450k") {
 			target <- "probes450"

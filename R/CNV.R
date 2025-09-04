@@ -61,7 +61,7 @@ getGLADProfiles<-function(rnb.set,refbased=TRUE){
 	
   annot <- annotation(rnb.set)
   target <- rnb.set@target
-  if(target %in% c("probes27","probes450","probesEPIC", "probesEPICv2")){
+  if(target %in% c("probes27","probes450","probesEPIC", "probesEPICv2", "probesMSA")){
     target <- "probes450"
   }
   cnv.reference.data<-rnb.get.cnv.annotations(target)

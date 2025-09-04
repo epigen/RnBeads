@@ -61,6 +61,8 @@ rnb.plot.control.boxplot <- function(
 		meta <- rnb.get.annotation("controlsEPIC", assembly = "hg19")
 	}else if(rnb.set@target=="probesEPICv2"){
 		meta <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
+	}else if(rnb.set@target=="probesMSA"){
+		meta <- rnb.get.annotation("controlsMSA", assembly = "hg38")
 	}else if(rnb.set@target=="probes450"){
 		meta <- rnb.get.annotation("controls450", assembly = "hg19")
 	}else if(rnb.set@target=="probes27"){
@@ -72,6 +74,8 @@ rnb.plot.control.boxplot <- function(
 	if(rnb.set@target=="probesEPIC"){
 		types<-rnb.infinium.control.targets(rnb.set@target)[c(14,4,3,15,1:2,12:13,6,11)]
 	}else if(rnb.set@target=="probesEPICv2"){ 
+		types<-rnb.infinium.control.targets(rnb.set@target)[c(14,4,3,15,1:2,12:13,6,11)]
+	}else if(rnb.set@target=="probesMSA"){ 
 		types<-rnb.infinium.control.targets(rnb.set@target)[c(14,4,3,15,1:2,12:13,6,11)]
 	}else if(rnb.set@target=="probes450"){
 		types<-rnb.infinium.control.targets(rnb.set@target)[c(13,4,3,14,1:2,11:12,6)]
@@ -85,12 +89,12 @@ rnb.plot.control.boxplot <- function(
 		warning("Unoptimized probe type, plotting performance may be decreased")
 	}
 
-	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2"){
+	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMSA"){
 		rownames(meta)<-meta[["ID"]]
 		### TODO: Remove the following passage
 		### for testing purposes only!
-		if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2"){ 
-			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not validated for EPICv2
+		if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMSA"){ 
+			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not validated for EPICv2 & MSA
 		}
 		meta <- meta[type == meta[["Target"]], ]
 		ids<-as.character(meta[["ID"]])
@@ -125,7 +129,7 @@ rnb.plot.control.boxplot <- function(
 
 	scales<-lapply(qc(rnb.set), get.unified.scale)
 
-	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2"){
+	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMSA"){
 		## Shorten the words describing probe's expected intensity
 		INTENSITIES <- c("Background" = "Bgnd", "High" = "High", "Low" = "Low", "Medium" = "Med")
 		levels(meta[, "Expected Intensity"]) <- INTENSITIES[levels(meta[, "Expected Intensity"])]
@@ -220,14 +224,14 @@ rnb.plot.negative.boxplot<- function(
 		...) {
 
 	
-	if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMMBC" ){
+	if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesMSA"){
 		genome.assembly<-rnb.getOption("assembly")
-		meta <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"=genome.assembly, "probesMMBC"="mm10", "probesEPICv2"="hg38")[rnb.set@target])
+		meta <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"=genome.assembly, "probesMMBC"="mm10", "probesEPICv2"="hg38", "probesMSA"="hg38")[rnb.set@target])
 		## Extract intensities of the control probes
 		### TODO: Remove the following passage
 		### for testing purposes only!
-		if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2"){
-			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not validated for EPICv2 (duplicate)
+		if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMSA"){
+			meta<-rnb.update.controlsEPIC.enrich(meta) ## TODO: Not validated for EPICv2 & MSA (duplicate)
 		}
 		meta <- meta["NEGATIVE" == meta[["Target"]], ]
 		ids<-as.character(meta[["ID"]])
@@ -367,9 +371,9 @@ rnb.plot.control.barplot<-function(
 {
 	
 	
-	if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMMBC"){
+	if(rnb.set@target=="probesEPIC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesMSA"){
 		genome.assembly<-rnb.getOption("assembly") ## TODO: Improve genome build selection
-		control.meta.data <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"=genome.assembly, "probesEPICv2"="hg38", "probesMMBC"="mm10")[rnb.set@target])
+		control.meta.data <- rnb.get.annotation(gsub("probes", "controls", rnb.set@target), assembly=c("probesEPIC"=genome.assembly, "probesEPICv2"="hg38", "probesMSA"="hg38", "probesMMBC"="mm10")[rnb.set@target])
 		### TODO: Remove the following passage
 		### for testing purposes only!
 		#if(rnb.set@target=="probesEPIC"){
@@ -438,7 +442,7 @@ rnb.plot.control.barplot<-function(
 
 	## get meta information
 
-	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2"){
+	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMSA"){
 		meta<-subset(control.meta.data, ID==id)
 	}else if(rnb.set@target=="probes27"){
 		meta<-subset(control.meta.data, Address==id)
@@ -465,7 +469,7 @@ rnb.plot.control.barplot<-function(
 
 	### plot green channel
 
-	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2"){
+	if(rnb.set@target=="probes450" || rnb.set@target=="probesEPIC" || rnb.set@target=="probesMMBC" || rnb.set@target=="probesEPICv2" || rnb.set@target=="probesMSA"){
 		main_txt_grn<-paste(probe, meta[,"Description"], "green channel", if(meta[, "Evaluate Green"]=="+") meta[, "Expected Intensity"] else "Background", sep=": ")
 		main_txt_red<-paste(probe, meta[,"Description"], "red channel",if(meta[, "Evaluate Red"]=="+") meta[, "Expected Intensity"] else "Background", sep=": ")
 	}else{
@@ -531,7 +535,7 @@ rnb.plot.control.barplot<-function(
 #' @author Yassen Assenov
 #' @noRd
 rnb.get.snp.matrix <- function(dataset, threshold.nas = 1) {
-	if (dataset@target %in% c("probes450", "probesEPIC", "probesMMBC", "probesEPICv2")) {
+	if (dataset@target %in% c("probes450", "probesEPIC", "probesMMBC", "probesEPICv2", "probesMSA")) {
 		result <- meth(dataset, row.names=TRUE)
 		result <- result[grep("^rs", rownames(result)), , drop = FALSE]
 	} else if (dataset@target == "probes27") {

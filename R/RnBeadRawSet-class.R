@@ -173,7 +173,8 @@ RnBeadRawSet<-function(
 		beta.offset=100,
 		summarize.bead.counts=TRUE,
 		summarize.regions=TRUE,
-		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10", ifelse(target=="probesEPICv2", "hg38", rnb.getOption("assembly")))), ## TODO: Implement assembly selection
+		region.types = rnb.region.types.for.analysis(ifelse(platform=="MMBC", "mm10",
+															 ifelse(target=="probesEPICv2"|| target=="probesMSA", "hg38", rnb.getOption("assembly")))), ## TODO: Implement assembly selection
 		useff=rnb.getOption("disk.dump.big.matrices"),
 		ffcleanup=FALSE){
 		
@@ -251,6 +252,9 @@ RnBeadRawSet<-function(
 			assembly <- ifelse(genome.assembly == "hg19", "hg19", "hg38")
 		}else if (platform =="EPICv2") {
 			target <- "probesEPICv2"
+			assembly <- "hg38"
+		}else if (platform =="MSA") {
+			target <- "probesMSA"
 			assembly <- "hg38"
 		}else if (platform =="450k") {
 			target <- "probes450"
@@ -422,6 +426,8 @@ setAs("MethyLumiSet", "RnBeadRawSet",
 				platform="EPIC"
 			}else if(annotation(from)=="IlluminaMethylationEPICv2"){
 				platform="EPICv2"
+			}else if(annotation(from)=="IlluminaMethylationScreeningArray"){
+				platform="MSA"
 			}else if(annotation(from)=="IlluminaHumanMethylation450k"){
 				platform="450k"
 			}else if(annotation(from)=="IlluminaHumanMethylation27k"){
@@ -507,6 +513,9 @@ setAs("RnBeadRawSet","MethyLumiSet",
 				}else if(from@target == "probesEPICv2"){
 					probeIDs<-rnb.get.annotation("controlsEPICv2", assembly = "hg38")[,"Target"]
 					probeIDs<-paste(probeIDs, unlist(sapply(table(probeIDs)[unique(probeIDs)], seq, from=1 )), sep=".")
+				}else if(from@target == "probesMSA"){
+					probeIDs<-rnb.get.annotation("controlsMSA", assembly = "hg38")[,"Target"]
+					probeIDs<-paste(probeIDs, unlist(sapply(table(probeIDs)[unique(probeIDs)], seq, from=1 )), sep=".")
 				}else if(from@target == "probes450"){
 					probeIDs<-rnb.get.annotation("controls450")[,"Target"]
 					probeIDs<-paste(probeIDs, unlist(sapply(table(probeIDs)[unique(probeIDs)], seq, from=1 )), sep=".")
@@ -521,6 +530,8 @@ setAs("RnBeadRawSet","MethyLumiSet",
 					annotation(mset@QC) <- "IlluminaMethylationEPIC"
 				}else if(from@target == "probesEPICv2"){
 					annotation(mset@QC) <- "IlluminaMethylationEPICv2"
+				}else if(from@target == "probesMSA"){
+					annotation(mset@QC) <- "IlluminaMethylationScreeningArray"
 				}else if(from@target == "probes450"){
 					annotation(mset@QC) <- "IlluminaHumanMethylation450k"
 				}else if(from@target == "probes27"){
@@ -532,6 +543,8 @@ setAs("RnBeadRawSet","MethyLumiSet",
 				annotation(mset) <- "IlluminaMethylationEPIC"
 			}else if(from@target == "probesEPICv2"){
 				annotation(mset) <- "IlluminaMethylationEPICv2"
+			}else if(from@target == "probesMSA"){
+				annotation(mset) <- "IlluminaMethylationScreeningArray"
 			}else if(from@target == "probes450"){
 				annotation(mset) <- "IlluminaHumanMethylation450k"
 			}else if(from@target == "probes27"){
@@ -558,7 +571,10 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 		} else if (assay.name == "IlluminaHumanMethylationEPICv2") {
 			assay.name <- "probesEPICv2"
 			platform.name <- "EPICv2"
-		} else if (assay.name == "IlluminaHumanMethylation450k") {
+		} else if (assay.name == "IlluminaHumanMethylationScreeningArray") {
+			assay.name <- "probesMSA"
+			platform.name <- "MSA"
+		}  else if (assay.name == "IlluminaHumanMethylation450k") {
 			assay.name <- "probes450"
 			platform.name <- "450k"
 		} else if (assay.name == "IlluminaHumanMethylation27k") {
@@ -569,7 +585,8 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 		}
 	
 		## Use RnBeads' mapping from probe IDs to addresses
-		probes.all <- rnb.get.annotation(assay.name, ifelse(assay.name=="probesEPICv2", "hg38", rnb.getOption("assembly"))) ## TODO: Impove genome build selection
+		is.EPICv2.or.MSA <- ifelse(assay.name == "probesEPICv2" || assay.name == "probesMSA", TRUE, FALSE)
+		probes.all <- rnb.get.annotation(assay.name, ifelse(is.EPICv2.or.MSA, "hg38", rnb.getOption("assembly"))) ## TODO: Impove genome build selection
 		probes.all <- lapply(probes.all, function(x) {
 				result <- as.data.frame(mcols(x)[, c("Design", "Color", "AddressA", "AddressB")])
 				rownames(result) <- names(x)
@@ -577,7 +594,7 @@ setAs("RGChannelSet", "RnBeadRawSet", function(from, to) {
 			}
 		)
 		probes.all <- do.call(rbind, unname(probes.all))
-		controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", rnb.getOption("assembly"))) ## TODO: Impove genome build selection
+		controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(is.EPICv2.or.MSA, "hg38", rnb.getOption("assembly"))) ## TODO: Impove genome build selection
 		controls.all <- controls.all[, "ID"]
 
 		## Extract data on signals
@@ -674,7 +691,8 @@ setAs("RnBeadRawSet", "RGChannelSet", function(from, to){
 #	probes.all <- do.call(rbind, unname(probes.all))
 	probes.all <- annotation(from)[,c("Design", "Color", "AddressA", "AddressB")]
 	genome.assembly<-rnb.getOption("assembly")
-	controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(assay.name=="probesEPICv2", "hg38", genome.assembly))
+	is.EPICv2.or.MSA<-ifelse(assay.name == "probesEPICv2" || assay.name == "probesMSA", TRUE, FALSE)
+	controls.all <- rnb.get.annotation(sub("^probes", "controls", assay.name), ifelse(is.EPICv2.or.MSA, "hg38", genome.assembly))
 	controls.all <- controls.all[, "ID"]
 
 	# Obtain methylated and unmethylated intensities
@@ -747,6 +765,8 @@ setAs("RnBeadRawSet", "RGChannelSet", function(from, to){
 		anno <- "IlluminaHumanMethylationEPIC"
 	}else if(assay.name %in% "probesEPICv2"){
 		anno <- "IlluminaHumanMethylationEPICv2"
+	}else if(assay.name %in% "probesMSA"){
+		anno <- "IlluminaHumanMethylationScreeningArray"
 	}else if(assay.name %in% "probes450"){
 		anno <- "IlluminaHumanMethylation450k"
 	}else if(assay.name %in% "probes27"){
@@ -1305,6 +1325,8 @@ intensities.by.color<-function(raw.set,
   if (add.controls) {
 	if (raw.set@target == "probesEPICv2") {
 		ncd <- rnb.get.annotation("controlsEPICv2", assembly = "hg38")
+	} else if (raw.set@target == "probesMSA") {
+		ncd <- rnb.get.annotation("controlsMSA", assembly = "hg38")
 	} else {
 		ncd <- rnb.get.annotation(ifelse(raw.set@target == "probesEPIC", "controlsEPIC", "controls450"))
 	}

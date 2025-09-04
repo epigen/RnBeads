@@ -157,6 +157,8 @@ rnb.execute.normalization<-function(
 				disable.method(FALSE, 'not supported for Infinium 27k')
 			} else if (bgcorr.method == "methylumi.noob" && object@target == "probesEPICv2") {
 				disable.method(FALSE, 'methylumi.noob is not supported for MethylationEPICv2')
+            } else if (bgcorr.method == "methylumi.noob" && object@target == "probesMSA") {
+				disable.method(FALSE, 'methylumi.noob is not supported for MethylationScreeningArray')
             } else if (bgcorr.method == "methylumi.noob" && object@target == "probesEPIC") {
 				disable.method(FALSE, 'methylumi.noob is not supported for MethylationEPIC')
             } else if (bgcorr.method == "methylumi.noob" && object@target == "probesMMBC") {
@@ -227,6 +229,9 @@ rnb.execute.normalization<-function(
 	}
 	if (inherits(object, "RnBeadSet") && object@target == "probesEPICv2" && !(method %in% accepted)) {
 		disable.method(TRUE, 'not supported for HumanMethylationEPICv2')
+	}
+	if (inherits(object, "RnBeadSet") && object@target == "probesMSA" && !(method %in% accepted)) {
+		disable.method(TRUE, 'not supported for HumanMethylationScreeningArray')
 	}
     accepted<-setdiff(.rnb.options[["accepted"]][["normalization.method"]], c("illumina", "minfi.funnorm", "swan", "wm.tost","wm.fuks", "wm.swan"))
     if (inherits(object, "RnBeadSet") && object@target == "probesMMBC" && !(method %in% accepted)) {
