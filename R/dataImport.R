@@ -825,6 +825,7 @@ read.idat.files <- function(base.dir,
 		#probes[probe.categories[[pcind]]$Indices]<-annot[probe.categories[[pcind]]$Indices,"ID"]
 	}
 
+  mouse_fractions <- c()
 	for(sid in 1:nsamp){
 
 		#barcode<-sample.sheet$barcode[sid]
@@ -841,6 +842,11 @@ read.idat.files <- function(base.dir,
 		int.files<-list()
 		int.files[["Red"]]<-readIDAT(idatfile.red)
 		int.files[["Grn"]]<-readIDAT(idatfile.grn)
+      
+    if(rnb.getOption('inference.mouse.fraction')){
+			res_fraction <- rnb.run_xeno(gsub("_Red.idat", "", idatfile.red))
+      mouse_fractions <- c(mouse_fractions, res_fraction$mouse_fraction)
+    }
 
 		ctrls.indexes<-match(annot.ctrls[[ctrls.address.col]], int.files[["Red"]]$MidBlock)
 
@@ -919,6 +925,9 @@ read.idat.files <- function(base.dir,
 		sample.sheet<-data.frame(barcodes=barcode)
 	}
 
+	if(rnb.getOption('inference.mouse.fraction')){
+      sample.sheet$MouseFraction <- mouse_fractions
+	}
 	#  saveRDS(M, "/Users/baris.kalem/Code/RnBeads_Project/Kaur_CompareEPICv1_EPICv2/duplicated_probes_bug/M_good.RDS")
     
     ### solve the problem of duplicated probes

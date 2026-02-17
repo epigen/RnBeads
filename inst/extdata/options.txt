@@ -80,6 +80,7 @@ inference.age.prediction.training	logical	no	no		FALSE
 inference.age.prediction.predictor	character	no	yes		NULL
 inference.age.prediction.cv	logical	no	no		FALSE
 inference.immune.cells	logical	no	no		TRUE
+inference.mouse.fraction	logical	no	no		FALSE
 exploratory	logical	no	no		TRUE
 exploratory.columns	integer.vector	no	yes		NULL
 exploratory.top.dimensions	integer	no	no	[0,	0
