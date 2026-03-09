@@ -7,12 +7,10 @@
 #' @param n_cores The number of cores to be used
 #' @export
 #' @author Nima Esmaeelpour
-#' @importFrom dplyr bind_rows
-#' @importFrom sesame openSesame
-#' @importFrom methods is
 rnb.run_xeno <- function(idat_path, n_cores = 1) {
   rnb.require('sesame')
   rnb.require('BiocParallel')
+  rnb.require('dplyr')
   # Read .idat files
   logger.info(sprintf("Started Reading %s directory...", idat_path))
   sdfs <- openSesame(
@@ -36,14 +34,10 @@ rnb.run_xeno <- function(idat_path, n_cores = 1) {
   }
 
   # Return final df
-  bind_rows(results)
+  dplyr::bind_rows(results)
 }
 
 #' @noRd
-#' @importFrom dplyr filter
-#' @importFrom dplyr summarize
-#' @importFrom dplyr pull
-#' @importFrom stats median
 add_xeno <- function(df, sample_name) {
   platform <- resolve_platform(df, sample_name)
   manifest <- platform$manifest
@@ -51,13 +45,13 @@ add_xeno <- function(df, sample_name) {
 
   df <- filter_type_I_probes(df, manifest)
   df <- calculate_wrong_color_fraction(df, manifest)
-  df <- df %>% filter(rowSums(.[2:5]) > 1000)
+  df <- df %>% dplyr::filter(rowSums(.[2:5]) > 1000)
   bg <- median(df$wrong_color_fraction, na.rm = TRUE)
 
   mouse <- df |>
-    filter(Probe_ID %in% interspecies_probes) |>
-    summarize(med = median(wrong_color_fraction)) |>
-    pull(med)
+    dplyr::filter(Probe_ID %in% interspecies_probes) |>
+    dplyr::summarize(med = median(wrong_color_fraction)) |>
+    dplyr::pull(med)
 
   frac <- ifelse(is.na(mouse), 1,
     ifelse(mouse < 0.33, pmax(0, mouse - bg), mouse)
@@ -73,22 +67,18 @@ add_xeno <- function(df, sample_name) {
 }
 
 #' @noRd
-#' @importFrom dplyr filter
 filter_type_I_probes <- function(df, manifest) {
-  df <- df |> filter(Probe_ID %in% manifest$IlmnID)
+  df <- df |> dplyr::filter(Probe_ID %in% manifest$IlmnID)
 }
 
 #' @noRd
-#' @importFrom dplyr left_join
-#' @importFrom dplyr mutate
-#' @importFrom dplyr select
 calculate_wrong_color_fraction <- function(df, manifest) {
   df |>
-    left_join(
-      manifest |> select(IlmnID, Color_Channel),
+    dplyr::left_join(
+      manifest |> dplyr::select(IlmnID, Color_Channel),
       by = c("Probe_ID" = "IlmnID")
     ) |>
-    mutate(
+    dplyr::mutate(
       wrong_color_fraction =
         ifelse(Color_Channel == "Grn",
           (MR + UR) / (MR + UR + MG + UG),
