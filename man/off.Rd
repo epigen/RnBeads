@@ -8,14 +8,16 @@
 \alias{off,ReportGgPlot-method}
 \title{off-methods}
 \usage{
-\S4method{off}{Report}(.Object)
+\S4method{off}{Report}(object, ...)
 
-\S4method{off}{ReportPlot}(.Object)
+\S4method{off}{ReportPlot}(object)
 
-\S4method{off}{ReportGgPlot}(.Object, handle.errors = FALSE)
+\S4method{off}{ReportGgPlot}(object, handle.errors = FALSE)
 }
 \arguments{
-\item{.Object}{Object to be closed.}
+\item{object}{Object to be closed.}
+
+\item{...}{additional arguments}
 
 \item{handle.errors}{Flag indicating if the method should attempt to catch and process errors (e.g. I/O errors)
 internally. Setting this to \code{TRUE} does not guarantee that the method never stops with an

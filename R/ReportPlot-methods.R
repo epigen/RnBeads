@@ -114,10 +114,10 @@ get.files <- function(report.plot) {
 
 ########################################################################################################################
 
-#' @rdname off-methods
+#' @rdname off
 #' @export
-setMethod("off", "ReportPlot",
-	function(.Object) {
+setMethod("off", signature(object="ReportPlot"),
+	function(object) {
 		convert.f <- function(fname, ...) {
 			doerror <- function(e) {
 				dev.off()
@@ -130,7 +130,7 @@ setMethod("off", "ReportPlot",
 			}
 
 			tryCatch(
-				dev2bitmap(fname, type = "pngalpha", height = .Object@height, width = .Object@width,
+				dev2bitmap(fname, type = "pngalpha", height = object@height, width = object@width,
 					method = "pdf", ...),
 				warning = function(e) {
 					if (grepl(" had status 1$", e$message)) {
@@ -143,28 +143,28 @@ setMethod("off", "ReportPlot",
 				},
 				error = doerror)
 		}
-		if (.Object@create.pdf) {
-			if (.Object@high.png > 0) {
-				validate.dir(.Object@dir.png.high)
-				fname <- .Object@fname
-				if (.Object@low.png > 0 && .Object@dir.png.high == .Object@dir.png.low) {
+		if (object@create.pdf) {
+			if (object@high.png > 0) {
+				validate.dir(object@dir.png.high)
+				fname <- object@fname
+				if (object@low.png > 0 && object@dir.png.high == object@dir.png.low) {
 					fname <- paste0(fname, "_high_resolution")
 				}
-				fname <- file.path(.Object@dir.png.high, paste0(fname, ".png"))
-				convert.f(fname, res = .Object@high.png, fonts = c("Helvetica", "sans"))
+				fname <- file.path(object@dir.png.high, paste0(fname, ".png"))
+				convert.f(fname, res = object@high.png, fonts = c("Helvetica", "sans"))
 			}
-			if (.Object@low.png > 0) {
-				validate.dir(.Object@dir.png.low)
-				fname <- file.path(.Object@dir.png.low, paste0(.Object@fname, ".png"))
-				convert.f(fname, res = .Object@low.png, fonts = c("Helvetica", "sans"))
+			if (object@low.png > 0) {
+				validate.dir(object@dir.png.low)
+				fname <- file.path(object@dir.png.low, paste0(object@fname, ".png"))
+				convert.f(fname, res = object@low.png, fonts = c("Helvetica", "sans"))
 			}
-		} else if (.Object@low.png > 0 && .Object@high.png > 0) {
-			validate.dir(.Object@dir.png.low)
-			fname <- file.path(.Object@dir.png.low, paste0(.Object@fname, ".png"))
-			convert.f(fname, res = .Object@low.png)
+		} else if (object@low.png > 0 && object@high.png > 0) {
+			validate.dir(object@dir.png.low)
+			fname <- file.path(object@dir.png.low, paste0(object@fname, ".png"))
+			convert.f(fname, res = object@low.png)
 		}
 		dev.off()
-		return(invisible(.Object))
+		return(invisible(object))
 	}
 )
 
@@ -293,10 +293,10 @@ setMethod("initialize", "ReportGgPlot",
 		}
 )
 
-#' @rdname off-methods
+#' @rdname off
 #' @export
-setMethod("off", "ReportGgPlot",
-	function(.Object,handle.errors=FALSE) {
+setMethod("off", signature(object="ReportGgPlot"),
+	function(object,handle.errors=FALSE) {
 		do.it <- function(obj){
 			if (obj@create.pdf) {
 				validate.dir(obj@dir.pdf)
@@ -320,18 +320,18 @@ setMethod("off", "ReportGgPlot",
 		}
 		if (handle.errors){
 			tryCatch(
-				do.it(.Object),
+				do.it(object),
 				error=function(ee){
 					logger.warning(c("ReportGgPlot error ('off' method):",ee$message))
-					.Object@ggp <<- rnb.message.plot("plotting error")
-					do.it(.Object)
+				  object@ggp <<- rnb.message.plot("plotting error")
+					do.it(object)
 				}
 			)
 		} else {
-			do.it(.Object)
+			do.it(object)
 		}
-		.Object@ggp <- NULL
-		return(invisible(.Object))
+		object@ggp <- NULL
+		return(invisible(object))
 	}
 )
 

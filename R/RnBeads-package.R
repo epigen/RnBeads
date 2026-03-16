@@ -78,3 +78,49 @@ NULL
 #'          available for BS datasets.
 #' @author Michael Scherer
 NULL
+
+#' XenoMix EPICv1 (hg38)
+#'
+#' This is the manifest file for EPICv1, which is required for detecting inter-species probes for estimating mouse contamination
+#' with XenoMix
+#'
+#' @docType data
+#' @keywords datasets
+#' @name epic_v1_manifest
+#' @format \code{data.frame} provided by Illumina capturing information about the probe design.
+#' @author Nima Esmaeelpour
+NULL
+
+#' XenoMix EPICv2 (hg38)
+#'
+#' This is the manifest file for EPICv2, which is required for detecting inter-species probes for estimating mouse contamination
+#' with XenoMix
+#'
+#' @docType data
+#' @keywords datasets
+#' @name epic_v2_manifest
+#' @format \code{data.frame} provided by Illumina capturing information about the probe design.
+#' @author Nima Esmaeelpour
+NULL
+
+#' XenoMix interspeciesprobes (v1)
+#'
+#' These are the inter-species probes for EPICv1
+#'
+#' @docType data
+#' @keywords datasets
+#' @name interspecies_probes_v1
+#' @format \code{list} of CGIs for the inter-species probes.
+#' @author Nima Esmaeelpour
+NULL
+
+#' XenoMix interspeciesprobes (v2)
+#'
+#' These are the inter-species probes for EPICv2
+#'
+#' @docType data
+#' @keywords datasets
+#' @name interspecies_probes_v2
+#' @format \code{list} of CGIs for the inter-species probes.
+#' @author Nima Esmaeelpour
+NULL

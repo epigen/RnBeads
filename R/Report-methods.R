@@ -1114,37 +1114,31 @@ rnb.get.reference <- function(report, txt) {
 	return(result)
 }
 
-########################################################################################################################
-	
-if (!isGeneric("off")) {
-	if (exists("off") && typeof(get("off")) == "closure") {
-		setGeneric("off")
-	} else {
-		setGeneric("off", function(.Object,...) standardGeneric("off"))
-	}
-}
+#' @import methods
+#' @export
+setGeneric("off",
+           function(object, ...) standardGeneric("off"))
 
 #' off-methods
 #'
 #' Performs cleanup and/or other finishing activities and closes the specified device, connection, or document.
 #'
-#' @param .Object       Object to be closed.
+#' @param object       Object to be closed.
 #' @param handle.errors Flag indicating if the method should attempt to catch and process errors (e.g. I/O errors)
 #'                      internally. Setting this to \code{TRUE} does not guarantee that the method never stops with an
 #'                      error.
+#' @param ...         additional arguments
 #'
 #' @return The closed object, invisibly.
 #'
 #' @export
 #' @docType methods
-#' @rdname off-methods
+#' @rdname off
 #' @aliases off
-#' @aliases off,Report-method
-#' @aliases off,ReportPlot-method
-setMethod("off", "Report",
-	function(.Object) {
-		return(invisible(complete.report(.Object)))
-	}
+setMethod("off", signature(object="Report"),
+  function(object, ...) {
+    return(invisible(complete.report(object)))
+  }
 )
 
 ########################################################################################################################

@@ -305,6 +305,10 @@ is available (see below). Attempting to get or set the value of a non-existing o
   \item{\bold{\code{inference.immune.cells}}\code{ = TRUE}}{
        Flag indicating if immune cell content estimation is to be performed. Immune cell content prediction is based
        on the LUMP algorithm and is currently supported for the hg19 assembly only.}
+  \item{\bold{\code{inference.mouse.fraction}}\code{ = FALSE}}{
+       Flag indicating if mouse contamination is to be estimated. This is only meaningful, if PDX models or artificial
+       human/mouse mixtures were used. If this option is \code{TRUE}, the \code{sesame} R package has to be 
+       installed.}
   \item{\bold{\code{exploratory}}\code{ = TRUE}}{
        Flag indicating if the exploratory analysis module is to be executed.}
   \item{\bold{\code{exploratory.columns}}\code{ = NULL}}{

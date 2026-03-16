@@ -1,3 +1,14 @@
+RnBeads 2.27.3
+=============
+
+ * Implemented XenoMix for estimating mouse content from EPIC array data in PDX models
+
+RnBeads 2.27.1
+=============
+
+ * Fixed issue with nv probes. Now they are filtered during the preprocessing.
+
+
 RnBeads 2.19.0
 =============
 
