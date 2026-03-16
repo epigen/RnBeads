@@ -13,8 +13,8 @@ Authors@R: c(
     role = c("aut")),
     person("Fabian", "Mueller", email = "team@rnbeads.org",
     role = c("aut", "cre")))
-Date: 2026-02-17
-Version: 2.27.3
+Date: 2026-03-16
+Version: 2.29.1
 Suggests:
     Category,
     GOstats,
