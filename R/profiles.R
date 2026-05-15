@@ -648,7 +648,7 @@ rnb.plot.nv.heatmap <- function(dataset, writeToFile = FALSE, ...) {
 		## Trim rownames of nv probes -> assumes this format: nv-GRCh38-chr19-52213081-52213081-C-G_BC11
 		nv.probe.ids <- strsplit(rownames(dataset), split = "-")
 		rnb.require("biomaRt")
-		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")
+		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://sep2025.archive.ensembl.org")
 		for (i in 1:length(nv.probe.ids)) {
 			chr <- nv.probe.ids[[i]][3]
 			start <- nv.probe.ids[[i]][4]

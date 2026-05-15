@@ -1523,11 +1523,11 @@ rnb.run.exploratory <- function(rnb.set, dir.reports,
 	## EPICv2 nv probes visualization section
 	section.title <- "Visualization of nv Probe Data"
 	nv.probes <- tryCatch(rnb.get.nv.probes.matrix(rnb.set), error = function(err) { NULL })
-	if (is.null(nv.probes)) {
+	if (is.null(nv.probes) | rnb.getOption("nv.probe.tables") == FALSE) {
 		txt <- c("Overview of nv probes and sample comparison based on them cannot be performed ",
-			"because the dataset does not contain nv probes.")
+			"because the dataset does not contain nv probes or nv.probe.tables is disabled.")
 		report <- rnb.add.section(report, section.title, txt)
-	} else if (rnb.set@target == "probesEPICv2" & rnb.getOption("nv.probe.tables") & (rnb.getOption("nv.heatmap") | rnb.getOption("nv.beta.distribution"))) {
+	} else if (rnb.set@target == "probesEPICv2" & (rnb.getOption("nv.heatmap") | rnb.getOption("nv.beta.distribution"))) {
 		refText <- c("Kaur, D., Lee, S. M., Goldberg, D., Spix, N. J., Hinoue, T., Li, H.-T., Dwaraka, V. B., Smith, R., ",
 					 "Shen, H., Liang, G., Renke, N., Laird, P. W., & Zhou, W. (2023). Comprehensive evaluation of the Infinium human ",
 					 "MethylationEPIC v2 BeadChip. <i>Epigenetics Communications</i>, <b>3</b>(1), 6.")
