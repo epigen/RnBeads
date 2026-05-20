@@ -359,7 +359,7 @@ locus.profile.get.base.tracks <- function(chrom,start,end,assembly="hg19"){
 		featMap["symbol"] <- "external_gene_id"
 	} else if (assembly == "hg38"){
 		mart <- tryCatch(
-			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org"), ## Ensembl 109
+			useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://sep2025.archive.ensembl.org"), ## Ensembl 115
 			error = function(ee) {
 				logger.warning(c("could not retrieve Ensembl genes from biomart: ",ee$message))
 				NULL
