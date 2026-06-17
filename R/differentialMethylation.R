@@ -2054,7 +2054,7 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		sectionText <- paste(sectionText,"<li>",txt,"</li>\n",sep="")
 	}
 	## Save table of only the nv-probes in EPICv2
-	if (rnbSet@target == "probesEPICv2" & any(grepl("^nv", dmt$cgid))) {
+	if (rnbSet@target == "probesEPICv2" & rnb.getOption("nv.probe.tables") & any(grepl("^nv", dmt$cgid))) { 
 		logger.info("Saving table(s) containing only nv-probes")
 		sectionText <- paste(sectionText,"</ul>",sep="")
 		rnb.add.paragraph(report, sectionText)
@@ -2064,7 +2064,7 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 
 		logger.info("Enriching nv-probes comparison table with HGNC symbols. see: GeneSymbol column in the finished table.")
 		rnb.require("biomaRt")
-		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://feb2023.archive.ensembl.org")
+		mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl",host="https://sep2025.archive.ensembl.org")
 
 		refText <- c("Kaur, D., Lee, S. M., Goldberg, D., Spix, N. J., Hinoue, T., Li, H.-T., Dwaraka, V. B., Smith, R., ",
 					 "Shen, H., Liang, G., Renke, N., Laird, P. W., & Zhou, W. (2023). Comprehensive evaluation of the Infinium human ",

@@ -893,6 +893,8 @@ rnb.is.option <- function(txt) {
 #'        Flag indicating whether disked dumped big matrices (see \code{disk.dump.big.matrices} option) should actively
 #'        be deleted when RnBSets are modified. You should switch it to \code{TRUE} when \code{disk.dump.big.matrices}
 #' 		  is \code{TRUE} and the amount of hard drive space is also limited.}
+#' \item{\bold{\code{nv.probe.tables}}\code{ = FALSE}}{
+#'        Flag indicating whether nv-probe tables are generated. If \code{TRUE}, tables are generated.}
 #' }
 #'
 #' @examples
