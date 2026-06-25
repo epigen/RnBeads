@@ -1663,7 +1663,8 @@ rnb.run.differential <- function(rnb.set, dir.reports,
 			if (!is.null(diffmeth.lola.enrichment)){
 				save(diffmeth.lola.enrichment, file=file.path(diffmeth.path, "enrichment_lola.RData"))
 			}
-		logger.completed()
+                
+			logger.completed()
 	}
 
 	logger.start("Report Generation")

@@ -130,3 +130,4 @@ disk.dump.bigff.finalizer	character	no	no	(delete,close)	delete
 enforce.memory.management	logical	no	no		FALSE
 enforce.destroy.disk.dumps	logical	no	no		FALSE
 nv.probe.tables	logical	no	no		FALSE
+differential.residuals.output	character	no	no	(none,csv,ff,both)	none
