@@ -857,6 +857,25 @@ rnb.is.option <- function(txt) {
 #'        Flag indicating whether a section corresponding to differential site methylation should be added to the report.
 #'        Has no effect on the actual analysis, just the report. To disable differential site methylation analysis entirely
 #'        use the \code{analyze.sites} option.}
+#'   \item{\bold{\code{differential.report.heatmaps}}\code{ = FALSE}}{
+#'        Flag indicating whether differential methylation heatmaps should be added to report sections for sites and
+#'        regions.}
+#'   \item{\bold{\code{differential.heatmap.top.features}}\code{ = 100}}{
+#'        Number of top-ranked loci to display in each differential methylation heatmap.}
+#'   \item{\bold{\code{differential.heatmap.signal}}\code{ = "beta"}}{
+#'        Signal matrix used for differential heatmaps. Supported values are \code{"beta"}, \code{"mvalue"},
+#'        and \code{"residuals"}. Residuals require residual output to be available in the differential methylation
+#'        object.}
+#'   \item{\bold{\code{differential.heatmap.zscore}}\code{ = TRUE}}{
+#'        Flag indicating whether row-wise z-score transformation should be applied before plotting heatmaps.}
+#'   \item{\bold{\code{differential.heatmap.cluster.rows}}\code{ = TRUE}}{
+#'        Flag indicating whether rows (loci) should be clustered in differential methylation heatmaps.}
+#'   \item{\bold{\code{differential.heatmap.cluster.columns}}\code{ = TRUE}}{
+#'        Flag indicating whether columns (samples) should be clustered in differential methylation heatmaps.}
+#'   \item{\bold{\code{differential.heatmap.show.row.names}}\code{ = FALSE}}{
+#'        Flag indicating whether row names should be shown in differential methylation heatmaps.}
+#'   \item{\bold{\code{differential.heatmap.show.column.names}}\code{ = TRUE}}{
+#'        Flag indicating whether sample names should be shown in differential methylation heatmaps.}
 #'   \item{\bold{\code{export.to.bed}}\code{ = FALSE}}{
 #'        Flag indicating whether the data should be exported to bed files.}
 #'   \item{\bold{\code{export.to.trackhub}}\code{ = NULL}}{

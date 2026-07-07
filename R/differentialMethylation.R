@@ -1237,6 +1237,316 @@ auto.select.rank.cut <- function(p,r,alpha=0.1){
 	return(res)
 }
 
+### rnb.diffmeth.heatmap.select.rows
+###
+### selects row indices for differential methylation heatmaps
+rnb.diffmeth.heatmap.select.rows <- function(dmt, selected.mask, max.features){
+	if (length(selected.mask) != nrow(dmt)){
+		stop("invalid value for selected.mask")
+	}
+	selected.inds <- which(selected.mask)
+	if (length(selected.inds) < 1){
+		return(integer())
+	}
+	ord <- order(dmt[selected.inds,"combinedRank"], na.last = TRUE)
+	selected.inds <- selected.inds[ord]
+	max.features <- max(1L, as.integer(max.features))
+	if (length(selected.inds) > max.features){
+		selected.inds <- selected.inds[1:max.features]
+	}
+	return(selected.inds)
+}
+
+### rnb.diffmeth.resolve.heatmap.signal
+###
+### validates and normalizes differential heatmap signal option
+rnb.diffmeth.resolve.heatmap.signal <- function(signal.type){
+	signal.type <- tolower(as.character(signal.type)[1])
+	if (!(signal.type %in% c("beta","mvalue","residuals"))){
+		logger.warning(c("Unknown heatmap signal type:", signal.type, "- using 'beta'"))
+		signal.type <- "beta"
+	}
+	return(signal.type)
+}
+
+### rnb.diffmeth.get.residual.matrix
+###
+### retrieves residual matrix for a given comparison and region type from RnBDiffMeth object
+rnb.diffmeth.get.residual.matrix <- function(diffmeth, comparison, region.type, row.inds, sample.inds){
+	if (is.null(diffmeth) || !inherits(diffmeth, "RnBDiffMeth")){
+		return(NULL)
+	}
+	res.obj <- NULL
+	if (region.type == "sites"){
+		res.obj <- diffmeth@residSites[[comparison]]
+	} else {
+		if (!is.null(diffmeth@residRegions[[region.type]])){
+			res.obj <- diffmeth@residRegions[[region.type]][[comparison]]
+		}
+	}
+	if (is.null(res.obj)){
+		return(NULL)
+	}
+	res.mat <- tryCatch({
+		if (inherits(res.obj, "ff")) {
+			as.matrix(res.obj[])
+		} else {
+			as.matrix(res.obj)
+		}
+	}, error = function(e) {
+		logger.warning(c("Could not retrieve residual matrix for heatmap:", e$message))
+		NULL
+	})
+	if (is.null(res.mat) || nrow(res.mat) < max(row.inds) || ncol(res.mat) < max(sample.inds)){
+		return(NULL)
+	}
+	return(res.mat[row.inds, sample.inds, drop = FALSE])
+}
+
+### rnb.diffmeth.get.heatmap.signal.matrix
+###
+### retrieves matrix used for heatmap according to selected signal type
+rnb.diffmeth.get.heatmap.signal.matrix <- function(rnbSet, diffmeth, comparison, region.type, row.inds, sample.inds,
+		signal.type="beta"){
+	signal.type <- rnb.diffmeth.resolve.heatmap.signal(signal.type)
+	if (signal.type == "beta"){
+		return(meth(rnbSet, type = region.type, i = row.inds, j = sample.inds))
+	}
+	if (signal.type == "mvalue"){
+		return(rnb.beta2mval(meth(rnbSet, type = region.type, i = row.inds, j = sample.inds)))
+	}
+	# residual signal
+	return(rnb.diffmeth.get.residual.matrix(diffmeth, comparison, region.type, row.inds, sample.inds))
+}
+
+### rnb.diffmeth.heatmap.row.zscore
+###
+### computes row-wise z-scores while preserving NAs
+rnb.diffmeth.heatmap.row.zscore <- function(mm){
+	if (!(is.matrix(mm) && nrow(mm) > 0 && ncol(mm) > 0)){
+		return(mm)
+	}
+	if (requireNamespace("matrixStats", quitely = TRUE)) {
+		mx <- matrixStats::rowMeans2(mm, na.rm = TRUE)
+		sx <- matrixStats::rowSds(mm, na.rm = TRUE)
+		sx[is.na(sx) | sx == 0] <- Inf
+		res <- (mm - mx) /sx
+		res[is.infinite(sx), ] <- 0
+	} else {
+		res <- t(apply(mm, 1, function(x){
+			sx <- stats::sd(x, na.rm = TRUE)
+			mx <- mean(x, na.rm = TRUE)
+			if (is.na(sx) || sx == 0){
+				return(rep(0, length(x)))
+			}
+			(x - mx) / sx
+		}))
+		colnames(res) <- colnames(mm)
+		rownames(res) <- rownames(mm)
+	}
+	res
+}
+
+### rnb.diffmeth.prepare.heatmap.signal
+###
+### applies optional transformation to selected heatmap signal matrix
+rnb.diffmeth.prepare.heatmap.signal <- function(mm, do.zscore=FALSE){
+	if (isTRUE(do.zscore)){
+		mm <- rnb.diffmeth.heatmap.row.zscore(mm)
+	}
+	return(mm)
+}
+
+### rnb.diffmeth.create.heatmap.plot
+###
+### helper for creating a differential methylation heatmap report plot
+rnb.diffmeth.create.heatmap.plot <- function(report, figName, mm, grp1.size, grp2.size,
+		grp1.name, grp2.name, cluster.rows=TRUE, cluster.columns=TRUE,
+		show.row.names=FALSE, show.column.names=TRUE, legend.title="signal"){
+	report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
+	if (!(is.matrix(mm) && nrow(mm) > 0 && ncol(mm) > 1)){
+		print(rnb.message.plot("Heatmap could not be created"))
+		return(off(report.plot, handle.errors = TRUE))
+	}
+	if (all(is.na(mm))){
+		print(rnb.message.plot("Heatmap not available (all values are NA)"))
+		return(off(report.plot, handle.errors = TRUE))
+	}
+	tryCatch({
+		col_split <- factor(
+			c(rep(grp1.name, grp1.size), rep(grp2.name, grp2.size)),
+			levels = c(grp1.name, grp2.name)
+		)
+		hm.cols <- colorRampPalette(rnb.getOption("colors.meth"))(100)
+		grid::grid.newpage()
+		hm <- ComplexHeatmap::Heatmap(
+			mm,
+			name = legend.title,
+			col = hm.cols,
+			cluster_rows = cluster.rows,
+			cluster_columns = cluster.columns,
+			show_row_names = show.row.names,
+			show_column_names = show.column.names,
+			column_split = col_split,
+			na_col = "grey90"
+		)
+		ComplexHeatmap::draw(hm, heatmap_legend_side = "right")
+	}, error = function(e){
+		logger.warning(c("Could not create differential methylation heatmap:", e$message))
+		print(rnb.message.plot("Heatmap could not be created"))
+	})
+	report.plot <- off(report.plot, handle.errors = TRUE)
+	return(report.plot)
+}
+
+### addReportPlots.diffMeth.bin.site.heatmap
+###
+### adds differential methylation heatmaps for the site level binary case to a report.
+addReportPlots.diffMeth.bin.site.heatmap <- function(report, rnbSet, diffmeth, comparison, dmt, cmpName, sample.inds,
+		diffSiteRankCut, autoRankCut=NULL, grp1.name="Group1", grp2.name="Group2",
+		rerank=TRUE, thres.p.val=0.05,
+		max.features=rnb.getOption("differential.heatmap.top.features"),
+		heatmap.signal=rnb.getOption("differential.heatmap.signal"),
+		heatmap.zscore=rnb.getOption("differential.heatmap.zscore"),
+		cluster.rows=rnb.getOption("differential.heatmap.cluster.rows"),
+		cluster.columns=rnb.getOption("differential.heatmap.cluster.columns"),
+		show.row.names=rnb.getOption("differential.heatmap.show.row.names"),
+		show.column.names=rnb.getOption("differential.heatmap.show.column.names")){
+	figPlots <- list()
+	heatmap.signal <- rnb.diffmeth.resolve.heatmap.signal(heatmap.signal)
+	legend.title <- ifelse(isTRUE(heatmap.zscore), paste0("z(",heatmap.signal,")"), heatmap.signal)
+	if (!(is.list(sample.inds) && all(c("group1","group2") %in% names(sample.inds)))){
+		return(figPlots)
+	}
+	grp1.size <- length(sample.inds$group1)
+	grp2.size <- length(sample.inds$group2)
+	if (grp1.size < 1 || grp2.size < 1){
+		return(figPlots)
+	}
+	all.sample.inds <- c(sample.inds$group1, sample.inds$group2)
+
+	create.plot <- function(selected.mask, measure.id){
+		sel.inds <- rnb.diffmeth.heatmap.select.rows(dmt, selected.mask, max.features)
+		figName <- paste("diffMeth_site_heatmap", cmpName, measure.id, sep = "_")
+		if (length(sel.inds) < 1){
+			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
+			print(rnb.message.plot("No loci matched this criterion"))
+			report.plot <- off(report.plot, handle.errors = TRUE)
+			return(report.plot)
+		}
+		mm <- rnb.diffmeth.get.heatmap.signal.matrix(
+			rnbSet = rnbSet, diffmeth = diffmeth, comparison = comparison,
+			region.type = "sites", row.inds = sel.inds, sample.inds = all.sample.inds,
+			signal.type = heatmap.signal
+		)
+		if (is.null(mm)){
+			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
+			print(rnb.message.plot("Requested signal not available for this comparison"))
+			report.plot <- off(report.plot, handle.errors = TRUE)
+			return(report.plot)
+		}
+		mm <- rnb.diffmeth.prepare.heatmap.signal(mm, do.zscore = heatmap.zscore)
+		return(rnb.diffmeth.create.heatmap.plot(report, figName, mm, grp1.size, grp2.size,
+			grp1.name, grp2.name, cluster.rows = cluster.rows, cluster.columns = cluster.columns,
+			show.row.names = show.row.names, show.column.names = show.column.names,
+			legend.title = legend.title))
+	}
+
+	if (is.element("diffmeth.p.adj.fdr", colnames(dmt))){
+		figPlots <- c(figPlots, list(create.plot(dmt[,"diffmeth.p.adj.fdr"] < P.VAL.CUT, "fdrAdjPval")))
+	}
+
+	rrs <- dmt[,"combinedRank"]
+	if (rerank) rrs <- rank(rrs, na.last = "keep", ties.method = "min")
+	for (i in seq_along(diffSiteRankCut)){
+		rc <- diffSiteRankCut[i]
+		figPlots <- c(figPlots, list(create.plot(rrs < rc, paste("rc", i, sep=""))))
+		if (rc >= max.features) {
+			break
+		}
+	}
+	if (is.integer(autoRankCut)){
+		figPlots <- c(figPlots, list(create.plot(dmt[,"combinedRank"] <= autoRankCut, "rcAuto")))
+	}
+	if (is.element("rankPermP", colnames(dmt))){
+		figPlots <- c(figPlots, list(create.plot(dmt[,"rankPermP"] < thres.p.val, "permutationP")))
+	}
+
+	return(figPlots)
+}
+
+### addReportPlots.diffMeth.bin.region.heatmap
+###
+### adds differential methylation heatmaps for the region level binary case to a report.
+addReportPlots.diffMeth.bin.region.heatmap <- function(report, rnbSet, diffmeth, comparison, dmt, cmpName, regName, region.type, sample.inds,
+		diffRegionRankCut, autoRankCut=NULL, grp1.name="Group1", grp2.name="Group2", rerank=TRUE,
+		max.features=rnb.getOption("differential.heatmap.top.features"),
+		heatmap.signal=rnb.getOption("differential.heatmap.signal"),
+		heatmap.zscore=rnb.getOption("differential.heatmap.zscore"),
+		cluster.rows=rnb.getOption("differential.heatmap.cluster.rows"),
+		cluster.columns=rnb.getOption("differential.heatmap.cluster.columns"),
+		show.row.names=rnb.getOption("differential.heatmap.show.row.names"),
+		show.column.names=rnb.getOption("differential.heatmap.show.column.names")){
+	figPlots <- list()
+	heatmap.signal <- rnb.diffmeth.resolve.heatmap.signal(heatmap.signal)
+	legend.title <- ifelse(isTRUE(heatmap.zscore), paste0("z(",heatmap.signal,")"), heatmap.signal)
+	if (!(is.list(sample.inds) && all(c("group1","group2") %in% names(sample.inds)))){
+		return(figPlots)
+	}
+	grp1.size <- length(sample.inds$group1)
+	grp2.size <- length(sample.inds$group2)
+	if (grp1.size < 1 || grp2.size < 1){
+		return(figPlots)
+	}
+	all.sample.inds <- c(sample.inds$group1, sample.inds$group2)
+
+	create.plot <- function(selected.mask, measure.id){
+		sel.inds <- rnb.diffmeth.heatmap.select.rows(dmt, selected.mask, max.features)
+		figName <- paste("diffMeth_region_heatmap", cmpName, regName, measure.id, sep = "_")
+		if (length(sel.inds) < 1){
+			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
+			print(rnb.message.plot("No loci matched this criterion"))
+			report.plot <- off(report.plot, handle.errors = TRUE)
+			return(report.plot)
+		}
+		mm <- rnb.diffmeth.get.heatmap.signal.matrix(
+			rnbSet = rnbSet, diffmeth = diffmeth, comparison = comparison,
+			region.type = region.type, row.inds = sel.inds, sample.inds = all.sample.inds,
+			signal.type = heatmap.signal
+		)
+		if (is.null(mm)){
+			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
+			print(rnb.message.plot("Requested signal not available for this comparison"))
+			report.plot <- off(report.plot, handle.errors = TRUE)
+			return(report.plot)
+		}
+		mm <- rnb.diffmeth.prepare.heatmap.signal(mm, do.zscore = heatmap.zscore)
+		return(rnb.diffmeth.create.heatmap.plot(report, figName, mm, grp1.size, grp2.size,
+			grp1.name, grp2.name, cluster.rows = cluster.rows, cluster.columns = cluster.columns,
+			show.row.names = show.row.names, show.column.names = show.column.names,
+			legend.title = legend.title))
+	}
+
+	if (is.element("comb.p.adj.fdr", colnames(dmt))){
+		figPlots <- c(figPlots, list(create.plot(dmt[,"comb.p.adj.fdr"] < P.VAL.CUT, "fdrAdjPval")))
+	}
+
+	rrs <- dmt[,"combinedRank"]
+	if (rerank) rrs <- rank(rrs, na.last = "keep", ties.method = "min")
+	for (i in seq_along(diffRegionRankCut)){
+		rc <- diffRegionRankCut[i]
+		figPlots <- c(figPlots, list(create.plot(rrs < rc, paste("rc", i, sep=""))))
+		if (rc >= max.features) {
+			break
+		}
+	}
+	if (is.integer(autoRankCut)){
+		figPlots <- c(figPlots, list(create.plot(dmt[,"combinedRank"] <= autoRankCut, "rcAuto")))
+	}
+
+	return(figPlots)
+}
+
 ### addReportPlots.diffMeth.bin.site.scatter
 ###
 ### adds report scatterplots for differential methylation for the site level binary case to a report.
@@ -2102,6 +2412,75 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		as a gradient according to the color legend.')
 	report <- rnb.add.figure(report, description, addedPlots, setting.names)
 	logger.completed()
+
+	#heatmaps
+	if (rnb.getOption("differential.report.heatmaps")){
+		logger.start("Adding heatmaps")
+		if (!(.hasSlot(diffmeth,"comparison.info") && length(diffmeth@comparison.info) > 0)){
+			logger.warning("Could not add differential methylation heatmaps: missing comparison sample indices")
+		} else {
+			rnb.require("ComplexHeatmap")
+			rnb.cleanMem()
+			addedPlots <- list()
+			if(parallel.isEnabled()){
+				addedPlots <- foreach(i=seq_along(get.comparisons(diffmeth)),.combine="c") %dopar% {
+					cc <- names(get.comparisons(diffmeth))[i]
+					ccc <- get.comparisons(diffmeth)[cc]
+					dmt <- get.table(diffmeth,ccc,"sites",return.data.frame=TRUE)
+					ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
+					grp.names <- get.comparison.grouplabels(diffmeth)[ccc,]
+					auto.rank.cut <- rank.cuts.auto[[i]]
+					cmp.info <- diffmeth@comparison.info[[ccc]]
+					res <- addReportPlots.diffMeth.bin.site.heatmap(report, rnbSet, diffmeth, ccc, dmt, ccn,
+						sample.inds = cmp.info$group.inds,
+						diffSiteRankCut = diffSiteRankCut, autoRankCut = auto.rank.cut,
+						grp1.name = grp.names[1], grp2.name = grp.names[2])
+					rnb.cleanMem()
+					res
+				}
+			} else {
+				for (i in seq_along(get.comparisons(diffmeth))){
+					cc <- names(get.comparisons(diffmeth))[i]
+					ccc <- get.comparisons(diffmeth)[cc]
+					dmt <- get.table(diffmeth,ccc,"sites",return.data.frame=TRUE)
+					ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
+					grp.names <- get.comparison.grouplabels(diffmeth)[ccc,]
+					auto.rank.cut <- rank.cuts.auto[[i]]
+					cmp.info <- diffmeth@comparison.info[[ccc]]
+					addedPlots <- c(addedPlots,addReportPlots.diffMeth.bin.site.heatmap(report, rnbSet, diffmeth, ccc, dmt, ccn,
+						sample.inds = cmp.info$group.inds,
+						diffSiteRankCut = diffSiteRankCut, autoRankCut = auto.rank.cut,
+						grp1.name = grp.names[1], grp2.name = grp.names[2]))
+					rnb.cleanMem()
+				}
+			}
+
+			if (length(addedPlots) > 0){
+				measure.ids <- unique(sapply(addedPlots, FUN=function(rp){
+					parts <- strsplit(slot(rp, "fname"), "_", fixed = TRUE)[[1]]
+					parts[length(parts)]
+				}))
+				diffMethType <- c(
+					"fdrAdjPval" = paste("FDR adjusted p-value <", P.VAL.CUT),
+					setNames(paste("combined rank among the ",diffSiteRankCut," best ranking sites",sep=""), paste("rc",1:length(diffSiteRankCut),sep="")),
+					"rcAuto" = "automatically selected rank cutoff",
+					"permutationP" = "rank permutation test p-value"
+				)
+				diffMethType <- diffMethType[names(diffMethType) %in% measure.ids]
+				setting.names <- list(
+					'comparison' = comps,
+					'differential methylation measure' = diffMethType
+				)
+				description <- c('Heatmap for differential methylation (sites). Rows correspond to selected sites and columns to samples. ',
+					'The number of displayed rows is controlled by option <code>differential.heatmap.top.features</code>. ',
+					'Samples are split by comparison groups.')
+				report <- rnb.add.figure(report, description, addedPlots, setting.names)
+			} else {
+				logger.warning("No differential methylation site heatmaps were generated")
+			}
+		}
+		logger.completed()
+	}
 	
 	#volcano plots
 	logger.start("Adding volcano plots")
@@ -2457,6 +2836,86 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 		combined ranking.'
 	report <- rnb.add.figure(report, description, addedPlots, setting.names)
 	logger.completed()
+
+	#heatmaps
+	if (rnb.getOption("differential.report.heatmaps")){
+		logger.start("Adding heatmaps")
+		if (!(.hasSlot(diffmeth,"comparison.info") && length(diffmeth@comparison.info) > 0)){
+			logger.warning("Could not add differential methylation heatmaps: missing comparison sample indices")
+		} else {
+			rnb.require("ComplexHeatmap")
+			rnb.cleanMem()
+			addedPlots <- list()
+			if(parallel.isEnabled()){
+				#generate pairs of comparison, region combinations with indices
+				iis <- seq_along(comps)
+				jjs <- seq_along(reg.types)
+				pps <- expand.grid(iis,jjs)
+
+				addedPlots <- foreach(k=seq_len(nrow(pps)),.combine="c") %dopar% {
+					i <- pps[k,1]
+					j <- pps[k,2]
+					cc <- names(comps)[i]
+					ccc <- comps[cc]
+					ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
+					rr <- reg.types[j]
+					rrn <- ifelse(is.valid.fname(rr),rr,paste("reg",j,sep=""))
+					auto.rank.cut <- rank.cuts.auto[[i]][[j]]
+					dmt <- get.table(diffmeth,ccc,rr,return.data.frame=TRUE)
+					cmp.info <- diffmeth@comparison.info[[ccc]]
+					res <- addReportPlots.diffMeth.bin.region.heatmap(report, rnbSet, diffmeth, ccc, dmt, ccn, rrn, rr,
+						sample.inds = cmp.info$group.inds,
+						diffRegionRankCut = diffRegionRankCut, autoRankCut = auto.rank.cut,
+						grp1.name = grp.labels[ccc,1], grp2.name = grp.labels[ccc,2])
+					rnb.cleanMem()
+					res
+				}
+			} else {
+				for (i in seq_along(comps)){
+					cc <- names(comps)[i]
+					ccc <- comps[cc]
+					ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
+					for (j in seq_along(reg.types)){
+						rr <- reg.types[j]
+						rrn <- ifelse(is.valid.fname(rr),rr,paste("reg",j,sep=""))
+						auto.rank.cut <- rank.cuts.auto[[i]][[j]]
+						dmt <- get.table(diffmeth,ccc,rr,return.data.frame=TRUE)
+						cmp.info <- diffmeth@comparison.info[[ccc]]
+						addedPlots <- c(addedPlots,addReportPlots.diffMeth.bin.region.heatmap(report, rnbSet, diffmeth, ccc, dmt, ccn, rrn, rr,
+							sample.inds = cmp.info$group.inds,
+							diffRegionRankCut = diffRegionRankCut, autoRankCut = auto.rank.cut,
+							grp1.name = grp.labels[ccc,1], grp2.name = grp.labels[ccc,2]))
+						rnb.cleanMem()
+					}
+				}
+			}
+
+			if (length(addedPlots) > 0){
+				measure.ids <- unique(sapply(addedPlots, FUN=function(rp){
+					parts <- strsplit(slot(rp, "fname"), "_", fixed = TRUE)[[1]]
+					parts[length(parts)]
+				}))
+				diffMethType <- c(
+					"fdrAdjPval" = paste("FDR adjusted p-value <",P.VAL.CUT),
+					setNames(paste("combined rank among the ",diffRegionRankCut," best ranking regions",sep=""), paste("rc",1:length(diffRegionRankCut),sep="")),
+					"rcAuto" = "automatically selected rank cutoff"
+				)
+				diffMethType <- diffMethType[names(diffMethType) %in% measure.ids]
+				setting.names <- list(
+					'comparison' = comps,
+					'regions' = reg.types,
+					'differential methylation measure' = diffMethType
+				)
+				description <- c('Heatmap for differential methylation (regions). Rows correspond to selected regions and columns to samples. ',
+					'The number of displayed rows is controlled by option <code>differential.heatmap.top.features</code>. ',
+					'Samples are split by comparison groups.')
+				report <- rnb.add.figure(report, description, addedPlots, setting.names)
+			} else {
+				logger.warning("No differential methylation region heatmaps were generated")
+			}
+		}
+		logger.completed()
+	}
 
 	logger.start("Adding tables")
 	includeCovg <- hasCovg(rnbSet)

@@ -80,7 +80,8 @@ Depends:
     plyr,
     reshape2
 Imports:
-    IRanges
+    IRanges,
+    ComplexHeatmap
 License: GPL-3
 biocViews: DNAMethylation, MethylationArray, MethylSeq, Epigenetics,
     QualityControl, Preprocessing, BatchEffect, DifferentialMethylation,
