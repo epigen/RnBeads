@@ -1506,7 +1506,7 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(report, rnbSet, diffmeth,
 		if (length(sel.inds) < 1){
 			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
 			print(rnb.message.plot("No loci matched this criterion"))
-			report.plot <- off(report.plot, handle.errors = TRUE)
+			report.plot <- off(report.plot)
 			return(report.plot)
 		}
 		mm <- rnb.diffmeth.get.heatmap.signal.matrix(
@@ -1517,7 +1517,7 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(report, rnbSet, diffmeth,
 		if (is.null(mm)){
 			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
 			print(rnb.message.plot("Requested signal not available for this comparison"))
-			report.plot <- off(report.plot, handle.errors = TRUE)
+			report.plot <- off(report.plot)
 			return(report.plot)
 		}
 		mm <- rnb.diffmeth.prepare.heatmap.signal(mm, do.zscore = heatmap.zscore)
