@@ -1376,7 +1376,7 @@ rnb.diffmeth.create.heatmap.plot <- function(report, figName, mm, grp1.size, grp
 			row_names_side = "left",
 			row_names_gp = grid::gpar(fontsize = 8),
 			show_column_names = show.column.names,
-			colum_names_gp = grid::gpar(fontsize = 8),
+			column_names_gp = grid::gpar(fontsize = 8),
 			column_split = col_split,
 			na_col = "grey90"
 		)
