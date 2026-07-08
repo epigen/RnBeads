@@ -115,7 +115,6 @@ differential.enrichment.lola.dbs	character.vector	no	yes		(${LOLACore})
 differential.report.sites	logical	no	no		TRUE
 differential.report.heatmaps	logical	no	no		FALSE
 differential.heatmap.top.features	integer	no	no	[1,	100
-differential.heatmap.signal	character	no	no	(beta,mvalue,residuals)	beta
 differential.heatmap.zscore	logical	no	no		TRUE
 differential.heatmap.cluster.rows	logical	no	no		TRUE
 differential.heatmap.cluster.columns	logical	no	no		TRUE

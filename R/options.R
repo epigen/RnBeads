@@ -862,10 +862,6 @@ rnb.is.option <- function(txt) {
 #'        regions.}
 #'   \item{\bold{\code{differential.heatmap.top.features}}\code{ = 100}}{
 #'        Number of top-ranked loci to display in each differential methylation heatmap.}
-#'   \item{\bold{\code{differential.heatmap.signal}}\code{ = "beta"}}{
-#'        Signal matrix used for differential heatmaps. Supported values are \code{"beta"}, \code{"mvalue"},
-#'        and \code{"residuals"}. Residuals require residual output to be available in the differential methylation
-#'        object.}
 #'   \item{\bold{\code{differential.heatmap.zscore}}\code{ = TRUE}}{
 #'        Flag indicating whether row-wise z-score transformation should be applied before plotting heatmaps.}
 #'   \item{\bold{\code{differential.heatmap.cluster.rows}}\code{ = TRUE}}{
