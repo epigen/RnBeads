@@ -119,7 +119,7 @@ differential.heatmap.zscore	logical	no	no		TRUE
 differential.heatmap.cluster.rows	logical	no	no		TRUE
 differential.heatmap.cluster.columns	logical	no	no		TRUE
 differential.heatmap.show.row.names	logical	no	no		FALSE
-differential.heatmap.show.column.names	logical	no	no		TRUE
+differential.heatmap.show.column.names	logical	no	no		FALSE
 export.to.bed	logical	no	no		FALSE
 export.to.trackhub	character.vector	no	yes	(bigBed,bigWig)	()
 export.to.csv	logical	no	no		FALSE
