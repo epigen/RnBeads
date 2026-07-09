@@ -536,10 +536,16 @@ computeDiffTab.extended.site <- function(
 ) {
 	# require(matrixStats)
 	tt.basic <- computeDiffTab.default.site(
-		X,inds.g1=inds.g1,inds.g2=inds.g2,
-		diff.method=diff.method,variability.method=variability.method,
-		paired=paired,adjustment.table=adjustment.table,eps=eps,
-		imputed=imputed,return.residuals=return.residuals
+	  X,
+	  inds.g1 = inds.g1,
+	  inds.g2 = inds.g2,
+	  diff.method = diff.method,
+	  variability.method = variability.method,
+	  paired = paired,
+	  adjustment.table = adjustment.table,
+	  eps = eps,
+	  imputed = imputed,
+	  return.residuals = return.residuals
 	)
 	tab.g1 <- X[,inds.g1]
 	tab.g2 <- X[,inds.g2]
@@ -1624,9 +1630,9 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(
 			  grp2.name,
 			  cluster.rows = cluster.rows,
 			  cluster.columns = cluster.columns,
-			show.row.names = show.row.names,
-			show.column.names = show.column.names,
-			legend.title = legend.title
+			  show.row.names = show.row.names,
+			  show.column.names = show.column.names,
+			  legend.title = legend.title
 			)
 		)
 	}
