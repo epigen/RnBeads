@@ -857,6 +857,9 @@ rnb.is.option <- function(txt) {
 #'        Flag indicating whether a section corresponding to differential site methylation should be added to the report.
 #'        Has no effect on the actual analysis, just the report. To disable differential site methylation analysis entirely
 #'        use the \code{analyze.sites} option.}
+#'   \item{\bold{\code{differential.residuals.output}}\code{ = NULL}}{
+#'        character controls whether limma residual matrices are retained and/or exported. Allowed values: \code{NULL} (default),
+#'        \code{csv}, \code{object}. If \code{object} selected, residual matrices are stroed in the diffMeth object. \code{csv} would also export residuals as csv files.
 #'   \item{\bold{\code{differential.report.heatmaps}}\code{ = FALSE}}{
 #'        Flag indicating whether differential methylation heatmaps should be added to report sections for sites and
 #'        regions.}

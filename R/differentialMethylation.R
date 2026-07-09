@@ -315,7 +315,7 @@ limmaP <- function(X,inds.g1,inds.g2=-inds.g1,adjustment.table=NULL,fun.conversi
 #' @param imputed flag indicating if methylation matrix was already imputed
 #' @param return.residuals Logical, if \code{TRUE}, the (M-value) residuals of the fitted model with
 #'        				   covariate contributions removed are returned in addition to p-values. Default: \code{FALSE}.
-#' 						   It can be set to \code{TRUE} by setting the option \code{differential.residuals.output} to "csv" or "ff" or "both".
+#' 						   It can be set to \code{TRUE} by setting the option \code{differential.residuals.output} to "csv" or "object".
 #' @return If \code{return.residuals==FALSE} a numeric vector of p-values resulting from limma's differential analysis.
 #' @return a dataframe containing the following variables:
 #' \item{mean.g1}{Mean of group 1}
@@ -755,7 +755,7 @@ computeDiffTab.default.region <- function(dmtp,regions2sites,includeCovg=FALSE){
 	col.vec <- c(col.id.g1, col.id.g2, col.id.diff, col.id.quot, col.id.p, col.id.num.na.g1, col.id.num.na.g2)
 	# include residual mean columns if residual output requested
 	res.opt <- rnb.getOption("differential.residuals.output")
-	if (!is.null(res.opt) && !identical(res.opt, "none")){
+	if (!is.null(res.opt)){
 		col.id.resid.g1 <- "resid.mean.g1"
 		col.id.resid.g2 <- "resid.mean.g2"
 		col.id.resid.diff <- "resid.mean.diff"
@@ -2250,7 +2250,7 @@ get.diffmeth.tab.annot.cols <- function(target, includeCovg, hasVariability, cov
 				"num.na.g1","num.na.g2")
 		# include residual mean columns if residual output requested
 		res.opt <- rnb.getOption("differential.residuals.output")
-		if (!is.null(res.opt) && !identical(res.opt, "none")){
+		if (!is.null(res.opt)){
 			res <- c(res, "resid.mean.g1", "resid.mean.g2", "resid.mean.diff")
 		}
 		if (includeCovg){
@@ -2343,9 +2343,14 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 						  c) a statistical test (limma or t-test depending on the settings) assessing whether the methylation values in the two groups originate from distinct distributions.
 						  Additionally each site was assigned a rank based on each of these three criteria. A combined rank is computed as the maximum (i.e. worst)
 						  rank among the three ranks. The smaller the combined rank for a site, the more evidence for differential methylation it exhibits.
-						  This section includes scatterplots of the site group means, pairwise comparison differential heatmaps, and volcano plots
+						  This section includes scatterplots of the site group means as well as volcano plots
 						  of each pairwise comparison colored according to the combined ranks or p-values of a given site.")
 	report <- rnb.add.section(report, 'Site Level', sectionText)
+	heatmap.txt <- c("In addition, pairwise comparison heatmaps of the top differentially methylated sites are shown.")
+	.add.heatmap <-rnb.getOption("differential.report.heatmaps")
+	if (.add.heatmap){
+		rnb.add.paragraph(report, heatmap.txt)
+	}
 
 	logger.start("Selection of rank cutoffs")
 	rank.cuts.auto <- lapply(1:length(get.comparisons(diffmeth)),FUN=function(i){
@@ -2418,6 +2423,46 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		'Additionally, the colored points represent differentially methylated sites (according to the selected criterion). 
 		If the selected criterion is <code>rankGradient</code>: median combined ranks accross hexagonal bins are shown
 		as a gradient according to the color legend.')
+	report <- rnb.add.figure(report, description, addedPlots, setting.names)
+	logger.completed()
+	
+	#volcano plots
+	logger.start("Adding volcano plots")
+	rnb.cleanMem()
+	addedPlots <- list()
+	if(parallel.isEnabled()){
+		addedPlots <- foreach(i=1:length(get.comparisons(diffmeth)),.combine="c") %dopar% {
+			cc <- names(get.comparisons(diffmeth))[i]
+			ccc <- get.comparisons(diffmeth)[cc]
+			dmt <- get.table(diffmeth,ccc,"sites",return.data.frame=TRUE)
+			ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
+			grp.names <- get.comparison.grouplabels(diffmeth)[ccc,]
+			res <- addReportPlots.diffMeth.bin.site.volcano(report,dmt,ccn,
+					grp1.name=grp.names[1],grp2.name=grp.names[2])
+			rnb.cleanMem()
+			res
+		}
+	} else {
+		for (i in 1:length(get.comparisons(diffmeth))){
+			cc <- names(get.comparisons(diffmeth))[i]
+			ccc <- get.comparisons(diffmeth)[cc]
+			dmt <- get.table(diffmeth,ccc,"sites",return.data.frame=TRUE)
+			ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
+			grp.names <- get.comparison.grouplabels(diffmeth)[ccc,]
+			addedPlots <- c(addedPlots,addReportPlots.diffMeth.bin.site.volcano(report,dmt,ccn,
+							grp1.name=grp.names[1],grp2.name=grp.names[2]))
+			rnb.cleanMem()
+		}
+	}
+
+	diff.measure <- c("diff"="Difference","quot"="Quotient")
+	signif.measure <- c("pVal"="p-value","pValAdj"="adjusted p-value","quotSig"="Quotient (only meaningful if 'Difference' is selected above)")
+	setting.names <- list(
+		'comparison' = comps,
+		'difference metric' = diff.measure,
+		'significance metric' = signif.measure)
+	description <- 'Volcano plot for differential methylation quantified by various metrics. Color scale according to
+					combined ranking.'
 	report <- rnb.add.figure(report, description, addedPlots, setting.names)
 	logger.completed()
 
@@ -2504,46 +2549,7 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		}
 		logger.completed()
 	}
-	
-	#volcano plots
-	logger.start("Adding volcano plots")
-	rnb.cleanMem()
-	addedPlots <- list()
-	if(parallel.isEnabled()){
-		addedPlots <- foreach(i=1:length(get.comparisons(diffmeth)),.combine="c") %dopar% {
-			cc <- names(get.comparisons(diffmeth))[i]
-			ccc <- get.comparisons(diffmeth)[cc]
-			dmt <- get.table(diffmeth,ccc,"sites",return.data.frame=TRUE)
-			ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
-			grp.names <- get.comparison.grouplabels(diffmeth)[ccc,]
-			res <- addReportPlots.diffMeth.bin.site.volcano(report,dmt,ccn,
-					grp1.name=grp.names[1],grp2.name=grp.names[2])
-			rnb.cleanMem()
-			res
-		}
-	} else {
-		for (i in 1:length(get.comparisons(diffmeth))){
-			cc <- names(get.comparisons(diffmeth))[i]
-			ccc <- get.comparisons(diffmeth)[cc]
-			dmt <- get.table(diffmeth,ccc,"sites",return.data.frame=TRUE)
-			ccn <- ifelse(is.valid.fname(cc),cc,paste("cmp",i,sep=""))
-			grp.names <- get.comparison.grouplabels(diffmeth)[ccc,]
-			addedPlots <- c(addedPlots,addReportPlots.diffMeth.bin.site.volcano(report,dmt,ccn,
-							grp1.name=grp.names[1],grp2.name=grp.names[2]))
-			rnb.cleanMem()
-		}
-	}
 
-	diff.measure <- c("diff"="Difference","quot"="Quotient")
-	signif.measure <- c("pVal"="p-value","pValAdj"="adjusted p-value","quotSig"="Quotient (only meaningful if 'Difference' is selected above)")
-	setting.names <- list(
-		'comparison' = comps,
-		'difference metric' = diff.measure,
-		'significance metric' = signif.measure)
-	description <- 'Volcano plot for differential methylation quantified by various metrics. Color scale according to
-					combined ranking.'
-	report <- rnb.add.figure(report, description, addedPlots, setting.names)
-	logger.completed()
 	logger.start("Adding tables")
 	includeCovg <- hasCovg(rnbSet)
 	hasVariability <- rnb.getOption("differential.variability")
@@ -2578,7 +2584,7 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 		fname <- paste("diffMethTable_site_",ccn,".csv",sep="")
 		fname <- rnb.write.table(dmt,fname,fpath=rnb.get.directory(report, "data", absolute = TRUE),format="csv",gz=gzTable,row.names = FALSE,quote=FALSE)
 		res.opt <- rnb.getOption("differential.residuals.output")
-		if (res.opt %in% c("csv","both")){
+		if ("csv" %in% res.opt){
 			resid_mat <- NULL
 			cmp_idx <- which(diffmeth@comparisons == cc)
 			if (length(cmp_idx) == 1) {
@@ -2723,6 +2729,11 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 		"colored according to the combined rank of a given region.")
 	)
 	report <- rnb.add.section(report, "Region Level", sectionText)
+	heatmap.txt <- c("In addition, pairwise comparison heatmaps of the top differentially methylated regions are shown.")
+	.add.heatmap <-rnb.getOption("differential.report.heatmaps")
+	if (.add.heatmap){
+		rnb.add.paragraph(report, heatmap.txt)
+	}
 
 	comps <- get.comparisons(diffmeth)
 	reg.types <- get.region.types(diffmeth)
@@ -2991,7 +3002,7 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 			fname <- paste("diffMethTable_region_",ccn,"_",rrn,".csv",sep="")
 			fname <- rnb.write.table(dmt,fname,fpath=rnb.get.directory(report, "data", absolute = TRUE),format="csv",gz=gzTable,row.names=FALSE,quote=FALSE)
 			res.opt <- rnb.getOption("differential.residuals.output")
-			if (res.opt %in% c("csv","both")){
+			if ("csv" %in% res.opt){
 				resid_mat <- NULL
 				cmp_idx <- which(diffmeth@comparisons == cc)
 				if (length(cmp_idx) == 1) {
@@ -3783,7 +3794,7 @@ rnb.execute.computeDiffMeth <- function(x,pheno.cols,region.types=rnb.region.typ
 
 	# determine whether residuals should be computed based on rnb option
 	.resid.opt <- rnb.getOption("differential.residuals.output")
-	.request.resid <- (!is.null(.resid.opt) && identical(.resid.opt, "none") == FALSE)
+	.request.resid <- (!is.null(.resid.opt))
 
 	if (is.element("diff.method",names(dot.args))){
 		diff.method <- dot.args[["diff.method"]]

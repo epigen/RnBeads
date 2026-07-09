@@ -551,7 +551,6 @@ setMethod("addDiffMethTable", signature(object="RnBDiffMeth"),
 			for (rr in object@region.types){
 				object@regions[[rr]] <- c(object@regions[[rr]],list(NULL))
 				names(object@regions[[rr]])[cmp.i] <- comparison
-				# append placeholder for residuals per region
 				object@residRegions[[rr]] <- c(object@residRegions[[rr]],list(NULL))
 				names(object@residRegions[[rr]])[cmp.i] <- comparison
 			}
@@ -572,9 +571,7 @@ setMethod("addDiffMethTable", signature(object="RnBDiffMeth"),
 
 			# if a residual matrix attribute is present on the data.frame, store it (ff if dumped)
 			resid_mat <- attr(dmt, "resid_mat")
-			if (!is.null(resid_mat) && !is.null(res.opt) && !identical(res.opt, "none")){
-				# store as ff/in-memory when requested
-				if (res.opt %in% c("ff","both")){
+			if (!is.null(res.opt) && !is.null(resid_mat)){
 					if (disk.dump && !is.null(disk.path)){
 						fileN <- paste0(paste("residuals_site",cmp.fname,sep="_"),".ff")
 						res_ff <- ff(resid_mat, dim=dim(resid_mat), dimnames=dimnames(resid_mat), filename=file.path(disk.path,fileN))
@@ -583,7 +580,6 @@ setMethod("addDiffMethTable", signature(object="RnBDiffMeth"),
 						# fallback to in-memory storage if ff requested but no disk dump
 						object@residSites[[comparison]] <- resid_mat
 					}
-				}
 			}
 
 			object@includesSites <- TRUE
@@ -597,7 +593,6 @@ setMethod("addDiffMethTable", signature(object="RnBDiffMeth"),
 				names(empty.cmp.list.4.regs) <- object@comparisons
 				object@regions <- c(object@regions,list(empty.cmp.list.4.regs))
 				names(object@regions)[length(object@regions)] <- region.type
-				# create placeholder for residuals for this new region type
 				object@residRegions <- c(object@residRegions,list(empty.cmp.list.4.regs))
 				names(object@residRegions)[length(object@residRegions)] <- region.type
 			}
@@ -614,9 +609,7 @@ setMethod("addDiffMethTable", signature(object="RnBDiffMeth"),
 
 				# if a residual matrix attribute is present on the data.frame, store it (ff if dumped)
 				resid_mat <- attr(dmt, "resid_mat")
-				if (!is.null(resid_mat) && !is.null(res.opt) && !identical(res.opt, "none")){
-					# store as ff/in-memory when requested
-					if (res.opt %in% c("ff","both")){
+				if (!is.null(res.opt) && !is.null(resid_mat)){
 						# logger.info("addTable: residual matrix found in the input table. storing it in the RnBDiffMeth object.")
 						if (disk.dump && !is.null(disk.path)){
 							fileN <- paste0(paste("residuals_region",reg.dir.name,cmp.fname,sep="_"),".ff")
@@ -625,7 +618,7 @@ setMethod("addDiffMethTable", signature(object="RnBDiffMeth"),
 						} else {
 							object@residRegions[[region.type]][[comparison]] <- resid_mat
 						}
-					}
+					
 				}
 		}
 		
@@ -761,7 +754,7 @@ setMethod("reload", signature(object="RnBDiffMeth"),
 			} else {
 				object@sites[cci] <- list(NULL)
 			}
-			# relink residuals for sites if present in archive
+			# relink residuals for sites if present
 			resid.site.name <- paste("residuals.sites",ccn,sep=".")
 			if (exists(resid.site.name,ee)){
 				object@residSites[[cci]] <- get(resid.site.name,ee)
@@ -779,7 +772,6 @@ setMethod("reload", signature(object="RnBDiffMeth"),
 						logger.warning(c("Could not relink:",rr,"--",cc))
 						object@regions[[rri]][cci] <- list(NULL)
 					}
-						# relink residuals for regions if present
 						resid.reg.name <- paste("residuals.regions",rrn,ccn,sep=".")
 						if (exists(resid.reg.name,ee)){
 							object@residRegions[[rri]][[cci]] <- get(resid.reg.name,ee)
