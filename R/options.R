@@ -859,7 +859,8 @@ rnb.is.option <- function(txt) {
 #'        use the \code{analyze.sites} option.}
 #'   \item{\bold{\code{differential.residuals.output}}\code{ = NULL}}{
 #'        character controls whether limma residual matrices are retained and/or exported. Allowed values: \code{NULL} (default),
-#'        \code{csv}, \code{object}. If \code{object} selected, residual matrices are stroed in the diffMeth object. \code{csv} would also export residuals as csv files.
+#'        \code{csv}, \code{object}. If \code{object} selected, residual matrices are stored in the diffMeth object. 
+#'        \code{csv} would also export residuals as csv files.}
 #'   \item{\bold{\code{differential.report.heatmaps}}\code{ = FALSE}}{
 #'        Flag indicating whether differential methylation heatmaps should be added to report sections for sites and
 #'        regions.}
