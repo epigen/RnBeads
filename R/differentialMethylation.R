@@ -3964,9 +3964,12 @@ rnb.execute.computeDiffMeth <- function(
 					...
 				)
 			} else {
-				dmr <- computeDiffMeth.bin.region(x,dm,
-					cmp.info.cur$group.inds$group1,cmp.info.cur$group.inds$group2,
-					region.types=cmp.info.cur$region.types,
+				dmr <- computeDiffMeth.bin.region(
+					x,
+					dm,
+					cmp.info.cur$group.inds$group1,
+					cmp.info.cur$group.inds$group2,
+					region.types = cmp.info.cur$region.types,
 					return.residuals = .request.resid
 				)	
 			}		
