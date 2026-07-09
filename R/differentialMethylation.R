@@ -3935,9 +3935,13 @@ rnb.execute.computeDiffMeth <- function(
 			dm <- NULL
 		} else {
 			dm <- computeDiffMeth.bin.site(
-				meth(x),inds.g1=cmp.info.cur$group.inds$group1,inds.g2=cmp.info.cur$group.inds$group2,
-				covg=covg(x),covg.thres=covg.thres,
-				paired=cmp.info.cur$paired, adjustment.table=cmp.info.cur$adjustment.table,
+				meth(x),
+				inds.g1 = cmp.info.cur$group.inds$group1,
+				inds.g2 = cmp.info.cur$group.inds$group2,
+				covg = covg(x),
+				covg.thres = covg.thres,
+				paired = cmp.info.cur$paired,
+				adjustment.table = cmp.info.cur$adjustment.table,
 				imputed=isImputed(x),
 				return.residuals = .request.resid,
 				...
@@ -3947,11 +3951,15 @@ rnb.execute.computeDiffMeth <- function(
 		rnb.cleanMem()
 		if (length(cmp.info.cur$region.types)>0){
 			if (skip.sites){
-				dmr <- computeDiffMeth.bin.region(x,NULL,
-					cmp.info.cur$group.inds$group1,cmp.info.cur$group.inds$group2,
-					region.types=cmp.info.cur$region.types,
-					covg.thres=covg.thres,
-					paired=cmp.info.cur$paired, adjustment.table=cmp.info.cur$adjustment.table,
+				dmr <- computeDiffMeth.bin.region(
+					x,
+					NULL,
+					cmp.info.cur$group.inds$group1,
+					cmp.info.cur$group.inds$group2,
+					region.types = cmp.info.cur$region.types,
+					covg.thres = covg.thres,
+					paired = cmp.info.cur$paired,
+					adjustment.table = cmp.info.cur$adjustment.table,
 					return.residuals = .request.resid,
 					...
 				)
