@@ -1417,7 +1417,13 @@ rnb.diffmeth.create.heatmap.plot <- function(
 			c(rep(grp1.name, grp1.size), rep(grp2.name, grp2.size)),
 			levels = c(grp1.name, grp2.name)
 		)
-		hm.cols <- colorRampPalette(rnb.getOption("colors.meth"))(100)
+		max.val <- max(mm, na.rm = TRUE)
+		min.val <- min(mm, na.rm = TRUE)
+		# hm.cols <- colorRampPalette(rnb.getOption("colors.meth"))(100)
+		hm.cols <- circlize::colorRamp2(
+			breaks = c(min.val, 0, max.val),
+			colors = rnb.getOption("colors.meth")
+		)
 		grid::grid.newpage()
 		hm <- ComplexHeatmap::Heatmap(
 			mm,
