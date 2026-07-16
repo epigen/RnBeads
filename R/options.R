@@ -866,8 +866,6 @@ rnb.is.option <- function(txt) {
 #'        regions.}
 #'   \item{\bold{\code{differential.heatmap.top.features}}\code{ = 100}}{
 #'        Number of top-ranked loci to display in each differential methylation heatmap.}
-#'   \item{\bold{\code{differential.heatmap.zscore}}\code{ = TRUE}}{
-#'        Flag indicating whether row-wise z-score transformation should be applied before plotting heatmaps.}
 #'   \item{\bold{\code{differential.heatmap.cluster.rows}}\code{ = TRUE}}{
 #'        Flag indicating whether rows (loci) should be clustered in differential methylation heatmaps.}
 #'   \item{\bold{\code{differential.heatmap.cluster.columns}}\code{ = TRUE}}{

@@ -113,7 +113,6 @@ enforce.destroy.disk.dumps	Flag indicating whether disked dumped big matrices (s
 differential.residuals.output	character controls whether limma residual matrices are retained and/or exported. Allowed values: `NULL` (default), `csv`, `object`. If `object` selected, residual matrices are stored in the diffMeth object. `csv` would also export residuals as csv files.	NULL
 differential.report.heatmaps	Flag indicating whether a section corresponding to differential methylation heatmaps should be added to the report.	TRUE
 differential.heatmap.top.features	Integer number of top-ranked loci to display in each differential methylation heatmap	100
-differential.heatmap.zscore	Flag indicating whether row-wise z-score transformation should be applied before plotting heatmaps.	TRUE
 differential.heatmap.cluster.rows	 Flag indicating whether rows (loci) should be clustered in differential methylation heatmaps.	TRUE
 differential.heatmap.cluster.columns	Flag indicating whether columns (samples) should be clustered in differential methylation heatmaps.	TRUE
 differential.heatmap.show.row.names	Flag indicating whether row names should be shown in differential methylation heatmaps.	FALSE
