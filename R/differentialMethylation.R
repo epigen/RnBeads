@@ -2942,7 +2942,7 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 	setting.names <- list(
 		'comparison' = comps,
 		'regions' = reg.types ,
-		'differential methylation measure' = diffMethType,)
+		'differential methylation measure' = diffMethType)
 	description <- 'Scatterplot for differential methylation (regions). If the selected criterion is not <code>rankGradient</code>:
 		The transparency corresponds to point density. The 1% of the points in the sparsest populated plot regions are drawn explicitly.
 		Additionally, the colored points represent differentially methylated regions (according to the selected criterion). 
