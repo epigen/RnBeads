@@ -2638,6 +2638,10 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 				measure.ids <- unique(fname.parts["measure",])
 				signal.ids <- unique(fname.parts["signal",])
 				zscore.ids <- unique(fname.parts["zscore",])
+				# DEBUG MESSAGE
+				logger.info(paste("measure.ids:", paste(measure.ids, collapse = ", ")))
+				logger.info(paste("signal.ids:", paste(signal.ids, collapse = ", ")))
+				logger.info(paste("zscore.ids:", paste(zscore.ids, collapse = ", ")))
 				
 				diffMethType <- c(
 					"fdrAdjPval" = paste("FDR adjusted p-value <", P.VAL.CUT),
@@ -2938,7 +2942,7 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 	setting.names <- list(
 		'comparison' = comps,
 		'regions' = reg.types ,
-		'differential methylation measure' = diffMethType)
+		'differential methylation measure' = diffMethType,)
 	description <- 'Scatterplot for differential methylation (regions). If the selected criterion is not <code>rankGradient</code>:
 		The transparency corresponds to point density. The 1% of the points in the sparsest populated plot regions are drawn explicitly.
 		Additionally, the colored points represent differentially methylated regions (according to the selected criterion). 
@@ -3056,15 +3060,17 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 				fname.parts <- sapply(addedPlots, FUN=function(rp){
 					parts <- strsplit(slot(rp, "fname"), "_", fixed = TRUE)[[1]]
 					# parts structure: diffMeth_region_heatmap_cmpName_regName_measure_signal_zscore
-					c(measure=parts[length(parts)-1], signal=parts[length(parts)], zscore=parts[length(parts)])
+					c(measure=parts[length(parts)-2], signal=parts[length(parts)-1], zscore=parts[length(parts)])
 				})
 				measure.ids <- unique(fname.parts["measure",])
 				signal.ids <- unique(fname.parts["signal",])
 				zscore.ids <- unique(fname.parts["zscore",])
+				# DEBUG MESSAGE
+				logger.info(paste("zscore.ids:", paste(zscore.ids, collapse = ", ")))
 				
 				diffMethType <- c(
 					"fdrAdjPval" = paste("FDR adjusted p-value <",P.VAL.CUT),
-					setNames(paste("combined rank among the ",diffRegionRankCut," best ranking regions",sep=""), paste("rc",1:length(diffRegionRankCut),sep="")),
+					setNames(paste("combined rank among the ",diffRegionRankCut," best ranking regions",sep=""), paste("rc",seq_along(diffRegionRankCut),sep="")),
 					"rcAuto" = "automatically selected rank cutoff"
 				)
 				diffMethType <- diffMethType[names(diffMethType) %in% measure.ids]
