@@ -1536,8 +1536,8 @@ addReportPlots.diffMeth.bin.site.heatmap <- function(
 			for (sig in signals){
 				plots.for.measure <- c(plots.for.measure, list(create.plot(selected.mask, measure.id, sig, heatmap.zscore)))
 			}
-		return(plots.for.measure)
 		}
+		return(plots.for.measure)
 	}
 
 	if (is.element("diffmeth.p.adj.fdr", colnames(dmt))){
