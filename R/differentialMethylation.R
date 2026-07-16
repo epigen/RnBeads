@@ -1487,7 +1487,7 @@ addReportPlots.diffMeth.bin.site.heatmap <- function(
 
 	create.plot <- function(selected.mask, measure.id, signal.type, heatmap.zscore) {
 		sel.inds <- rnb.diffmeth.heatmap.select.rows(dmt, selected.mask, max.features)
-		zScore <- ifelse(isTRUE(heatmap.zscore), "z-score", "raw")
+		zScore <- ifelse(isTRUE(heatmap.zscore), "zscore", "raw")
 		figName <- paste("diffMeth_site_heatmap", cmpName, measure.id, signal.type, zScore, sep = "_")
 		if (length(sel.inds) < 1){
 			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
@@ -1602,7 +1602,7 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(
 
 	create.plot <- function(selected.mask, measure.id, signal.type, heatmap.zscore) {
 		sel.inds <- rnb.diffmeth.heatmap.select.rows(dmt, selected.mask, max.features)
-		zScore <- ifelse(isTRUE(heatmap.zscore), "z-score", "raw")
+		zScore <- ifelse(isTRUE(heatmap.zscore), "zscore", "raw")
 		figName <- paste("diffMeth_region_heatmap", cmpName, regName, measure.id, signal.type, zScore, sep = "_")
 		if (length(sel.inds) < 1){
 			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
@@ -2659,7 +2659,7 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 				signal.types <- signal.types[names(signal.types) %in% signal.ids]
 				
 				zscore.types <- c(
-					"z-score" = "Yes",
+					"zscore" = "Yes",
 					"raw" = "No"
 				)
 
@@ -3083,7 +3083,7 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 				signal.types <- signal.types[names(signal.types) %in% signal.ids]
 				
 				zscore.types <- c(
-					"z-score" = "Yes",
+					"zscore" = "Yes",
 					"raw" = "No"
 				)
 				zscore.types <- zscore.types[names(zscore.types) %in% zscore.ids]
