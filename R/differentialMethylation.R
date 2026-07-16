@@ -1419,9 +1419,10 @@ rnb.diffmeth.create.heatmap.plot <- function(
 		)
 		max.val <- max(mm, na.rm = TRUE)
 		min.val <- min(mm, na.rm = TRUE)
+		mid.val <- ifelse(min.val < 0, 0, ave(c(min.val, max.val)))
 		# hm.cols <- colorRampPalette(rnb.getOption("colors.meth"))(100)
 		hm.cols <- circlize::colorRamp2(
-			breaks = c(min.val, 0, max.val),
+			breaks = c(min.val, mid.val, max.val),
 			colors = rnb.getOption("colors.meth")
 		)
 		grid::grid.newpage()
