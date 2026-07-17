@@ -1419,9 +1419,9 @@ rnb.diffmeth.create.heatmap.plot <- function(
 		)
 		max.val <- max(mm, na.rm = TRUE)
 		min.val <- min(mm, na.rm = TRUE)
-		# hm.cols <- colorRampPalette(rnb.getOption("colors.meth"))(100)
+		mid.val <- ifelse(min.val < 0, 0, ave(c(min.val, max.val)))
 		hm.cols <- circlize::colorRamp2(
-			breaks = c(min.val, 0, max.val),
+			breaks = c(min.val, mid.val, max.val),
 			colors = rnb.getOption("colors.meth")
 		)
 		grid::grid.newpage()
@@ -1466,7 +1466,6 @@ addReportPlots.diffMeth.bin.site.heatmap <- function(
   rerank = TRUE,
   thres.p.val = 0.05,
   max.features = rnb.getOption("differential.heatmap.top.features"),
-  heatmap.zscore = rnb.getOption("differential.heatmap.zscore"),
   cluster.rows = rnb.getOption("differential.heatmap.cluster.rows"),
   cluster.columns = rnb.getOption("differential.heatmap.cluster.columns"),
   show.row.names = rnb.getOption("differential.heatmap.show.row.names"),
@@ -1486,9 +1485,10 @@ addReportPlots.diffMeth.bin.site.heatmap <- function(
 	
 	signals <- c("beta", "mvalue", "residuals")
 
-	create.plot <- function(selected.mask, measure.id, signal.type) {
+	create.plot <- function(selected.mask, measure.id, signal.type, heatmap.zscore) {
 		sel.inds <- rnb.diffmeth.heatmap.select.rows(dmt, selected.mask, max.features)
-		figName <- paste("diffMeth_site_heatmap", cmpName, measure.id, signal.type, sep = "_")
+		zScore <- ifelse(isTRUE(heatmap.zscore), "zscore", "raw")
+		figName <- paste("diffMeth_site_heatmap", cmpName, measure.id, signal.type, zScore, sep = "_")
 		if (length(sel.inds) < 1){
 			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
 			print(rnb.message.plot("No loci matched this criterion"))
@@ -1511,7 +1511,7 @@ addReportPlots.diffMeth.bin.site.heatmap <- function(
 			return(report.plot)
 		}
 		mm <- rnb.diffmeth.prepare.heatmap.signal(mm, do.zscore = heatmap.zscore)
-		legend.title <- ifelse(isTRUE(heatmap.zscore), paste0("z(",signal.type,")"), signal.type)
+		legend.title <- ifelse(isTRUE(heatmap.zscore), paste0(signal.type," (z-score)"), signal.type)
 		return(
 			rnb.diffmeth.create.heatmap.plot(
 			  report,
@@ -1532,8 +1532,10 @@ addReportPlots.diffMeth.bin.site.heatmap <- function(
 
 	create.plot.all.signals <- function(selected.mask, measure.id){
 		plots.for.measure <- list()
-		for (sig in signals){
-			plots.for.measure <- c(plots.for.measure, list(create.plot(selected.mask, measure.id, sig)))
+		for (heatmap.zscore in c(FALSE, TRUE)) {
+			for (sig in signals){
+				plots.for.measure <- c(plots.for.measure, list(create.plot(selected.mask, measure.id, sig, heatmap.zscore)))
+			}
 		}
 		return(plots.for.measure)
 	}
@@ -1579,7 +1581,6 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(
   grp1.name = "Group1",
   grp2.name = "Group2",rerank = TRUE,
   max.features = rnb.getOption("differential.heatmap.top.features"),
-  heatmap.zscore = rnb.getOption("differential.heatmap.zscore"),
   cluster.rows = rnb.getOption("differential.heatmap.cluster.rows"),
   cluster.columns = rnb.getOption("differential.heatmap.cluster.columns"),
   show.row.names = rnb.getOption("differential.heatmap.show.row.names"),
@@ -1599,9 +1600,10 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(
 	
 	signals <- c("beta", "mvalue", "residuals")
 
-	create.plot <- function(selected.mask, measure.id, signal.type){
+	create.plot <- function(selected.mask, measure.id, signal.type, heatmap.zscore) {
 		sel.inds <- rnb.diffmeth.heatmap.select.rows(dmt, selected.mask, max.features)
-		figName <- paste("diffMeth_region_heatmap", cmpName, regName, measure.id, signal.type, sep = "_")
+		zScore <- ifelse(isTRUE(heatmap.zscore), "zscore", "raw")
+		figName <- paste("diffMeth_region_heatmap", cmpName, regName, measure.id, signal.type, zScore, sep = "_")
 		if (length(sel.inds) < 1){
 			report.plot <- createReportPlot(figName, report, width = 8, height = 8, create.pdf = FALSE, high.png = 200)
 			print(rnb.message.plot("No loci matched this criterion"))
@@ -1624,7 +1626,7 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(
 			return(report.plot)
 		}
 		mm <- rnb.diffmeth.prepare.heatmap.signal(mm, do.zscore = heatmap.zscore)
-		legend.title <- ifelse(isTRUE(heatmap.zscore), paste0("z(",signal.type,")"), signal.type)
+		legend.title <- ifelse(isTRUE(heatmap.zscore), paste0(signal.type, " (z-score))"), signal.type)
 		return(
 			rnb.diffmeth.create.heatmap.plot(
 			  report,
@@ -1645,8 +1647,10 @@ addReportPlots.diffMeth.bin.region.heatmap <- function(
 
 	create.plot.all.signals <- function(selected.mask, measure.id){
 		plots.for.measure <- list()
-		for (sig in signals){
-			plots.for.measure <- c(plots.for.measure, list(create.plot(selected.mask, measure.id, sig)))
+		for (heatmap.zscore in c(FALSE, TRUE)) {
+			for (sig in signals){
+				plots.for.measure <- c(plots.for.measure, list(create.plot(selected.mask, measure.id, sig, heatmap.zscore)))
+			}
 		}
 		return(plots.for.measure)
 	}
@@ -2628,11 +2632,16 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 				# Extract measure and signal type from filenames
 				fname.parts <- sapply(addedPlots, FUN=function(rp){
 					parts <- strsplit(slot(rp, "fname"), "_", fixed = TRUE)[[1]]
-					# parts structure: diffMeth_site_heatmap_cmpName_measure_signal
-					c(measure=parts[length(parts)-1], signal=parts[length(parts)])
+					# parts structure: diffMeth_site_heatmap_cmpName_measure_signal_zscore
+					c(measure=parts[length(parts)-2], signal=parts[length(parts)-1], zscore=parts[length(parts)])
 				})
 				measure.ids <- unique(fname.parts["measure",])
 				signal.ids <- unique(fname.parts["signal",])
+				zscore.ids <- unique(fname.parts["zscore",])
+				# DEBUG MESSAGE
+				logger.info(paste("measure.ids:", paste(measure.ids, collapse = ", ")))
+				logger.info(paste("signal.ids:", paste(signal.ids, collapse = ", ")))
+				logger.info(paste("zscore.ids:", paste(zscore.ids, collapse = ", ")))
 				
 				diffMethType <- c(
 					"fdrAdjPval" = paste("FDR adjusted p-value <", P.VAL.CUT),
@@ -2649,14 +2658,23 @@ rnb.section.diffMeth.site <- function(rnbSet,diffmeth,report,gzTable=FALSE){
 				)
 				signal.types <- signal.types[names(signal.types) %in% signal.ids]
 				
+				zscore.types <- c(
+					"zscore" = "Yes",
+					"raw" = "No"
+				)
+
+				zscore.types <- zscore.types[names(zscore.types) %in% zscore.ids]
+
 				setting.names <- list(
 					'comparison' = comps,
 					'differential methylation measure' = diffMethType,
-					'signal type' = signal.types
+					'signal type' = signal.types,
+					'z-score normalization' = zscore.types
 				)
 				description <- c('Heatmap for differential methylation (sites). Rows correspond to selected sites and columns to samples. ',
 					'The number of displayed rows is controlled by option <code>differential.heatmap.top.features</code>. ',
-					'Samples are split by comparison groups. Select the desired signal type using the dropdown menu. ',
+					'The criterion for selecting the sites is controlled by the selected differential methylation measure from <code>diffMeth</code> tables. ',
+					'Samples are split by comparison groups. Select the desired signal type and the row-wise z-score normalization option using the dropdown menus. ',
 					'If residuals are not available, only beta methylation and M-values will be shown.')
 				report <- rnb.add.figure(report, description, addedPlots, setting.names)
 			} else {
@@ -3038,18 +3056,21 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 			}
 
 			if (length(addedPlots) > 0){
-				# Extract measure and signal type from filenames
+				# Extract measure, signal type and zscore transformation from filenames
 				fname.parts <- sapply(addedPlots, FUN=function(rp){
 					parts <- strsplit(slot(rp, "fname"), "_", fixed = TRUE)[[1]]
-					# parts structure: diffMeth_region_heatmap_cmpName_regName_measure_signal
-					c(measure=parts[length(parts)-1], signal=parts[length(parts)])
+					# parts structure: diffMeth_region_heatmap_cmpName_regName_measure_signal_zscore
+					c(measure=parts[length(parts)-2], signal=parts[length(parts)-1], zscore=parts[length(parts)])
 				})
 				measure.ids <- unique(fname.parts["measure",])
 				signal.ids <- unique(fname.parts["signal",])
+				zscore.ids <- unique(fname.parts["zscore",])
+				# DEBUG MESSAGE
+				logger.info(paste("zscore.ids:", paste(zscore.ids, collapse = ", ")))
 				
 				diffMethType <- c(
 					"fdrAdjPval" = paste("FDR adjusted p-value <",P.VAL.CUT),
-					setNames(paste("combined rank among the ",diffRegionRankCut," best ranking regions",sep=""), paste("rc",1:length(diffRegionRankCut),sep="")),
+					setNames(paste("combined rank among the ",diffRegionRankCut," best ranking regions",sep=""), paste("rc",seq_along(diffRegionRankCut),sep="")),
 					"rcAuto" = "automatically selected rank cutoff"
 				)
 				diffMethType <- diffMethType[names(diffMethType) %in% measure.ids]
@@ -3061,15 +3082,23 @@ rnb.section.diffMeth.region <- function(rnbSet,diffmeth,report,dm.go.enrich=NULL
 				)
 				signal.types <- signal.types[names(signal.types) %in% signal.ids]
 				
+				zscore.types <- c(
+					"zscore" = "Yes",
+					"raw" = "No"
+				)
+				zscore.types <- zscore.types[names(zscore.types) %in% zscore.ids]
+
 				setting.names <- list(
 					'comparison' = comps,
 					'regions' = reg.types,
 					'differential methylation measure' = diffMethType,
-					'signal type' = signal.types
+					'signal type' = signal.types,
+					'z-score normalization' = zscore.types
 				)
 				description <- c('Heatmap for differential methylation (regions). Rows correspond to selected regions and columns to samples. ',
 					'The number of displayed rows is controlled by option <code>differential.heatmap.top.features</code>. ',
-					'Samples are split by comparison groups. Select the desired signal type using the dropdown menu. ',
+					'The criterion for selecting the sites is controlled by the selected differential methylation measure from <code>diffMeth</code> tables. ',
+					'Samples are split by comparison groups. Select the desired signal type and the row-wise z-score normalization option using the dropdown menus. ',
 					'If residuals are not available, only beta methylation and M-values will be shown.')
 				report <- rnb.add.figure(report, description, addedPlots, setting.names)
 			} else {
