@@ -160,14 +160,14 @@ setMethod("destroy", signature(object="RnBDiffMeth"),
 	function(object){
 		n.comps <- length(object@comparisons)
 		n.region.types <- length(object@region.types)
-		if (object@disk.dump){			
+		if (object@disk.dump){
 			logger.start("Deleting RnBDiffMeth disk dump files from disk")
 			for (cci in 1:n.comps) {
 				cc <- object@comparisons[cci]
 				if (!is.null(object@sites[[cci]])){
 					delete(object@sites[[cci]])
 				}
-				if (!is.null(object@residSites[[cci]])){
+				if (length(object@residSites) >= cci && !is.null(object@residSites[[cci]])) {
 					delete(object@residSites[[cci]])
 				}
 				if (n.region.types > 0){
@@ -176,8 +176,13 @@ setMethod("destroy", signature(object="RnBDiffMeth"),
 						if (!is.null(object@regions[[rri]][[cci]])){
 							delete(object@regions[[rri]][[cci]])
 						}
-						if (!is.null(object@residRegions[[rri]][[cci]])){
-							delete(object@residRegions[[rri]][[cci]])
+						if (length(object@residRegions) >= rri) {
+						  resid_target <- object@residRegions[[rri]]
+						  if (length(resid_target) >= cci
+							&& !is.null(resid_target[[cci]])
+						  ) {
+							 delete(resid_target[[cci]])
+						  }
 						}
 					}
 				}
