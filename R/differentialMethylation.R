@@ -2409,7 +2409,7 @@ get.diffmeth.tab.annot.colnames.pretty <- function(target, name.g1, name.g2, inc
 				paste("num.na",name.g1,sep="."),paste("num.na",name.g2,sep="."))
 		# include pretty names for residual means when residual output is requested
 		res.opt <- rnb.getOption("differential.residuals.output")
-		if (!is.null(res.opt) && !identical(res.opt, "none")){
+		if (!is.null(res.opt)){
 			res <- c(res, paste("resid.mean",name.g1,sep="."), paste("resid.mean",name.g2,sep="."), "resid.mean.diff")
 		}
 		if (includeCovg){
