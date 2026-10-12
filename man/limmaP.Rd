@@ -10,7 +10,8 @@ limmaP(
   inds.g2 = -inds.g1,
   adjustment.table = NULL,
   fun.conversion = rnb.beta2mval,
-  paired = FALSE
+  paired = FALSE,
+  return.residuals = FALSE
 )
 }
 \arguments{
@@ -27,13 +28,22 @@ for infinity values. See \code{\link{rnb.beta2mval}} for details.}
 
 \item{paired}{should a paired analysis model be used. If so, the first index in \code{inds.g1} must correspond to the first
 index in  \code{inds.g2} and so on.}
+
+\item{return.residuals}{Logical, if \code{TRUE}, the (M-value) residuals of the fitted model with
+covariate contributions removed are returned in addition to p-values. Default: \code{FALSE}.
+ It can be set to \code{TRUE} by setting the option \code{differential.residuals.output} to "csv" or "ff" or "both".}
 }
 \value{
-vector of p-values resulting from limma's differential analysis
+If \code{return.residuals==FALSE} a numeric vector of p-values resulting from limma's differential analysis.
+        If \code{TRUE}, a list with elements:
+		   \itemize{
+		   \item{\code{diffmeth.p.val}}{ Numeric vector of p-values.}
+		   \item{\code{residuals}}{ Numeric matrix (features x samples) of M-values with covariate contributions removed.}
+		   }
 }
 \description{
 applies hierarchical modeling anlalogous to differential expression employed in the \code{limma} package and returns
-p-values for differential methylation
+p-values (and optional residuals) for differential methylation
 }
 \note{
 Requires \code{limma} package
@@ -46,6 +56,8 @@ logger.start(fname=NA)
 meth.mat <- meth(rnb.set.example)
 sample.groups <- rnb.sample.groups(rnb.set.example)[[1]]
 p.vals <- limmaP(meth.mat,sample.groups[[1]],sample.groups[[2]])
+res <- limmaP(meth.mat,sample.groups[[1]],sample.groups[[2]], return.residuals=TRUE)
+resid_mat <- res$residuals
 }
 }
 \author{

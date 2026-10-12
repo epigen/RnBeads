@@ -13,8 +13,8 @@ Authors@R: c(
     role = c("aut")),
     person("Fabian", "Mueller", email = "team@rnbeads.org",
     role = c("aut", "cre")))
-Date: 2026-03-16
-Version: 2.29.1
+Date: 2026-10-12
+Version: 2.31.2
 Suggests:
     Category,
     GOstats,
@@ -80,7 +80,8 @@ Depends:
     plyr,
     reshape2
 Imports:
-    IRanges
+    IRanges,
+    ComplexHeatmap
 License: GPL-3
 biocViews: DNAMethylation, MethylationArray, MethylSeq, Epigenetics,
     QualityControl, Preprocessing, BatchEffect, DifferentialMethylation,
@@ -147,4 +148,5 @@ Collate:
     'utilities.R'
     'wbcInference.R'
     'xenomix.R'
+Config/roxygen2/version: 8.1.0
 RoxygenNote: 7.3.3

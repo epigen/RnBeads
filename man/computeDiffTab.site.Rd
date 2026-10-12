@@ -15,7 +15,8 @@ computeDiffTab.default.site(
   paired = FALSE,
   adjustment.table = NULL,
   eps = 0.01,
-  imputed = FALSE
+  imputed = FALSE,
+  return.residuals = FALSE
 )
 
 computeDiffTab.extended.site(
@@ -29,7 +30,8 @@ computeDiffTab.extended.site(
   eps = 0.01,
   covg = NULL,
   covg.thres = rnb.getOption("filtering.coverage.threshold"),
-  imputed = FALSE
+  imputed = FALSE,
+  return.residuals = FALSE
 )
 }
 \arguments{
@@ -58,11 +60,17 @@ order, such that the first element of inds.g1 corresponds to the first element o
 
 \item{imputed}{flag indicating if methylation matrix was already imputed}
 
+\item{return.residuals}{Logical, if \code{TRUE}, the (M-value) residuals of the fitted model with
+covariate contributions removed are returned in addition to p-values. Default: \code{FALSE}.
+ It can be set to \code{TRUE} by setting the option \code{differential.residuals.output} to "csv" or "object".}
+
 \item{covg}{coverage information (should be NULL for disabled or of equal dimensions as X)}
 
 \item{covg.thres}{a coverage threshold}
 }
 \value{
+If \code{return.residuals==FALSE} a numeric vector of p-values resulting from limma's differential analysis.
+
 a dataframe containing the following variables:
 \item{mean.g1}{Mean of group 1}
 \item{mean.g2}{Mean of group 2}
