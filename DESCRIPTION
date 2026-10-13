@@ -81,7 +81,8 @@ Depends:
     reshape2
 Imports:
     IRanges,
-    ComplexHeatmap
+    ComplexHeatmap,
+    circlize
 License: GPL-3
 biocViews: DNAMethylation, MethylationArray, MethylSeq, Epigenetics,
     QualityControl, Preprocessing, BatchEffect, DifferentialMethylation,
