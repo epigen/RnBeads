@@ -13,7 +13,7 @@ Authors@R: c(
     role = c("aut")),
     person("Fabian", "Mueller", email = "team@rnbeads.org",
     role = c("aut", "cre")))
-Date: 2026-07-16
+Date: 2026-10-12
 Version: 2.31.2
 Suggests:
     Category,
@@ -149,4 +149,5 @@ Collate:
     'utilities.R'
     'wbcInference.R'
     'xenomix.R'
+Config/roxygen2/version: 8.1.0
 RoxygenNote: 7.3.3

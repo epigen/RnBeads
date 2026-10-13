@@ -446,6 +446,23 @@ is available (see below). Attempting to get or set the value of a non-existing o
        Flag indicating whether a section corresponding to differential site methylation should be added to the report.
        Has no effect on the actual analysis, just the report. To disable differential site methylation analysis entirely
        use the \code{analyze.sites} option.}
+  \item{\bold{\code{differential.residuals.output}}\code{ = NULL}}{
+       character controls whether limma residual matrices are retained and/or exported. Allowed values: \code{NULL} (default),
+       \code{csv}, \code{object}. If \code{object} selected, residual matrices are stored in the diffMeth object. 
+       \code{csv} would also export residuals as csv files.}
+  \item{\bold{\code{differential.report.heatmaps}}\code{ = FALSE}}{
+       Flag indicating whether differential methylation heatmaps should be added to report sections for sites and
+       regions.}
+  \item{\bold{\code{differential.heatmap.top.features}}\code{ = 100}}{
+       Number of top-ranked loci to display in each differential methylation heatmap.}
+  \item{\bold{\code{differential.heatmap.cluster.rows}}\code{ = TRUE}}{
+       Flag indicating whether rows (loci) should be clustered in differential methylation heatmaps.}
+  \item{\bold{\code{differential.heatmap.cluster.columns}}\code{ = TRUE}}{
+       Flag indicating whether columns (samples) should be clustered in differential methylation heatmaps.}
+  \item{\bold{\code{differential.heatmap.show.row.names}}\code{ = FALSE}}{
+       Flag indicating whether row names should be shown in differential methylation heatmaps.}
+  \item{\bold{\code{differential.heatmap.show.column.names}}\code{ = TRUE}}{
+       Flag indicating whether sample names should be shown in differential methylation heatmaps.}
   \item{\bold{\code{export.to.bed}}\code{ = FALSE}}{
        Flag indicating whether the data should be exported to bed files.}
   \item{\bold{\code{export.to.trackhub}}\code{ = NULL}}{
@@ -482,6 +499,8 @@ is available (see below). Attempting to get or set the value of a non-existing o
        Flag indicating whether disked dumped big matrices (see \code{disk.dump.big.matrices} option) should actively
        be deleted when RnBSets are modified. You should switch it to \code{TRUE} when \code{disk.dump.big.matrices}
 		  is \code{TRUE} and the amount of hard drive space is also limited.}
+\item{\bold{\code{nv.probe.tables}}\code{ = FALSE}}{
+       Flag indicating whether nv-probe tables are generated. If \code{TRUE}, tables are generated.}
 }
 }
 
