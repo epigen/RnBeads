@@ -433,8 +433,12 @@ computeDiffTab.default.site <- function(
 	}
 	# if residuals requested, compute per-group residual means and include them in the table
 	if (exists("resid_mat")){
-		resid.mean.g1 <- rowMeans(resid_mat[,inds.g1,drop=FALSE], na.rm=TRUE)
-		resid.mean.g2 <- rowMeans(resid_mat[,inds.g2,drop=FALSE], na.rm=TRUE)
+		# limmaP returns residuals for the compared samples only, in the order c(inds.g1, inds.g2),
+		# so index by position for mean calculation.
+		n.g1 <- if(is.logical(inds.g1)) sum(inds.g1) else length(inds.g1)
+		n.g2 <- if(is.logical(inds.g2)) sum(inds.g2) else length(inds.g2)
+		resid.mean.g1 <- rowMeans(resid_mat[,seq_len(n.g1), drop=FALSE], na.rm=TRUE)
+		resid.mean.g2 <- rowMeans(resid_mat[,n.g1 + seq_len(n.g2), drop=FALSE], na.rm=TRUE)
 		resid.mean.diff <- resid.mean.g1 - resid.mean.g2
 		tt <- data.frame(mean.g1=mean.g1,mean.g2=mean.g2,mean.diff=mean.diff,mean.quot.log2=mean.quot.log2,diffmeth.p.val=p.vals,
 						 resid.mean.g1=resid.mean.g1,resid.mean.g2=resid.mean.g2,resid.mean.diff=resid.mean.diff)
@@ -492,7 +496,7 @@ computeDiffTab.default.site <- function(
 	  if (!all(p.vals.is.na)){
 	    if (any(p.vals.is.na)){
 	      logger.info(c(sum(p.vals.is.na),"p-values are NA. They are treated as 1 in FDR adjustment"))
-	      p.vals.var[is.na(p.vals.t.na.adj)] <- 1
+	      p.vals.var[p.vals.is.na] <- 1
 	    }
 	    p.vals.var.adj <- p.adjust(p.vals.var, method = "fdr")
 	  } else {
@@ -513,8 +517,10 @@ computeDiffTab.default.site <- function(
 	  }
 	  neg.log10.p <- -log10(p.vals.var)
 	  neg.log10.fdr <- -log10(p.vals.var.adj)
+	  resid.attr <- attr(tt, "resid_mat")
 	  tt <- data.frame(tt,var.g1=var.g1,var.g2=var.g2,var.diff=var.diff,var.log.ratio=var.log.ratio,diffVar.p.val=p.vals.var,diffVar.p.adj.fdr=p.vals.var.adj,log10P=neg.log10.p,
 	                   log10FDR=neg.log10.fdr)
+	  if (!is.null(resid.attr)) attr(tt, "resid_mat") <- resid.attr
 	}
 	return(tt)
 }
@@ -623,7 +629,6 @@ computeDiffTab.extended.site <- function(
 	# preserve residual matrix attribute from basic table if present (cbind drop attributes)
 	if (!is.null(attr(tt.basic, "resid_mat"))) {
 		attr(tt, "resid_mat") <- attr(tt.basic, "resid_mat")
-		# logger.info("extended.site: residuals preserved in the returned table as an attribute")
 	}
 	return(tt)
 }
